@@ -1,0 +1,3 @@
+class Debitcard < Card
+
+end

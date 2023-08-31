@@ -1,0 +1,3 @@
+class Creditcard < Card
+
+end
