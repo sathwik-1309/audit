@@ -1,5 +1,8 @@
+require 'sidekiq/web'
 Rails.application.routes.draw do
+  mount ActionCable.server => '/cable'
   devise_for :users
+  mount Sidekiq::Web => '/sidekiq'
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Defines the root path route ("/")
@@ -8,7 +11,7 @@ Rails.application.routes.draw do
     get '/index' => 'user#index'
     get '/check' => 'user#check'
     post '/create' => 'user#create'
-    put '/:id/update' => 'user#update'
+    put '/update' => 'user#update'
   end
 
   scope :accounts do
@@ -16,6 +19,7 @@ Rails.application.routes.draw do
     post '/create' => 'account#create'
     put '/:id/update' => 'account#update'
     delete '/:id/delete' => 'account#delete'
+    get '/home' => 'account#home'
   end
 
   scope :mops do
@@ -34,9 +38,15 @@ Rails.application.routes.draw do
 
   scope :transactions do
     get '/index' => 'transaction#index'
-    post '/create' => 'transaction#create'
     put '/:id/update' => 'transaction#update'
     delete '/:id/delete' => 'transaction#delete'
+    post '/debit' => 'transaction#debit'
+    post '/credit' => 'transaction#credit'
+    get 'dashboard' => 'transaction#dashboard'
+  end
+
+  scope :sessions do
+    post '/sign_in' => 'session#sign_in'
   end
 
 end

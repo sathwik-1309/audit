@@ -1,0 +1,152 @@
+.dark-button {
+    background-color: #b02031;
+    color: white;
+    border-radius: 0.25rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+.dark-button-submit {
+    background-color: var(--dark-bg2);
+    color: white;
+    border-radius: 0.25rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+.dark-button-submit:hover {
+    background-color: var(--dark-bg3);
+    color: var(--dark-c1);
+}
+.light-button {
+    background-color: #eb1c34;
+    color: white;
+    border-radius: 0.25rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+.light-button-submit {
+    background-color: var(--light-bg2);
+    color: white;
+    border-radius: 0.25rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+.light-button-submit:hover {
+    background-color: var(--light-bg3);
+    color: var(--light-c1);
+}
+.dark-button:hover{
+    background-color: whitesmoke;
+    color: #b02031
+}
+.light-button:hover{
+    background-color: whitesmoke;
+    color: #eb1c34;
+}
+
+/* dark */
+.dark-bg1 {
+    background-color: var(--dark-bg1);
+}
+.dark-bg2 {
+    background-color: var(--dark-bg2);
+}
+.dark-bg3 {
+    background-color: var(--dark-bg3);
+}
+
+.dark-bg1-hover:hover{
+    background-color: var(--dark-bg1);
+}
+.dark-bg2-hover:hover{
+    background-color: var(--dark-bg2);
+}
+.dark-bg3-hover:hover{
+    background-color: var(--dark-bg3);
+}
+
+.dark-c1 {
+    color: var(--dark-c1);
+}
+.dark-c2 {
+    color: var(--dark-c2);
+}
+.dark-c3 {
+    color: var(--dark-c3);
+}
+
+.dark-c1-hover:hover {
+    color: var(--dark-c1);
+}
+.dark-c2-hover:hover {
+    color: var(--dark-c2);
+}
+
+/* light */
+.light-bg1 {
+    background-color: var(--light-bg1);
+}
+.light-bg2 {
+    background-color: var(--light-bg2);
+}
+.light-bg3 {
+    background-color: var(--light-bg3);
+}
+
+.light-bg1-hover:hover{
+    background-color: var(--light-bg1);
+}
+.light-bg2-hover:hover{
+    background-color: var(--light-bg2);
+}
+.light-bg3-hover:hover{
+    background-color: var(--light-bg3);
+}
+
+.light-c1 {
+    color: var(--light-c1);
+}.light-c2 {
+    color: var(--light-c2);
+}
+.light-c3 {
+    color: var(--light-c3);
+}
+
+.light-c1-hover:hover {
+    color: var(--light-c1);
+}
+.light-c2-hover:hover {
+    color: var(--light-c2);
+}
+
+.dark-border {
+    border-color: var(--dark-c3);
+}
+.dark-border-1 {
+    border-color: var(--dark-bg2);
+}
+.light-border {
+    border-color: var(--light-c3);
+}
+.light-border-1 {
+    border-color: var(--light-bg2);
+}
+
+.dark-border-c1 {
+    border-color: var(--dark-c1);
+}
+.light-border-c1 {
+    border-color: var(--light-c1);
+}
+
+.font {
+    /*font-family: 'Poppins', sans-serif;*/
+    font-family: 'Poppins', sans-serif;
+}

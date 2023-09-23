@@ -3,7 +3,7 @@ class AddOtherTables < ActiveRecord::Migration[7.0]
     create_table :cards do |t|
       t.string :name
       t.string :ctype
-      t.float :outstanding_bill
+      t.float :outstanding_bill, default: 0
       t.date :last_paid
       t.belongs_to :account
       t.belongs_to :user
@@ -11,7 +11,8 @@ class AddOtherTables < ActiveRecord::Migration[7.0]
     end
 
     create_table :mops do |t|
-      t.string :name
+      t.string :name, null: false
+      t.json :meta, default: {}
       t.belongs_to :account
       t.belongs_to :user
       t.timestamps

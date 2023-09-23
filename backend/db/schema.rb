@@ -11,14 +11,13 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[7.0].define(version: 2023_08_30_075521) do
-  # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
-
   create_table "accounts", force: :cascade do |t|
-    t.string "name"
+    t.string "name", null: false
     t.float "balance"
-    t.boolean "owed"
-    t.bigint "user_id"
+    t.boolean "owed", default: false
+    t.boolean "creditcard", default: false
+    t.date "opening_date"
+    t.integer "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_accounts_on_user_id"
@@ -27,10 +26,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_30_075521) do
   create_table "cards", force: :cascade do |t|
     t.string "name"
     t.string "ctype"
-    t.float "outstanding_bill"
+    t.float "outstanding_bill", default: 0.0
     t.date "last_paid"
-    t.bigint "account_id"
-    t.bigint "user_id"
+    t.integer "account_id"
+    t.integer "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_cards_on_account_id"
@@ -40,28 +39,32 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_30_075521) do
   create_table "categories", force: :cascade do |t|
     t.string "name"
     t.string "nature"
-    t.bigint "user_id"
+    t.integer "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_categories_on_user_id"
   end
 
-  create_table "daily_log", force: :cascade do |t|
+  create_table "daily_logs", force: :cascade do |t|
     t.float "opening_balance"
     t.float "closing_balance"
     t.date "date"
     t.integer "total_transactions"
     t.json "meta"
-    t.bigint "account_id"
-    t.bigint "user_id"
-    t.index ["account_id"], name: "index_daily_log_on_account_id"
-    t.index ["user_id"], name: "index_daily_log_on_user_id"
+    t.integer "account_id"
+    t.integer "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_daily_logs_on_account_id"
+    t.index ["user_id"], name: "index_daily_logs_on_user_id"
   end
 
   create_table "mops", force: :cascade do |t|
-    t.string "name"
-    t.bigint "account_id"
-    t.bigint "user_id"
+    t.string "name", null: false
+    t.boolean "auto_generated", default: false
+    t.json "meta", default: {}
+    t.integer "account_id"
+    t.integer "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_mops_on_account_id"
@@ -74,14 +77,14 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_30_075521) do
     t.date "date"
     t.string "party"
     t.string "category"
-    t.boolean "pseudo"
+    t.boolean "pseudo", default: false
     t.float "balance_before"
     t.float "balance_after"
     t.json "meta"
     t.string "comments"
-    t.bigint "mop_id"
-    t.bigint "account_id"
-    t.bigint "user_id"
+    t.integer "mop_id"
+    t.integer "account_id"
+    t.integer "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_transactions_on_account_id"
@@ -90,9 +93,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_30_075521) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "name"
-    t.string "username", default: "", null: false
+    t.string "name", null: false
     t.string "password", default: ""
+    t.string "theme", default: "dark"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "email", default: "", null: false

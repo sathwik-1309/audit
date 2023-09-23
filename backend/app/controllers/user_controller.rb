@@ -1,4 +1,6 @@
 class UserController < ApplicationController
+before_action :set_current_user
+
   def index
     arr = []
     users = User.all
@@ -16,42 +18,41 @@ class UserController < ApplicationController
     password = params[:password]
     user = User.find_by(email: email)
     if user.nil?
-      render_202("Username not found")
+      render_202("Email id not found")
     else
       if user.valid_password?(password)
         render_200("Credentials are valid")
       else
-        render_202("Username and Password dont match")
+        render_202("Email id and Password dont match")
       end
     end
   end
 
   def create
-    attributes = filter_params.slice(:name, :email, :password, :username)
-    if User.find_by_username(filter_params[:username]).present?
-      render_202("Username already taken") and return
-    end
+    attributes = filter_params.slice(:name, :email, :password)
     if User.find_by_email(filter_params[:email]).present?
       render_202("Email already taken") and return
     end
     @user = User.new(attributes)
-    if @user.save!
+    begin
+      @user.save!
       render_200("User created", {
         "name": @user.name,
         "email": @user.email
       })
-    else
-      render_404("Some error occured")
+    rescue StandardError => ex
+      render_202(ex.message)
     end
   end
 
   def update
-    @user = User.find_by_id(params[:id])
-    if @user.nil?
-      render_404("Account not found") and return
+    unless @current_user.present?
+      render_400("Unauthorized, Please sign in") and return
     end
+    @user = @current_user
     @user.assign_attributes(filter_params)
-    if @user.save!
+    begin
+      @user.save!
       msg = {
         "@user": {
           "name": @user.name,
@@ -59,14 +60,14 @@ class UserController < ApplicationController
         }
       }
       render_200("User updated", msg)
-    else
-      render_404("Some error occured")
+    rescue StandardError => ex
+      render_404(ex.message)
     end
   end
 
   private
 
   def filter_params
-    params.permit(:name, :email, :password, :username)
+    params.permit(:name, :email, :password, :theme)
   end
 end

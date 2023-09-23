@@ -1,0 +1,10 @@
+# Ignore files and directories when copying the application into the Docker image
+.git
+log/*
+tmp/*
+db/*.sqlite3
+db/*.sqlite3-journal
+public/assets
+public/packs
+node_modules
+yarn-error.log

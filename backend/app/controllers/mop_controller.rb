@@ -2,19 +2,29 @@ class MopController < ApplicationController
   before_action :check_current_user
 
   def index
-    mops = current_user.mops
-    render(:json => mops.to_json)
+    json = []
+    mops = @current_user.mops
+    mops = mops.select{|m| !m.is_card? and !m.is_auto_generated?} if params[:unfiltered].nil?
+    mops.each do |mop|
+      temp = mop.attributes
+      temp['account'] = {
+        "name" => mop.account.name
+      }
+      json << temp
+    end
+    render(:json => json)
   end
 
   def create
     attributes = filter_params.slice(:account_id, :name)
-    attributes[:user_id] = current_user.id
+    attributes[:user_id] = @current_user.id
     @mop = Mop.new(attributes)
-    if @mop.save!
+    begin
+      @mop.save!
       msg = @mop.attributes
       render_200("Mode of payment created", msg)
-    else
-      render_404("Some error occured")
+    rescue StandardError => ex
+      render_400(ex.message)
     end
   end
 
@@ -37,7 +47,7 @@ class MopController < ApplicationController
     if @mop.nil?
       render_404("Mode of payment not found") and return
     end
-    @mop.delete
+    @mop.destroy
     msg = @mop.attributes
     render_200("Mode of payment deleted", msg)
   end

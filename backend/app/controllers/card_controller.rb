@@ -2,22 +2,36 @@ class CardController < ApplicationController
   before_action :check_current_user
 
   def index
-    cards = current_user.cards
-    render(:json => cards.to_json)
+    cards = @current_user.cards
+    json = { CREDITCARD => [], DEBITCARD => []}
+    cards.each do|card|
+      card_json = card.attributes
+      if card.ctype == CREDITCARD
+        json[CREDITCARD] << card_json
+      else
+        card_json['account'] = card.account.name.titleize
+        json[DEBITCARD] << card_json
+      end
+    end
+    render(:json => json)
   end
 
   def create
     if CTYPES.exclude? filter_params[:ctype]
       render_400("Invalid ctype") and return
     end
-    attributes = filter_params.slice(:name, :account_id, :ctype)
-    attributes[:user_id] = current_user.id
+    account = Account.create_credit_card_account(filter_params[:name], @current_user) if filter_params[:ctype] == CREDITCARD
+    attributes = filter_params.slice(:name, :ctype)
+    attributes[:account_id] = filter_params[:ctype] == DEBITCARD ? filter_params[:account_id] : account.reload.id
+    attributes[:user_id] = @current_user.id
     @card = Card.new(attributes)
-    if @card.save!
+    begin
+      @card.save!
       msg = @card.attributes
+      Mop.create("#{@card.ctype}_#{@card.name}", @card.account, {"ctype" => "#{@card.ctype}", "card_id"=>"#{@card.id}"})
       render_200("Card created", msg)
-    else
-      render_404("Some error occured")
+    rescue StandardError => ex
+      render_400(ex.message)
     end
   end
 
@@ -27,11 +41,12 @@ class CardController < ApplicationController
       render_404("Card not found") and return
     end
     @card.assign_attributes(filter_params)
-    if @card.save!
+    begin
+      @card.save!
       msg = @card.attributes
       render_200("Card updated", msg)
-    else
-      render_404("Some error occured")
+    rescue StandardError => ex
+      render_400(ex.message)
     end
   end
 
@@ -40,9 +55,14 @@ class CardController < ApplicationController
     if @card.nil?
       render_404("Card not found") and return
     end
-    @card.delete
-    msg = @card.attributes
-    render_200("Card deleted", msg)
+    begin
+      @card.destroy
+      msg = @card.attributes
+      render_200("Card deleted", msg)
+    rescue StandardError => ex
+      render_400(ex.message)
+    end
+
   end
 
   private

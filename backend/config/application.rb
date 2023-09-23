@@ -11,6 +11,21 @@ module Audit
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.0
 
+    config.generators do |g|
+      g.test_framework :rspec, fixture: true
+      g.ficture_replacement :factory_bot
+      g.view_specs false
+      g.helper_specs false
+    end
+
+    config.eager_load_paths += %W{
+    #{config.root}/lib
+    }
+
+    config.eager_load_paths += %W{
+    #{config.root}/app/channels/account_channel.rb
+    }
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files

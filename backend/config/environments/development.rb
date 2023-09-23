@@ -60,6 +60,12 @@ Rails.application.configure do
 
   # Suppress logger output for asset requests.
   config.assets.quiet = true
+  
+  config.active_job.queue_adapter = :sidekiq
+
+  config.action_cable.disable_request_forgery_protection = true
+  config.action_cable.url = "ws://localhost:3001/cable"
+  config.action_cable.allowed_request_origins = [ /http:\/\/localhost:\d+/ ]
 
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
