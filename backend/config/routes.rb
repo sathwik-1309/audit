@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   scope :accounts do
     get '/index' => 'account#index'
     post '/create' => 'account#create'
+    post '/create_owed' => 'account#create_owed'
     put '/:id/update' => 'account#update'
     delete '/:id/delete' => 'account#delete'
     get '/home' => 'account#home'

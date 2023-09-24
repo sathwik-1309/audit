@@ -44,7 +44,7 @@ class Account < ApplicationRecord
   def update_balance(transaction)
     if transaction.ttype == CREDIT
       self.balance = self.balance + transaction.amount
-    else
+    elsif [DEBIT, PAID_BY_PARTY].include? transaction.ttype
       self.balance = self.balance - transaction.amount
     end
     self.save!
@@ -79,7 +79,7 @@ class Account < ApplicationRecord
   end
 
   def self.list(user)
-    accounts = user.accounts.where(creditcard: false)
+    accounts = user.accounts.where(creditcard: false, owed: false)
     accounts.each do |account|
       account['name'] = account['name'].titleize
     end

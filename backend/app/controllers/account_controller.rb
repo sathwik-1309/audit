@@ -12,7 +12,7 @@ class AccountController < ApplicationController
     if @current_user.accounts.pluck(:name).include? filter_params[:name]
       render_400("An account with the same name already exists") and return
     end
-    attributes = filter_params.slice(:name, :owed)
+    attributes = filter_params.slice(:name)
     attributes[:user_id] = @current_user.id
     attributes[:balance] = filter_params[:balance]
     attributes[:opening_date] = filter_params[:date].present? ? filter_params[:date] : Date.today
@@ -21,6 +21,25 @@ class AccountController < ApplicationController
       @account.save!
       msg = @account.attributes
       render_200("Account created", msg)
+    rescue StandardError => ex
+      render_400(ex.message)
+    end
+  end
+
+  def create_owed
+    if @current_user.accounts.pluck(:name).include? filter_params[:name]
+      render_400("An account with the same name already exists") and return
+    end
+    attributes = filter_params.slice(:name)
+    attributes[:user_id] = @current_user.id
+    attributes[:balance] = 0
+    attributes[:opening_date] = Date.today - 365
+    attributes[:owed] = true
+    @account = Account.new(attributes)
+    begin
+      @account.save!
+      msg = @account.attributes
+      render_200("Owed Account created", msg)
     rescue StandardError => ex
       render_400(ex.message)
     end

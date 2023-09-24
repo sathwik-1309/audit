@@ -107,6 +107,12 @@ class TransactionController < ApplicationController
     end
   end
 
+  # amount, party,
+  # date, category, comments
+  def paid_by_party
+
+  end
+
   def dashboard
     json = {}
     json['accounts'] = Account.list(@current_user)
