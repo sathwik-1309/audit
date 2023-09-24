@@ -87,8 +87,8 @@ Rails.application.configure do
     address: 'smtp.gmail.com',
     port: 587,
     domain: 'example.com', # Replace with your domain
-    user_name: 'audit.app.mail@gmail.com', # Replace with your Gmail email address
-    password: 'zuka ydyi punm bzyb', # Replace with your Gmail password or App Password
+    user_name: ENV['GMAIL_EMAIL'], # Replace with your Gmail email address
+    password: ENV['GMAIL_PASSWORD'], # Replace with your Gmail password or App Password
     authentication: 'plain',
     enable_starttls_auto: true
   }
