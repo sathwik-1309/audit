@@ -49,6 +49,42 @@ describe TransactionController do
       expect([log.opening_balance, log.closing_balance]).to eq([0, 900])
     end
 
+    it 'creates new debit transaction using debitcard' do
+      @card = create(:card, account: @account, ctype: DEBITCARD, user: @user)
+      post :debit, params: { amount: 100, card_id: @card.id }
+      resp = Oj.load(response.body)
+      transaction = Transaction.find_by_id(resp['id'])
+      validate_response(response, 200, 'Debit Transaction added')
+      get :index
+      resp = Oj.load(response.body)
+      expect(resp.length).to eq 2
+      bal = @account.balance
+      expect(@account.reload.balance).to eq(bal - 100)
+      expect([transaction.balance_before, transaction.balance_after]).to eq([bal, bal-100])
+      log = @account.daily_logs.find_by_date(transaction.date)
+      expect(log.meta['tr_ids'].include? transaction.id).to eq true
+      expect([log.opening_balance, log.closing_balance]).to eq([0, 900])
+    end
+
+    it 'creates new debit transaction using creditcard' do
+      @card = create(:card, ctype: CREDITCARD, user: @user)
+      post :debit, params: { amount: 100, card_id: @card.id }
+      resp = Oj.load(response.body)
+      transaction = Transaction.find_by_id(resp['id'])
+      validate_response(response, 200, 'Debit Transaction added')
+      get :index
+      resp = Oj.load(response.body)
+      expect(resp.length).to eq 2
+      @account = @card.account
+      bal = @account.balance
+      expect(@account.reload.balance).to eq(bal - 100)
+      expect([transaction.balance_before, transaction.balance_after]).to eq([bal, bal-100])
+      log = @account.daily_logs.find_by_date(transaction.date)
+      expect(log.meta['tr_ids'].include? transaction.id).to eq true
+      expect([log.opening_balance, log.closing_balance]).to eq([0, -100])
+      expect(@card.reload.outstanding_bill).to eq 100
+    end
+
     it 'throw error if transaction date is before account opening' do
       post :debit, params: { amount: 100, mop_id: @mop.id, date: Date.today - 2 }
       validate_response(response, 202, "Cannot add a transaction in past date of account opening")

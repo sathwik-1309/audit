@@ -4,6 +4,7 @@ import ThemeContext from '../context/ThemeContext';
 import { BACKEND_API_URL } from '../config';
 import ApiPut from '../axios/putapi';
 import ApiDelete from '../axios/deleteapi';
+import PaymentsIcon from '@mui/icons-material/Payments';
 
 function MopBox(props) {
     const mop = props.mop;
@@ -46,8 +47,12 @@ function MopBox(props) {
             className={`${theme}-c1 text-md font-semibold p-1 h-1/2 outline-none ${theme}-c1 ${theme}-bg1 border`}
           />
         ) : (
-          // Display the mop name as text when not in edit mode
-          <div className='flex items-end pb-1 pl-3 text-md h-1/2 font-bold'>{mop.name}</div>
+          <div className='flex flex-row pl-3 h-1/2 pb-1'>
+            <PaymentsIcon style={{
+                height: '100%',
+            }}/>
+            <div className='flex items-center pl-3 text-md font-bold'>{mop.name}</div>
+          </div>
         )}
         <div className='flex items-center h-1/2 text-sm font-semibold'>
           <div className={`${theme}-c3 pl-12`}>Account:</div>

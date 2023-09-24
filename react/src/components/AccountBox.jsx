@@ -4,6 +4,7 @@ import ThemeContext from '../context/ThemeContext';
 import { BACKEND_API_URL } from '../config';
 import ApiPut from '../axios/putapi';
 import ApiDelete from '../axios/deleteapi';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 
 function AccountBox(props) {
     const account = props.account;
@@ -46,8 +47,12 @@ function AccountBox(props) {
             className={`${theme}-c1 text-md font-semibold p-1 h-1/2 outline-none ${theme}-c1 ${theme}-bg1 border`}
           />
         ) : (
-          // Display the account name as text when not in edit mode
-          <div className='flex items-end pb-1 pl-3 text-md h-1/2 font-bold'>{account.name}</div>
+          <div className='flex flex-row h-1/2 pb-1 pl-3'>
+            <AccountBalanceWalletIcon style={{
+                height: '100%',
+            }}/>
+            <div className='flex pl-3 text-md font-bold items-center'>{account.name}</div>
+          </div>
         )}
         <div className='flex items-center h-1/2'>
           <div className={`${theme}-c3 pl-12 text-sm font-semibold`}>Balance:</div>

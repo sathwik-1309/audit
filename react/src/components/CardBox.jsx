@@ -4,6 +4,7 @@ import ThemeContext from '../context/ThemeContext';
 import { BACKEND_API_URL } from '../config';
 import ApiPut from '../axios/putapi';
 import ApiDelete from '../axios/deleteapi';
+import CreditCardIcon from '@mui/icons-material/CreditCard';
 
 function CardBox(props) {
     const card = props.card;
@@ -37,17 +38,22 @@ function CardBox(props) {
   return (
     <div className={`flex flex-row ${theme}-c1 ${theme}-bg1 mt-3 font-semibold h-24 rounded`}>
       <div className='flex flex-col w-3/4'>
-        {edit ? (
-          // Display an input field when in edit mode
-          <input
-            type='text'
-            value={editedName}
-            onChange={handleNameChange}
-            className={`${theme}-c1 text-md font-semibold p-1 h-1/2 outline-none ${theme}-c1 ${theme}-bg1 border`}
-          />
-        ) : (
-          <div className='flex items-end pb-1 pl-3 text-md h-1/2 font-bold'>{card.name}</div>
-        )}
+        <div className='flex flex-row p-1 h-10 pb-1'>
+            <CreditCardIcon style={{
+                height: '100%',
+            }}/>
+            {edit ? (
+            // Display an input field when in edit mode
+            <input
+                type='text'
+                value={editedName}
+                onChange={handleNameChange}
+                className={`${theme}-c1 text-md font-semibold p-1 h-full outline-none sm:w-[300px] w-48 ${theme}-c1 ${theme}-bg1 border`}
+            />
+            ) : (
+            <div className='flex items-center pl-3 text-md h-full font-bold'>{card.name}</div>
+            )}
+        </div>
         <div className='flex items-center h-1/2'>
           {
             card.ctype === 'creditcard' ?
