@@ -12,7 +12,12 @@ class LazyWorker
 
   def update_subsequent(args)
     transaction = Transaction.find_by_id(args['transaction_id'])
-    transaction.update_subsequent
+    if args['account_id'].present?
+      transaction.update_subsequent(Account.find_by_id(args['account_id']))
+    else
+      transaction.update_subsequent
+    end
+
   end
 
   def send_welcome_email(args)

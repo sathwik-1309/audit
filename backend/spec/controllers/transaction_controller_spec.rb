@@ -44,7 +44,7 @@ describe TransactionController do
       bal = @account.balance
       expect(@account.reload.balance).to eq(bal - 100)
       expect([transaction.balance_before, transaction.balance_after]).to eq([bal, bal-100])
-      log = DailyLog.find_by_date(transaction.date)
+      log = @account.daily_logs.find_by_date(transaction.date)
       expect(log.meta['tr_ids'].include? transaction.id).to eq true
       expect([log.opening_balance, log.closing_balance]).to eq([0, 900])
     end
@@ -119,7 +119,7 @@ describe TransactionController do
       bal = @account.balance
       expect(@account.reload.balance).to eq(bal + 100)
       expect([transaction.balance_before, transaction.balance_after]).to eq([bal, bal+100])
-      log = DailyLog.find_by_date(transaction.date)
+      log = @account.daily_logs.find_by_date(transaction.date)
       expect(log.meta['tr_ids'].include? transaction.id).to eq true
       expect([log.opening_balance, log.closing_balance]).to eq([0, 1100])
     end
@@ -204,6 +204,128 @@ describe TransactionController do
         expect([tr5.reload.balance_before, tr5.balance_after]).to eq([1050, 750])
       end
       expect(@account.reload.balance).to eq(750)
+    end
+  end
+
+  context 'Transaction:paid_by_party' do
+    
+    it 'throw error if party is invalid' do
+      post :paid_by_party, params: { amount: 100 , party: 100}
+      validate_error_response(response, 400, 'party not found')
+    end
+
+    it 'throw error if party is not sent' do
+      post :paid_by_party, params: { amount: 100 }
+      validate_error_response(response, 400, 'party not found')
+    end
+
+    it 'should create a paid_by_party transaction' do
+      account = create(:account, owed: true, user: @user)
+      post :paid_by_party, params: { amount: 73 , party: account.id}
+      validate_response(response, 200, "Paid by party Transaction added")
+      expect(account.reload.balance).to eq -73
+      expect(account.owed_transactions.last.amount).to eq 73
+    end
+
+  end
+
+  context 'Transaction:paid_by_you' do
+    
+    it 'throw error if party is invalid' do
+      post :paid_by_you, params: { amount: 100 , party: 100}
+      validate_error_response(response, 400, 'party not found')
+    end
+
+    it 'throw error if party is not sent' do
+      post :paid_by_you, params: { amount: 100 }
+      validate_error_response(response, 400, 'party not found')
+    end
+
+    it 'should create a paid_by_you transaction' do
+      account = create(:account, owed: true, user: @user)
+      post :paid_by_you, params: { amount: 73 , party: account.id, mop_id: @mop.id}
+      validate_response(response, 200, "Paid by you Transaction added")
+      expect(@mop.reload.account.balance).to eq 927
+      log1 = @mop.account.daily_logs.find_by_date(Date.today)
+      expect([log1.opening_balance, log1.closing_balance]).to eq([0,927])
+
+      expect(account.reload.balance).to eq 73
+      expect(account.owed_transactions[-1].amount).to eq 73
+      log2 = account.daily_logs.find_by_date(Date.today)
+      expect([log2.opening_balance, log2.closing_balance]).to eq([0,73])
+    end
+
+  end
+
+  context 'Transaction:settled_by_party' do
+
+    it 'throw error if party is invalid' do
+      post :settled_by_party, params: { amount: 100 , party: 100, account_id: @account.id}
+      validate_error_response(response, 400, 'party not found')
+    end
+
+    it 'throw error if party and account is not sent' do
+      post :settled_by_party, params: { amount: 100 }
+      validate_error_response(response, 400, 'account not found')
+    end
+
+    it 'throw error if party is not sent' do
+      post :settled_by_party, params: { amount: 100 , account_id: @account.id}
+      validate_error_response(response, 400, 'party not found')
+    end
+
+    it 'throw error if account is invalid' do
+      account = create(:account, owed: true, user: @user)
+      post :settled_by_party, params: { amount: 100 , party: account.id, account_id: 1001}
+      validate_error_response(response, 400, 'account not found')
+    end
+
+    it 'should create a settled_by_party transaction' do
+      account = create(:account, owed: true, user: @user)
+      post :settled_by_party, params: { amount: 80 , party: account.id, account_id: @account.id}
+      validate_response(response, 200, "Settled by party Transaction added")
+      expect(@account.reload.balance).to eq 1080
+      log1 = @account.daily_logs.find_by_date(Date.today)
+      expect([log1.opening_balance, log1.closing_balance]).to eq([0,1080])
+
+      expect(account.reload.balance).to eq -80
+      expect(account.owed_transactions.last.amount).to eq 80
+      log2 = account.daily_logs.find_by_date(Date.today)
+      expect([log2.opening_balance, log2.closing_balance]).to eq([0,-80])
+    end
+  end
+
+  context 'Transaction:settled_by_you' do
+
+    it 'throw error if party is invalid' do
+      post :settled_by_you, params: { amount: 100 , party: 100, account_id: @account.id}
+      validate_error_response(response, 400, 'party not found')
+    end
+
+    it 'throw error if mop or account is not sent' do
+      account = create(:account, owed: true, user: @user)
+      post :settled_by_you, params: { amount: 100 , party: account.id }
+      validate_error_response(response, 400, 'Either mop_id or account_id must be sent in request')
+    end
+
+    it 'throw error if mop or account is invalid' do
+      account = create(:account, owed: true, user: @user)
+      post :settled_by_you, params: { amount: 100 , party: account.id, account_id: 1001}
+      validate_error_response(response, 400, 'mop_id or account_id is invalid')
+    end
+
+    it 'should create a settled_by_you transaction' do
+      account = create(:account, owed: true, user: @user)
+      post :settled_by_you, params: { amount: 80 , party: account.id, account_id: @account.id}
+      validate_response(response, 200, "Settled by you Transaction added")
+      expect(@account.reload.balance).to eq 920
+      log1 = @account.daily_logs.find_by_date(Date.today)
+      expect([log1.opening_balance, log1.closing_balance]).to eq([0,920])
+
+      expect(account.reload.balance).to eq 80
+      expect(account.owed_transactions.last.amount).to eq 80
+      log2 = account.daily_logs.find_by_date(Date.today)
+      expect([log2.opening_balance, log2.closing_balance]).to eq([0,80])
     end
   end
 

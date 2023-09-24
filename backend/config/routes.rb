@@ -43,6 +43,10 @@ Rails.application.routes.draw do
     delete '/:id/delete' => 'transaction#delete'
     post '/debit' => 'transaction#debit'
     post '/credit' => 'transaction#credit'
+    post '/paid_by_party' => 'transaction#paid_by_party'
+    post '/paid_by_you' => 'transaction#paid_by_you'
+    post '/settled_by_party' => 'transaction#settled_by_party'
+    post '/settled_by_you' => 'transaction#settled_by_you'
     get 'dashboard' => 'transaction#dashboard'
   end
 
