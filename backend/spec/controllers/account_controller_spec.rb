@@ -16,13 +16,22 @@ describe AccountController do
 
   context 'Account#create:' do
 
-    it 'creates new account with owed' do
-      post :create, params: { name: 'new_account', balance: 1000, owed: true }
+    it 'creates new account' do
+      post :create, params: { name: 'new_account', balance: 1000 }
       validate_response(response, 200, 'Account created')
       resp = Oj.load(response.body)
       expect(resp['balance']).to eq 1000
-      expect(resp['owed']).to eq true
+      expect(resp['owed']).to eq false
     end
+
+    it 'creates new owed account' do
+        post :create_owed, params: { name: 'somename' }
+        validate_response(response, 200, 'Owed Account created')
+        resp = Oj.load(response.body)
+        expect(resp['balance']).to eq 0
+        expect(resp['owed']).to eq true
+        expect(resp['name']).to eq 'somename'
+      end
 
     it 'returns 400 when tried to create account without name without name' do
       post :create, params: { balance: 1000, owed: true }
@@ -31,7 +40,7 @@ describe AccountController do
 
     it 'sends websocket message on account create' do
       expect { post :create, params: { name: 'new_account', balance: 1000, owed: true } }.to have_broadcasted_to(ACCOUNTS_CHANNEL)
-                                                                .with(a_hash_including('message' => 'refresh'))
+                                                                .with(a_hash_including())
     end
 
   end

@@ -28,7 +28,7 @@ class CardController < ApplicationController
     begin
       @card.save!
       msg = @card.attributes
-      Mop.create("#{@card.ctype}_#{@card.name}", @card.account, {"ctype" => "#{@card.ctype}", "card_id"=>"#{@card.id}"})
+      Mop.create("#{@card.ctype}_#{@card.name}", @card.account, {"ctype" => @card.ctype, "card_id"=>@card.id})
       render_200("Card created", msg)
     rescue StandardError => ex
       render_400(ex.message)

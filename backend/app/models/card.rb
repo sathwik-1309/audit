@@ -14,7 +14,7 @@ class Card < ApplicationRecord
   end
 
   def mop
-    self.account.mops.find{|m| m.meta["card_id"] and self.id.to_s == m.meta["card_id"]}
+    self.account.mops.find{|m| self.id == m.meta["card_id"]}
   end
 
 end

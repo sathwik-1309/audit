@@ -61,7 +61,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_30_075521) do
 
   create_table "mops", force: :cascade do |t|
     t.string "name", null: false
-    t.boolean "auto_generated", default: false
     t.json "meta", default: {}
     t.integer "account_id"
     t.integer "user_id"
@@ -75,7 +74,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_30_075521) do
     t.float "amount"
     t.string "ttype"
     t.date "date"
-    t.string "party"
+    t.integer "party"
     t.string "category"
     t.boolean "pseudo", default: false
     t.float "balance_before"

@@ -42,11 +42,7 @@ class Account < ApplicationRecord
   end
 
   def update_balance(transaction)
-    if transaction.ttype == CREDIT
-      self.balance = self.balance + transaction.amount
-    elsif [DEBIT, PAID_BY_PARTY].include? transaction.ttype
-      self.balance = self.balance - transaction.amount
-    end
+    self.balance += transaction.get_difference(self)
     self.save!
   end
 
@@ -55,15 +51,15 @@ class Account < ApplicationRecord
     if log.nil?
       meta = {"tr_ids" => []}
       if self.daily_logs.blank?
-        log = DailyLog.new(opening_balance: 0, closing_balance: 0, account_id: transaction.account_id, user_id: transaction.user_id, meta: meta, date: transaction.date, total_transactions: 0)
+        log = DailyLog.new(opening_balance: 0, closing_balance: 0, account_id: self.id, user_id: transaction.user_id, meta: meta, date: transaction.date, total_transactions: 0)
         log.save!
       else
         opening_balance = self.daily_logs.where("date < ?", transaction.date).order(date: :desc).first&.closing_balance
-        log = DailyLog.new(opening_balance: opening_balance, closing_balance: opening_balance, account_id: transaction.account_id, user_id: transaction.user_id, meta: meta, date: transaction.date, total_transactions: 0)
+        log = DailyLog.new(opening_balance: opening_balance, closing_balance: opening_balance, account_id: self.id, user_id: transaction.user_id, meta: meta, date: transaction.date, total_transactions: 0)
         log.save!
       end
     end
-    log.add_transaction(transaction)
+    log.add_transaction(transaction, self)
   end
 
   def self.create_credit_card_account(name, user)
@@ -88,5 +84,10 @@ class Account < ApplicationRecord
 
   def auto_generated_mop
     self.mops.find{|m| m.is_auto_generated?}
+  end
+
+  def owed_transactions
+    return nil unless self.owed
+    self.user.transactions.where(party: self.id)
   end
 end

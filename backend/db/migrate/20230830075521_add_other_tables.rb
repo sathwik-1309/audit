@@ -22,7 +22,7 @@ class AddOtherTables < ActiveRecord::Migration[7.0]
       t.float :amount
       t.string :ttype
       t.date :date
-      t.string :party
+      t.integer :party
       t.string :category
       t.boolean :pseudo, default: false
       t.float :balance_before
