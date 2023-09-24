@@ -15,5 +15,13 @@ class LazyWorker
     transaction.update_subsequent
   end
 
+  def send_welcome_email(args)
+    begin
+      UserMailer.welcome(args['name'], args['email']).deliver_now
+    rescue => ex
+      puts "LazyWorker#send_welcome_email: Error send email: #{ex.message}"
+    end
+  end
+
 end
   

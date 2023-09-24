@@ -1,11 +1,12 @@
 version: '3'
 services:
   rails:
-    image: sathwik139/audit:rails-v3
+    image: audit:rails-v2
     command: >
       /bin/sh -c "rails db:drop && rails db:create && rails db:migrate && puma -C config/puma.rb"
     environment:
-      RAILS_ENV: development
+      RAILS_ENV: production
+      DISABLE_DATABASE_ENVIRONMENT_CHECK: 1
       REDIS_URL: redis://redis:6379/1
       HOST_IP: localhost
     depends_on:
@@ -13,10 +14,11 @@ services:
     ports:
       - "3001:3001"
   sidekiq:
-    image: sathwik139/audit:rails-v3
+    image: audit:rails-v2
     command: bundle exec sidekiq -c 2 -q low
     environment:
-      RAILS_ENV: development
+      RAILS_ENV: production
+      DISABLE_DATABASE_ENVIRONMENT_CHECK: 1
       REDIS_URL: redis://redis:6379/1
       HOST_IP: localhost
     depends_on:
@@ -24,7 +26,7 @@ services:
   redis:
     image: redis:latest
   react:
-    image: sathwik139/audit:react-v2
+    image: audit:react-v2
     environment:
       VITE_HOST: localhost
       VITE_PORT: 5173

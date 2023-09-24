@@ -36,6 +36,7 @@ before_action :set_current_user
     @user = User.new(attributes)
     begin
       @user.save!
+      LazyWorker.perform_async("send_welcome_email", {"name" => @user.name, "email"=> @user.email })
       render_200("User created", {
         "name": @user.name,
         "email": @user.email
