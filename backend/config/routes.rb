@@ -54,4 +54,16 @@ Rails.application.routes.draw do
     post '/sign_in' => 'session#sign_in'
   end
 
+  scope :categories do
+    get '/index' => 'category#index'
+    post '/create' => 'category#create'
+    delete '/:id/delete' => 'category#delete'
+  end
+
+  scope :sub_categories do
+    get '/index' => 'sub_category#index'
+    post '/create' => 'sub_category#create'
+    delete '/:id/delete' => 'sub_category#delete'
+  end
+
 end

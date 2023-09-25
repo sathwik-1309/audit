@@ -37,8 +37,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_30_075521) do
   end
 
   create_table "categories", force: :cascade do |t|
-    t.string "name"
-    t.string "nature"
+    t.string "name", null: false
     t.integer "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -68,6 +67,16 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_30_075521) do
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_mops_on_account_id"
     t.index ["user_id"], name: "index_mops_on_user_id"
+  end
+
+  create_table "sub_categories", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "category_id"
+    t.integer "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_sub_categories_on_category_id"
+    t.index ["user_id"], name: "index_sub_categories_on_user_id"
   end
 
   create_table "transactions", force: :cascade do |t|

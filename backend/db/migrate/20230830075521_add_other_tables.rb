@@ -36,8 +36,7 @@ class AddOtherTables < ActiveRecord::Migration[7.0]
     end
 
     create_table :categories do |t|
-      t.string :name
-      t.string :nature
+      t.string :name, null: false
       t.belongs_to :user
       t.timestamps
     end
@@ -52,5 +51,13 @@ class AddOtherTables < ActiveRecord::Migration[7.0]
       t.belongs_to :user
       t.timestamps
     end
+
+    create_table :sub_categories do |t|
+      t.string :name, null: false
+      t.belongs_to :category
+      t.belongs_to :user
+      t.timestamps
+    end
+    
   end
 end

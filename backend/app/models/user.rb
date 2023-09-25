@@ -10,6 +10,8 @@ class User < ApplicationRecord
   has_many :mops
   has_many :cards
   has_many :transactions
+  has_many :categories
+  has_many :sub_categories
 
   def debitcards
     self.cards.where(ctype: DEBITCARD)
