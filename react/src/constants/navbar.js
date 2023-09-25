@@ -14,5 +14,13 @@ export const navbar_items = [
     {
         title: "MoP's",
         url: "/mops"
+    },
+    {
+        title: "Categories",
+        url: "/categories"
+    },
+    {
+        title: "Owed",
+        url: "/owed"
     }
 ]

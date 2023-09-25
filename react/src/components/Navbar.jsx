@@ -35,28 +35,28 @@ function Navbar(props) {
     }
     return null;
   }
-  async function updateUserTheme(theme){
-    const payload = {
-      theme: theme
-    }
-    try{
-      const response = await ApiPut(`${BACKEND_API_URL}/users/update`, payload)
-      if (response.status === 200) {
-        console.log("Theme updated in backend")
-      }else {
-        console.log(response)
-      }
-    }catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  }
-  const invertTheme = async (e) => {
-    let temp = theme === 'dark' ? 'light' : 'dark'
-    const auth_token = getAuthTokenCookie();
-    localStorage.setItem(`theme-${auth_token}`, temp);
-    setTheme(temp);
-    updateUserTheme(temp);
-  }
+  // async function updateUserTheme(theme){
+  //   const payload = {
+  //     theme: theme
+  //   }
+  //   try{
+  //     const response = await ApiPut(`${BACKEND_API_URL}/users/update`, payload)
+  //     if (response.status === 200) {
+  //       console.log("Theme updated in backend")
+  //     }else {
+  //       console.log(response)
+  //     }
+  //   }catch (error) {
+  //     console.error('Error fetching data:', error);
+  //   }
+  // }
+  // const invertTheme = async (e) => {
+  //   let temp = theme === 'dark' ? 'light' : 'dark'
+  //   const auth_token = getAuthTokenCookie();
+  //   localStorage.setItem(`theme-${auth_token}`, temp);
+  //   setTheme(temp);
+  //   updateUserTheme(temp);
+  // }
 
   return (
     <nav className={`h-14 ${theme}-bg2 flex flex-row rounded ${theme}-c2`}>

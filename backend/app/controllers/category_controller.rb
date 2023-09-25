@@ -2,8 +2,18 @@ class CategoryController < ApplicationController
   before_action :check_current_user
 
   def index
+    json = []
     categories = @current_user.categories
-    render(:json => categories.to_json)
+    categories.each do |category|
+      temp = category.attributes
+      sub_categories = []
+      category.sub_categories.each do |sub_category|
+        sub_categories << sub_category.attributes
+      end
+      temp['sub_categories'] = sub_categories
+      json << temp
+    end
+    render(:json => json)
   end
 
   def create

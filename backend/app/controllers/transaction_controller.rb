@@ -49,7 +49,7 @@ class TransactionController < ApplicationController
   # required params - amount (mop_id/account_id)
   # optional params - date, category, comments, account_id, mop_id
   def debit
-    attributes = filter_params.slice(:amount, :category, :comments)
+    attributes = filter_params.slice(:amount, :comments, :sub_category_id)
     if filter_params[:card_id].present?
       @card = @current_user.cards.find_by_id(filter_params[:card_id])
       mop = @card.mop
@@ -63,6 +63,10 @@ class TransactionController < ApplicationController
 
     if mop.nil?
       render_400("mop_id or account_id is invalid") and return
+    end
+
+    unless attributes[:sub_category_id].nil?
+      attributes[:category_id] = @current_user.sub_categories.find_by_id(filter_params[:sub_category_id]).category_id
     end
 
     attributes[:user_id] = @current_user.id
@@ -247,13 +251,14 @@ class TransactionController < ApplicationController
     json['accounts'] = Account.list(@current_user)
     json['mops'] = @current_user.mops.select{|m| !m.is_auto_generated? and !m.is_card? }.map {|m| { "id"=> m.id, "name" => m.name}}
     json['cards'] = @current_user.cards.map {|c| {"id"=>c.id, "name"=> c.name}}
+    json['sub_categories'] = @current_user.sub_categories.map{|c| {"id"=> c.id, "name"=> c.name}}
     render(:json => json)
   end
 
   private
 
   def filter_params
-    params.permit(:account_id, :mop_id, :amount, :ttype, :date, :party, :category, :meta, :comments, :card_id)
+    params.permit(:account_id, :mop_id, :amount, :ttype, :date, :party, :meta, :comments, :card_id, :sub_category_id)
   end
 
 end

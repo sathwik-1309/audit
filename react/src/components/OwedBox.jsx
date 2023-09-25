@@ -4,9 +4,9 @@ import ThemeContext from '../context/ThemeContext';
 import { BACKEND_API_URL } from '../config';
 import ApiPut from '../axios/putapi';
 import ApiDelete from '../axios/deleteapi';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import PersonIcon from '@mui/icons-material/Person';
 
-function AccountBox(props) {
+function OwedBox(props) {
     const account = props.account;
     const [edit, setEdit] = useState(false)
     const [editedName, setEditedName] = useState(account.name);
@@ -39,7 +39,7 @@ function AccountBox(props) {
     <div className={`flex flex-row ${theme}-c1 ${theme}-bg1 mt-3 font-semibold h-24 rounded`}>
       <div className='flex flex-col p-1 w-3/4'>
       <div className='flex flex-row h-1/2 pb-1 pl-3'>
-        <AccountBalanceWalletIcon style={{
+        <PersonIcon style={{
             height: '100%',
         }}/>
         {edit ? (
@@ -76,7 +76,7 @@ function AccountBox(props) {
   );
 }
 
-export default AccountBox;
+export default OwedBox;
 
 
 

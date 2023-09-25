@@ -16,6 +16,7 @@ Rails.application.routes.draw do
 
   scope :accounts do
     get '/index' => 'account#index'
+    get '/index_owed' => 'account#index_owed'
     post '/create' => 'account#create'
     post '/create_owed' => 'account#create_owed'
     put '/:id/update' => 'account#update'

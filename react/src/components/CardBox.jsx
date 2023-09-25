@@ -38,7 +38,7 @@ function CardBox(props) {
   return (
     <div className={`flex flex-row ${theme}-c1 ${theme}-bg1 mt-3 font-semibold h-24 rounded`}>
       <div className='flex flex-col w-3/4'>
-        <div className='flex flex-row p-1 h-10 pb-1'>
+        <div className='flex flex-row p-1 h-12 pb-1 pl-3'>
             <CreditCardIcon style={{
                 height: '100%',
             }}/>

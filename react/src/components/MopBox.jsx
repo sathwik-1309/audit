@@ -38,22 +38,20 @@ function MopBox(props) {
   return (
     <div className={`flex flex-row ${theme}-c1 ${theme}-bg1 mt-3 font-semibold h-24 rounded`}>
       <div className='flex flex-col w-3/4'>
+      <div className='flex flex-row pl-3 h-1/2 p-1'>
+        <PaymentsIcon style={{
+            height: '100%',
+        }}/>
         {edit ? (
-          // Display an input field when in edit mode
           <input
             type='text'
             value={editedName}
             onChange={handleNameChange}
-            className={`${theme}-c1 text-md font-semibold p-1 h-1/2 outline-none ${theme}-c1 ${theme}-bg1 border`}
-          />
-        ) : (
-          <div className='flex flex-row pl-3 h-1/2 pb-1'>
-            <PaymentsIcon style={{
-                height: '100%',
-            }}/>
+            className={`${theme}-c1 text-md font-semibold p-1 h-full outline-none sm:w-[300px] w-48 ${theme}-c1 ${theme}-bg1 border`}
+          />) : ( 
             <div className='flex items-center pl-3 text-md font-bold'>{mop.name}</div>
-          </div>
         )}
+        </div>
         <div className='flex items-center h-1/2 text-sm font-semibold'>
           <div className={`${theme}-c3 pl-12`}>Account:</div>
           <div className={`${theme}-c1 pl-3`}>{mop.account.name}</div>

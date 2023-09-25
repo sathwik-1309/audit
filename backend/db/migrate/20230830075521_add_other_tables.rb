@@ -23,12 +23,13 @@ class AddOtherTables < ActiveRecord::Migration[7.0]
       t.string :ttype
       t.date :date
       t.integer :party
-      t.string :category
+      t.integer :category_id
       t.boolean :pseudo, default: false
       t.float :balance_before
       t.float :balance_after
       t.json :meta
       t.string :comments
+      t.integer :sub_category_id
       t.belongs_to :mop
       t.belongs_to :account
       t.belongs_to :user
