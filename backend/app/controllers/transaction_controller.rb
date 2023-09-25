@@ -51,7 +51,8 @@ class TransactionController < ApplicationController
   def debit
     attributes = filter_params.slice(:amount, :category, :comments)
     if filter_params[:card_id].present?
-      mop = @current_user.cards.find_by_id(filter_params[:card_id]).mop
+      @card = @current_user.cards.find_by_id(filter_params[:card_id])
+      mop = @card.mop
     elsif filter_params[:mop_id].present?
       mop = @current_user.mops.find_by_id(filter_params[:mop_id])
     elsif filter_params[:account_id].present?
@@ -72,6 +73,7 @@ class TransactionController < ApplicationController
     begin
       @transaction = Transaction.create(attributes)
       @transaction.save!
+      @card.update_outstanding_bill(attributes[:amount]) if !@card.nil? and @card.ctype == CREDITCARD
       msg = @transaction.attributes
       render_200("Debit Transaction added", msg) and return
     rescue StandardError => ex

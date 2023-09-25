@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import account_icon from '../assets/account.svg';
-import money_icon from '../assets/money.svg';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import date_icon from '../assets/date.svg';
 import ThemeContext from '../context/ThemeContext';
 import { useContext } from 'react';
@@ -24,16 +25,20 @@ function AccountForm({ onSubmit, onCancel }) {
   return (
     <div className={`${theme}-bg1 p-3 ${theme}-c2`}>
       <form>
-        <div className={`flex flex-row pl-3 font-semibold ${theme}-bg2`}>
-            <img src={account_icon} alt="account_icon" className='h-10'/>
+        <div className={`flex flex-row pl-3 font-semibold ${theme}-bg2 h-10`}>
+            <AccountBalanceWalletIcon style={{
+                height: '100%',
+            }}/>
             <input type="text" 
             className='bg-transparent border-none outline-none pl-3'
             value={name} 
             onChange={(e) => setName(e.target.value)} 
             placeholder='Account Name' required/>
         </div>
-        <div className={`flex flex-row pl-3 font-semibold mt-2 ${theme}-bg2`}>
-            <img src={money_icon} alt="account_icon" className='h-10'/>
+        <div className={`flex flex-row pl-3 font-semibold mt-2 ${theme}-bg2 h-10`}>
+            <CurrencyRupeeIcon style={{
+                height: '100%',
+            }}/>
             <input type="number" 
             className='bg-transparent border-none outline-none pl-3'
             value={balance} 
@@ -41,7 +46,9 @@ function AccountForm({ onSubmit, onCancel }) {
             placeholder='Balance' required/>
         </div>
         <div className={`flex flex-row pl-3 font-semibold mt-2 ${theme}-bg2 h-10 items-center`}>
-            <img src={date_icon} alt="account_icon" className='h-8'/>
+            <CalendarMonthIcon style={{
+                height: '100%',
+            }}/>
             <input type="date" 
             className='bg-transparent border-none outline-none pl-3'
             value={date} 

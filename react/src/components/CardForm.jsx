@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import card_icon from '../assets/card.svg';
 import ThemeContext from '../context/ThemeContext';
 import { useContext } from 'react';
 import AccountButton from './AccountButton';
+import CreditCardIcon from '@mui/icons-material/CreditCard';
 
 function CardForm({ onSubmit, onCancel, accounts }) {
   let { theme } = useContext(ThemeContext);
@@ -45,8 +45,10 @@ function CardForm({ onSubmit, onCancel, accounts }) {
             <div className={`w-24 cursor-pointer flex items-center justify-center rounded ${cardtype=='credit' ? `${theme}-bg2` : `${theme}-c1`}`} onClick={() => handleCardSelect('credit')}>Credit</div>
         </div>
       <form>
-        <div className={`flex flex-row pl-3 font-semibold ${theme}-bg2`}>
-            <img src={card_icon} alt="account_icon" className='h-10'/>
+        <div className={`flex flex-row pl-3 font-semibold ${theme}-bg2 h-10`}>
+            <CreditCardIcon style={{
+                height: '100%',
+            }}/>
             <input type="text" 
             className='bg-transparent border-none outline-none pl-3'
             value={name} 

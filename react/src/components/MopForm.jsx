@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ThemeContext from '../context/ThemeContext';
 import account_icon from '../assets/account.svg';
+import PaymentsIcon from '@mui/icons-material/Payments';
 import { useContext, useEffect } from 'react';
 import ApiGet from '../axios/getapi';
 import { BACKEND_API_URL } from '../config';
@@ -58,8 +59,10 @@ function Mopform({ onSubmit, onCancel }) {
                 {error}
             </div>
         }
-        <div className={`flex flex-row pl-3 font-semibold ${theme}-bg2`}>
-            <img src={account_icon} alt="account_icon" className='h-10'/>
+        <div className={`flex flex-row pl-3 font-semibold ${theme}-bg2 h-10`}>
+            <PaymentsIcon style={{
+                height: '100%',
+            }}/>
             <input type="text" 
             className='bg-transparent border-none outline-none pl-3'
             value={name} 
