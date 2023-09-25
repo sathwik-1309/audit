@@ -118,7 +118,7 @@ class TransactionController < ApplicationController
     attributes = filter_params.slice(:amount, :party, :category, :comments)
     @account = Account.find_by_id(filter_params[:party])
     if @account.nil?
-      render_400("party not found") and return
+      render_202("party not found") and return
     end
 
     attributes[:user_id] = @current_user.id
@@ -145,7 +145,7 @@ class TransactionController < ApplicationController
     attributes = filter_params.slice(:amount, :party, :comments)
     @party = Account.find_by_id(filter_params[:party])
     if @party.nil?
-      render_400("party not found") and return
+      render_202("party not found") and return
     end
 
     if filter_params[:card_id].present?
@@ -155,11 +155,11 @@ class TransactionController < ApplicationController
     elsif filter_params[:account_id].present?
       mop = @current_user.mops.where(account_id: filter_params[:account_id]).find{|m| m.is_auto_generated? }
     else
-      render_400("Either mop_id or account_id must be sent in request") and return
+      render_202("Either mop_id or account_id must be sent in request") and return
     end
 
     if mop.nil?
-      render_400("mop_id or account_id is invalid") and return
+      render_202("mop_id or account_id is invalid") and return
     end
 
     attributes[:user_id] = @current_user.id
@@ -185,11 +185,11 @@ class TransactionController < ApplicationController
     attributes = filter_params.slice(:amount, :comments, :account_id)
     @account = Account.find_by_id(filter_params[:account_id])
     if @account.nil?
-      render_400("account not found") and return
+      render_202("account not found") and return
     end
     @party = Account.find_by_id(filter_params[:party])
     if @party.nil?
-      render_400("party not found") and return
+      render_202("party not found") and return
     end
 
     attributes[:user_id] = @current_user.id
@@ -205,14 +205,14 @@ class TransactionController < ApplicationController
       msg = @transaction.attributes
       render_200("Settled by party Transaction added", msg) and return
     rescue StandardError => ex
-      render_400(ex.message) and return
+      render_202(ex.message) and return
     end
   end
 
   def settled_by_you
     @party = Account.find_by_id(filter_params[:party])
     if @party.nil?
-      render_400("party not found") and return
+      render_202("party not found") and return
     end
     attributes = filter_params.slice(:amount, :comments)
     if filter_params[:card_id].present?
@@ -222,11 +222,11 @@ class TransactionController < ApplicationController
     elsif filter_params[:account_id].present?
       mop = @current_user.mops.where(account_id: filter_params[:account_id]).find{|m| m.is_auto_generated? }
     else
-      render_400("Either mop_id or account_id must be sent in request") and return
+      render_202("Either mop_id or account_id must be sent in request") and return
     end
 
     if mop.nil?
-      render_400("mop_id or account_id is invalid") and return
+      render_202("mop_id or account_id is invalid") and return
     end
 
     attributes[:user_id] = @current_user.id
@@ -249,6 +249,7 @@ class TransactionController < ApplicationController
   def dashboard
     json = {}
     json['accounts'] = Account.list(@current_user)
+    json['owed_accounts'] = Account.list(@current_user, true)
     json['mops'] = @current_user.mops.select{|m| !m.is_auto_generated? and !m.is_card? }.map {|m| { "id"=> m.id, "name" => m.name}}
     json['cards'] = @current_user.cards.map {|c| {"id"=>c.id, "name"=> c.name}}
     json['sub_categories'] = @current_user.sub_categories.map{|c| {"id"=> c.id, "name"=> c.name}}

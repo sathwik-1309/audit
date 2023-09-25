@@ -247,12 +247,12 @@ describe TransactionController do
     
     it 'throw error if party is invalid' do
       post :paid_by_party, params: { amount: 100 , party: 100}
-      validate_error_response(response, 400, 'party not found')
+      validate_response(response, 202, 'party not found')
     end
 
     it 'throw error if party is not sent' do
       post :paid_by_party, params: { amount: 100 }
-      validate_error_response(response, 400, 'party not found')
+      validate_response(response, 202, 'party not found')
     end
 
     it 'should create a paid_by_party transaction' do
