@@ -7,7 +7,7 @@ class Card < ApplicationRecord
   after_destroy :after_delete_action
 
   def after_create_action
-    Mop.create("#{self.ctype}_#{self.name}", self.account, {"ctype" => self.ctype, "card_id"=>self.id})
+    Mop.create("#{self.ctype}_#{self.name}", self.account, {"ctype" => self.ctype, "card_id"=>self.id })
   end
 
   def after_delete_action

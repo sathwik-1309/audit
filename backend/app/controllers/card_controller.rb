@@ -25,6 +25,7 @@ class CardController < ApplicationController
     attributes[:account_id] = filter_params[:ctype] == DEBITCARD ? filter_params[:account_id] : account.reload.id
     attributes[:user_id] = @current_user.id
     @card = Card.new(attributes)
+    
     begin
       @card.save!
       msg = @card.attributes
