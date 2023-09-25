@@ -9,6 +9,10 @@ class Account < ApplicationRecord
   after_commit :after_save_action, on: [:create, :update]
   after_destroy :after_delete_action
 
+  def after_save_action
+    Websocket.publish(ACCOUNTS_CHANNEL, 'refresh')
+  end
+
   def after_delete_action
     self.cards.each do |card|
       card.destroy
@@ -21,10 +25,6 @@ class Account < ApplicationRecord
 
   def after_create_action
     self.add_opening_transaction
-  end
-
-  def after_save_action
-    Websocket.publish(ACCOUNTS_CHANNEL, 'refresh')
   end
 
   def add_opening_transaction
@@ -74,8 +74,8 @@ class Account < ApplicationRecord
     return @account
   end
 
-  def self.list(user)
-    accounts = user.accounts.where(creditcard: false, owed: false)
+  def self.list(user, owed=false)
+    accounts = user.accounts.where(creditcard: false, owed: owed)
     accounts.each do |account|
       account['name'] = account['name'].titleize
     end

@@ -6,6 +6,11 @@ class AccountController < ApplicationController
     render(:json => accounts.to_json)
   end
 
+  def index_owed
+    accounts = Account.list(@current_user, true)
+    render(:json => accounts.to_json)
+  end
+
   # required - name
   # optional - owed
   def create

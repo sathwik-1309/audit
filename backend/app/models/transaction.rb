@@ -90,6 +90,14 @@ class Transaction < ApplicationRecord
     self.meta.present? && self.meta['opening_transaction'] == true
   end
 
+  def category
+    Category.find_by_id(self.category_id)
+  end
+
+  def sub_category
+    SubCategory.find_by_id(self.sub_category_id)
+  end
+
   private
 
   def self.find_previous_element(arr, element)

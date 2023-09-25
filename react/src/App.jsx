@@ -13,6 +13,8 @@ import Cards from './pages/Cards';
 import Mops from './pages/Mops';
 import { ThemeProvider } from './context/ThemeContext';
 import { WebSocketProvider } from './context/WebSocketContext';
+import Categories from './pages/Categories';
+import Owed from './pages/Owed';
 
 function App() {
   return (
@@ -32,6 +34,8 @@ function App() {
           <Route path="/accounts" element={<Accounts/>}/>
           <Route path="/cards" element={<Cards/>}/>
           <Route path="/mops" element={<Mops/>}/>
+          <Route path="/categories" element={<Categories/>}/>
+          <Route path="/owed" element={<Owed/>}/>
       </Routes>
     </Router>
     </ThemeProvider>

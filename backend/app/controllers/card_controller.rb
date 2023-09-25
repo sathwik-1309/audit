@@ -62,7 +62,6 @@ class CardController < ApplicationController
     rescue StandardError => ex
       render_400(ex.message)
     end
-
   end
 
   private

@@ -10,6 +10,8 @@ function TransactionForm(props) {
   const [selectedPayment, setSelectedPayment] = useState('select');
   const [amount, setAmount] = useState(0);
   const [comments, setComments] = useState('');
+  const [category, setCategory] = useState('');
+  
   const [date, setDate] = useState('');
   const [error, setError] = useState('');
   const method = props.method;
@@ -39,6 +41,13 @@ function TransactionForm(props) {
     setDate(value);
   }
 
+  const selectCategory = (event) => {
+    const value = event.target.value;
+    setCategory(value);
+  }
+
+  
+
   const handleCreate = async (e) => {
     e.preventDefault();
     const payload = {
@@ -67,6 +76,9 @@ function TransactionForm(props) {
       
       if (comments!==''){
           payload.comments = comments
+      }
+      if (category!==''){
+        payload.sub_category_id = category
       }
       if (date!==''){
           payload.date = date
@@ -110,7 +122,7 @@ function TransactionForm(props) {
             }
             <div className="mb-3">
               <label htmlFor="amount">Amount</label>
-              <input type="number" id="amount" name="amount" placeholder="100" required className={`w-full p-2 border rounded ${theme}-c1 bg-transparent`} onChange={changeAmount} value={amount}/>
+              <input type="number" id="amount" name="amount" placeholder="100" required className={`w-full p-2 border rounded ${theme}-c1 bg-transparent`} onChange={changeAmount}/>
             </div>
             {
               props.type === 'debit' &&
@@ -166,6 +178,15 @@ function TransactionForm(props) {
                   })}
                 </select>
               )}
+              <div className='mt-3 mb-3'>
+                  <label>Category</label>
+                  <select onChange={selectCategory} value={category} className={`${theme}-c1 bg-transparent w-full p-2 border rounded`}>
+                    <option>select</option>
+                    {props.data.sub_categories.map((sub_category, index) => {
+                      return <option value={sub_category.id}>{sub_category.name}</option>;
+                    })}
+                  </select>
+                </div>
             </div>
             }
 
@@ -184,7 +205,7 @@ function TransactionForm(props) {
               )
             }
             
-            <div className="mb-3">
+            <div className="mb-3 mt-3">
               <label htmlFor="comments">Comments</label>
               <input type="text" id="comments" name="comments" className={`${theme}-c1 bg-transparent w-full p-2 border rounded`} onChange={changeComments} value={comments}/>
             </div>
