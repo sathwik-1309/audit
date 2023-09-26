@@ -115,7 +115,7 @@ class TransactionController < ApplicationController
   # amount, party,
   # date, category, comments
   def paid_by_party
-    attributes = filter_params.slice(:amount, :party, :category, :comments)
+    attributes = filter_params.slice(:amount, :party, :sub_category_id, :comments)
     @account = Account.find_by_id(filter_params[:party])
     if @account.nil?
       render_202("party not found") and return
@@ -128,6 +128,9 @@ class TransactionController < ApplicationController
     attributes[:date] = filter_params[:date].present? ? filter_params[:date] : Date.today
     attributes[:party] = @account.id
     attributes[:pseudo] = true
+    unless attributes[:sub_category_id].nil?
+      attributes[:category_id] = @current_user.sub_categories.find_by_id(filter_params[:sub_category_id]).category_id
+    end
 
     begin
       @transaction = Transaction.create(attributes)
@@ -246,6 +249,47 @@ class TransactionController < ApplicationController
     end
   end
 
+  # amount, transactions, card_id/account_id/mop_id
+  # date, category, comments,
+  def split
+    attributes = filter_params.slice(:amount, :comments)
+    if filter_params[:card_id].present?
+      mop = @current_user.cards.find_by_id(filter_params[:card_id]).mop
+    elsif filter_params[:mop_id].present?
+      mop = @current_user.mops.find_by_id(filter_params[:mop_id])
+    elsif filter_params[:account_id].present?
+      mop = @current_user.mops.where(account_id: filter_params[:account_id]).find{|m| m.is_auto_generated? }
+    else
+      render_202("Either mop_id or account_id must be sent in request") and return
+    end
+
+    if mop.nil?
+      render_202("mop_id or account_id is invalid") and return
+    end
+
+    attributes[:user_id] = @current_user.id
+    attributes[:mop_id] = mop.id
+    attributes[:account_id] = mop.account_id
+    attributes[:ttype] = SPLIT
+    attributes[:date] = filter_params[:date].present? ? filter_params[:date] : Date.today
+
+    # split_tr_ids = []
+    # filter_params[:transactions].each do |transaction|
+    #   split_tr_ids <<
+    # end
+    # attributes[:meta] = { "child_transactions" => split_tr_ids}
+    begin
+      @transaction = Transaction.create(attributes)
+      @transaction.save!
+      LazyWorker.perform_async('create_split_transactions', { "transaction_id" => @transaction.id, "tr_array" => params[:transactions] } )
+      msg = @transaction.attributes
+      render_200("Split transactions will be added", msg) and return
+    rescue StandardError => ex
+      render_400(ex.message) and return
+    end
+
+  end
+
   def dashboard
     json = {}
     json['accounts'] = Account.list(@current_user)
@@ -259,7 +303,7 @@ class TransactionController < ApplicationController
   private
 
   def filter_params
-    params.permit(:account_id, :mop_id, :amount, :ttype, :date, :party, :meta, :comments, :card_id, :sub_category_id)
+    params.permit(:account_id, :mop_id, :amount, :ttype, :date, :party, :meta, :comments, :card_id, :sub_category_id, :transactions)
   end
 
 end

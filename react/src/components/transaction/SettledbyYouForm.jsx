@@ -15,7 +15,8 @@ function SettledbyYouForm(props) {
   const [amount, setAmount] = useState(0);
   const [comments, setComments] = useState('');
   const [account, setAccount] = useState('');
-  const [date, setDate] = useState('');
+  const today_date = new Date().toJSON().slice(0, 10);
+  const [date, setDate] = useState(today_date);
   const [error, setError] = useState('');
 
   let { theme } = useContext(ThemeContext);

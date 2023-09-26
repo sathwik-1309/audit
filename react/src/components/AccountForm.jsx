@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import date_icon from '../assets/date.svg';
 import ThemeContext from '../context/ThemeContext';
 import { useContext } from 'react';
 
@@ -10,7 +9,8 @@ function AccountForm({ onSubmit, onCancel }) {
   let { theme } = useContext(ThemeContext);
   const [name, setName] = useState('');
   const [balance, setBalance] = useState('');
-  const [date, setDate] = useState('');
+  const today_date = new Date().toJSON().slice(0, 10);
+  const [date, setDate] = useState(today_date);
 
   const handleSubmit = (e) => {
     e.preventDefault();

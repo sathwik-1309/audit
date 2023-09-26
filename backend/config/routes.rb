@@ -49,6 +49,7 @@ Rails.application.routes.draw do
     post '/settled_by_party' => 'transaction#settled_by_party'
     post '/settled_by_you' => 'transaction#settled_by_you'
     get 'dashboard' => 'transaction#dashboard'
+    post '/split' => 'transaction#split'
   end
 
   scope :sessions do

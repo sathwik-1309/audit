@@ -60,7 +60,7 @@ class Transaction < ApplicationRecord
       daily_log.opening_balance += amount
       daily_log.closing_balance += amount
       daily_log.save!
-      transactions = Transaction.where(id: daily_log.meta['tr_ids'])
+      transactions = account.user.transactions.where(id: daily_log.meta['tr_ids'])
       transactions.each do |transaction|
         transaction.balance_before += amount
         transaction.balance_after += amount
@@ -75,11 +75,11 @@ class Transaction < ApplicationRecord
   #   return @transaction
   # end
 
-  def get_previous
-    daily_log = self.account.daily_logs.find_by(date: self.date)
+  def get_previous(account=self.account)
+    daily_log = account.daily_logs.find_by(date: self.date)
     prev_tr = Transaction.find_by_id(Transaction.find_previous_element(daily_log.meta['tr_ids'], self.id))
     if prev_tr.nil?
-      prev_daily_log = self.account.daily_logs.where("date < ?", self.date).order(date: :desc).first
+      prev_daily_log = account.daily_logs.where("date < ?", self.date).order(date: :desc).first
       raise StandardError.new("Cant find previous transaction for tr_id #{self.id}") if prev_daily_log.nil?
       prev_tr = Transaction.find_by_id(prev_daily_log.meta['tr_ids'][-1])
     end
@@ -96,6 +96,66 @@ class Transaction < ApplicationRecord
 
   def sub_category
     SubCategory.find_by_id(self.sub_category_id)
+  end
+
+  def create_split_transactions(tr_array)
+    parsed_hashes = []
+    tr_array.each do |data_string|
+      # Convert the JSON-like string into a Ruby-like hash using eval
+      ruby_like_hash = eval(data_string)
+
+      # Convert the Ruby-like hash to a real Ruby hash
+      real_hash = ruby_like_hash.transform_keys(&:to_sym)
+
+      # Add the real hash to the parsed_hashes array
+      parsed_hashes << real_hash
+    end
+    child_tr_ids = []
+    parsed_hashes.each do |tr_json|
+      if tr_json[:user]
+        transaction = self.add_split_debit(tr_json)
+      else
+        transaction = self.add_split_paid_by_you(tr_json)
+      end
+      child_tr_ids << transaction&.id
+    end
+    self.meta["child_tr_ids"] = child_tr_ids
+    self.save!
+  end
+
+  def add_split_debit(args)
+    meta = { "parent_tr_id" => self.id }
+    transaction = Transaction.new(amount: args[:amount], ttype: DEBIT, date: self.date, category_id: self.category_id,
+                                   pseudo: true, balance_before: self.balance_before, balance_after: self.balance_after,
+                                   meta: meta, comments: self.comments, sub_category_id: self.sub_category_id,
+                                   mop_id: self.mop_id, account_id: self.account_id, user_id: self.user_id)
+    begin
+      transaction.save!
+      return transaction
+    rescue StandardError => ex
+      puts ex.message
+    end
+  end
+
+  def add_split_paid_by_you(args)
+    meta = { "parent_tr_id" => self.id }
+    transaction = Transaction.new(amount: args[:amount], ttype: PAID_BY_YOU, date: self.date, party: args[:party],
+                                  pseudo: true, meta: meta, comments: self.comments, mop_id: self.mop_id,
+                                  account_id: self.account_id, user_id: self.user_id)
+    begin
+      transaction.save!
+      owed_acc = self.user.accounts.find_by_id(args[:party])
+      owed_acc.update_balance(transaction)
+      owed_acc.update_daily_log(transaction)
+      prev_tr = transaction.get_previous(owed_acc)
+      transaction.balance_before = prev_tr.balance_after
+      transaction.balance_after = prev_tr.balance_after + transaction.get_difference(owed_acc)
+      transaction.save!
+      LazyWorker.perform_async("update_subsequent", {"transaction_id" => transaction.id})
+      return transaction
+    rescue StandardError => ex
+      puts ex.message
+    end
   end
 
   private

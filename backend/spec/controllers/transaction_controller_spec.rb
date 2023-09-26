@@ -1,5 +1,6 @@
 require 'rails_helper'
 require 'sidekiq/testing'
+RAILS_ENV='development'
 
 describe TransactionController do
   before :each do
@@ -335,19 +336,19 @@ describe TransactionController do
 
     it 'throw error if party is invalid' do
       post :settled_by_you, params: { amount: 100 , party: 100, account_id: @account.id}
-      validate_error_response(response, 400, 'party not found')
+      validate_response(response, 202, 'party not found')
     end
 
     it 'throw error if mop or account is not sent' do
       account = create(:account, owed: true, user: @user)
       post :settled_by_you, params: { amount: 100 , party: account.id }
-      validate_error_response(response, 400, 'Either mop_id or account_id must be sent in request')
+      validate_response(response, 202, 'Either mop_id or account_id must be sent in request')
     end
 
     it 'throw error if mop or account is invalid' do
       account = create(:account, owed: true, user: @user)
       post :settled_by_you, params: { amount: 100 , party: account.id, account_id: 1001}
-      validate_error_response(response, 400, 'mop_id or account_id is invalid')
+      validate_response(response, 202, 'mop_id or account_id is invalid')
     end
 
     it 'should create a settled_by_you transaction' do
@@ -363,6 +364,27 @@ describe TransactionController do
       log2 = account.daily_logs.find_by_date(Date.today)
       expect([log2.opening_balance, log2.closing_balance]).to eq([0,80])
     end
+  end
+
+  context 'Split#create' do
+    it 'should create a split transaction' do
+      owed1 = create(:account, user: @user, owed: true, name: 'owed1')
+      tr_array = [
+        {
+          "party": owed1.id,
+          "amount": 10,
+        },
+        {
+          "amount": 70,
+          "user": true,
+        }
+      ]
+      Sidekiq::Testing.inline! do
+        post :split, params: { amount: 100, account_id: @account.id, transactions: tr_array }
+        validate_response(response, 200, "Split transactions will be added")
+      end
+    end
+
   end
 
 end

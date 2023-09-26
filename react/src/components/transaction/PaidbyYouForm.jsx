@@ -17,7 +17,8 @@ function PaidbyYouForm(props) {
   const [party, setParty] = useState('');
   const [amount, setAmount] = useState(0);
   const [comments, setComments] = useState('');
-  const [date, setDate] = useState('');
+  const today_date = new Date().toJSON().slice(0, 10);
+  const [date, setDate] = useState(today_date);
   const [error, setError] = useState('');
   const [paymentType, setPaymentType] = useState('');
   const [paymentOption, selectPaymentOption] = useState('');
