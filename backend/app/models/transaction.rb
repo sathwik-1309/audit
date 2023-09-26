@@ -12,6 +12,7 @@ class Transaction < ApplicationRecord
   end
 
   def track_modifications
+    return if self.pseudo
     return if self.account_opening?
     self.reload.account.update_balance(self)
     self.account.update_daily_log(self)
@@ -60,7 +61,7 @@ class Transaction < ApplicationRecord
       daily_log.opening_balance += amount
       daily_log.closing_balance += amount
       daily_log.save!
-      transactions = account.user.transactions.where(id: daily_log.meta['tr_ids'])
+      transactions = self.user.transactions.where(id: daily_log.meta['tr_ids'])
       transactions.each do |transaction|
         transaction.balance_before += amount
         transaction.balance_after += amount
@@ -155,6 +156,10 @@ class Transaction < ApplicationRecord
       return transaction
     rescue StandardError => ex
       puts ex.message
+    end
+
+    def self.validate_split(amount, tr_json)
+      return
     end
   end
 

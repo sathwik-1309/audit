@@ -164,14 +164,14 @@ describe TransactionController do
     it 'create multiple credit transactions and ensure subsequent transactions are updated' do
       bal = @account.balance
       Sidekiq::Testing.inline! do
-        tr0 = create(:transaction, ttype: CREDIT, amount: 50, account: @account, date: Date.today + 2)
+        tr0 = create(:transaction, ttype: CREDIT, amount: 50, account: @account, user: @user, date: Date.today + 2)
         expect([tr0.balance_before, tr0.balance_after]).to eq([1000, 1050])
-        tr1 = create(:transaction, ttype: CREDIT, amount: 50, account: @account, date: Date.today + 2)
+        tr1 = create(:transaction, ttype: CREDIT, amount: 50, account: @account, user: @user, date: Date.today + 2)
         expect([tr1.balance_before, tr1.balance_after]).to eq([1050, 1100])
-        tr2 = create(:transaction, ttype: CREDIT, amount: 200, account: @account, date: Date.today + 1)
+        tr2 = create(:transaction, ttype: CREDIT, amount: 200, account: @account, user: @user, date: Date.today + 1)
         expect([tr2.balance_before, tr2.balance_after]).to eq([1000, 1200])
         expect([tr1.reload.balance_before, tr1.balance_after]).to eq([1250, 1300])
-        tr3 = create(:transaction, ttype: CREDIT, amount: 300, account: @account, date: Date.today )
+        tr3 = create(:transaction, ttype: CREDIT, amount: 300, account: @account, user: @user, date: Date.today )
         expect([tr1.reload.balance_before, tr1.balance_after]).to eq([1550, 1600])
         expect([tr2.reload.balance_before, tr2.balance_after]).to eq([1300, 1500])
         expect([tr3.reload.balance_before, tr3.balance_after]).to eq([1000, 1300])
@@ -206,12 +206,12 @@ describe TransactionController do
     it 'should handle credit and debit in order' do
       bal = @account.balance
       Sidekiq::Testing.inline! do
-        tr0 = create(:transaction, ttype: CREDIT, amount: 300, account: @account, date: Date.today)
-        tr1 = create(:transaction, ttype: DEBIT, amount: 100, mop: @mop, date: Date.today)
-        tr2 = create(:transaction, ttype: DEBIT, amount: 50, mop: @mop, date: Date.today+1)
-        tr3 = create(:transaction, ttype: CREDIT, amount: 100, account: @account, date: Date.today+1)
-        tr4 = create(:transaction, ttype: DEBIT, amount: 200, mop: @mop, date: Date.today+1)
-        tr5 = create(:transaction, ttype: DEBIT, amount: 300, mop: @mop, date: Date.today+2)
+        tr0 = create(:transaction, ttype: CREDIT, amount: 300, account: @account, user: @user, date: Date.today)
+        tr1 = create(:transaction, ttype: DEBIT, amount: 100, mop: @mop, user: @user, date: Date.today)
+        tr2 = create(:transaction, ttype: DEBIT, amount: 50, mop: @mop, user: @user, date: Date.today+1)
+        tr3 = create(:transaction, ttype: CREDIT, amount: 100, account: @account, user: @user, date: Date.today+1)
+        tr4 = create(:transaction, ttype: DEBIT, amount: 200, mop: @mop, user: @user, date: Date.today+1)
+        tr5 = create(:transaction, ttype: DEBIT, amount: 300, mop: @mop, user: @user, date: Date.today+2)
 
         expect([tr0.reload.balance_before, tr0.balance_after]).to eq([1000, 1300])
         expect([tr1.reload.balance_before, tr1.balance_after]).to eq([1300, 1200])
@@ -226,12 +226,12 @@ describe TransactionController do
     it 'should handle credit and debit in jumbled order' do
       bal = @account.balance
       Sidekiq::Testing.inline! do
-        tr2 = create(:transaction, ttype: DEBIT, amount: 50, mop: @mop, date: Date.today+1)
-        tr5 = create(:transaction, ttype: DEBIT, amount: 300, mop: @mop, date: Date.today+2)
-        tr0 = create(:transaction, ttype: CREDIT, amount: 300, account: @account, date: Date.today)
-        tr3 = create(:transaction, ttype: CREDIT, amount: 100, account: @account, date: Date.today+1)
-        tr1 = create(:transaction, ttype: DEBIT, amount: 100, mop: @mop, date: Date.today)
-        tr4 = create(:transaction, ttype: DEBIT, amount: 200, mop: @mop, date: Date.today+1)
+        tr2 = create(:transaction, ttype: DEBIT, amount: 50, mop: @mop, user: @user, date: Date.today+1)
+        tr5 = create(:transaction, ttype: DEBIT, amount: 300, mop: @mop, user: @user, date: Date.today+2)
+        tr0 = create(:transaction, ttype: CREDIT, amount: 300, account: @account, user: @user, date: Date.today)
+        tr3 = create(:transaction, ttype: CREDIT, amount: 100, account: @account, user: @user, date: Date.today+1)
+        tr1 = create(:transaction, ttype: DEBIT, amount: 100, mop: @mop, user: @user, date: Date.today)
+        tr4 = create(:transaction, ttype: DEBIT, amount: 200, mop: @mop, user: @user, date: Date.today+1)
 
         expect([tr0.reload.balance_before, tr0.balance_after]).to eq([1000, 1300])
         expect([tr1.reload.balance_before, tr1.balance_after]).to eq([1300, 1200])
@@ -270,12 +270,12 @@ describe TransactionController do
     
     it 'throw error if party is invalid' do
       post :paid_by_you, params: { amount: 100 , party: 100}
-      validate_error_response(response, 400, 'party not found')
+      validate_response(response, 202, 'party not found')
     end
 
     it 'throw error if party is not sent' do
       post :paid_by_you, params: { amount: 100 }
-      validate_error_response(response, 400, 'party not found')
+      validate_response(response, 202, 'party not found')
     end
 
     it 'should create a paid_by_you transaction' do
@@ -298,23 +298,23 @@ describe TransactionController do
 
     it 'throw error if party is invalid' do
       post :settled_by_party, params: { amount: 100 , party: 100, account_id: @account.id}
-      validate_error_response(response, 400, 'party not found')
+      validate_response(response, 202, 'party not found')
     end
 
     it 'throw error if party and account is not sent' do
       post :settled_by_party, params: { amount: 100 }
-      validate_error_response(response, 400, 'account not found')
+      validate_response(response, 202, 'account not found')
     end
 
     it 'throw error if party is not sent' do
       post :settled_by_party, params: { amount: 100 , account_id: @account.id}
-      validate_error_response(response, 400, 'party not found')
+      validate_response(response, 202, 'party not found')
     end
 
     it 'throw error if account is invalid' do
       account = create(:account, owed: true, user: @user)
       post :settled_by_party, params: { amount: 100 , party: account.id, account_id: 1001}
-      validate_error_response(response, 400, 'account not found')
+      validate_response(response, 202, 'account not found')
     end
 
     it 'should create a settled_by_party transaction' do
@@ -367,21 +367,61 @@ describe TransactionController do
   end
 
   context 'Split#create' do
+    it 'should throw error when money does not add up in a split transaction' do
+      owed1 = create(:account, user: @user, owed: true, name: 'owed1')
+      tr_array = [
+        {
+          "party": owed1.id,
+          "amount": 30,
+        },
+        {
+          "amount": 80,
+          "user": true,
+        }
+      ]
+      post :split, params: { amount: 100, account_id: @account.id, transactions: tr_array }
+      validate_response(response, 202, "Sum does not add up to the amount 100")
+    end
+
     it 'should create a split transaction' do
       owed1 = create(:account, user: @user, owed: true, name: 'owed1')
       tr_array = [
         {
           "party": owed1.id,
-          "amount": 10,
+          "amount": 20,
         },
         {
-          "amount": 70,
+          "amount": 80,
           "user": true,
         }
       ]
       Sidekiq::Testing.inline! do
         post :split, params: { amount: 100, account_id: @account.id, transactions: tr_array }
         validate_response(response, 200, "Split transactions will be added")
+        expect(owed1.reload.balance).to eq 20
+        expect(@account.reload.balance).to eq 900
+      end
+    end
+
+    it 'should add only for others' do
+      owed1 = create(:account, user: @user, owed: true, name: 'owed1')
+      owed2 = create(:account, user: @user, owed: true, name: 'owed2')
+      tr_array = [
+        {
+          "party": owed1.id,
+          "amount": 20,
+        },
+        {
+          "party": owed2.id,
+          "amount": 80,
+        }
+      ]
+      Sidekiq::Testing.inline! do
+        post :split, params: { amount: 100, account_id: @account.id, transactions: tr_array }
+        validate_response(response, 200, "Split transactions will be added")
+        expect(owed1.reload.balance).to eq 20
+        expect(owed2.reload.balance).to eq 80
+        expect(@account.reload.balance).to eq 900
       end
     end
 

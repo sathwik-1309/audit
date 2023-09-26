@@ -127,7 +127,6 @@ class TransactionController < ApplicationController
     attributes[:account_id] = @account.id
     attributes[:date] = filter_params[:date].present? ? filter_params[:date] : Date.today
     attributes[:party] = @account.id
-    attributes[:pseudo] = true
     unless attributes[:sub_category_id].nil?
       attributes[:category_id] = @current_user.sub_categories.find_by_id(filter_params[:sub_category_id]).category_id
     end
@@ -272,6 +271,11 @@ class TransactionController < ApplicationController
     attributes[:account_id] = mop.account_id
     attributes[:ttype] = SPLIT
     attributes[:date] = filter_params[:date].present? ? filter_params[:date] : Date.today
+    # Transaction.validate_split(attributes[:amount], params[:transactions])
+    amounts_arr = params[:transactions].map{|t| t['amount'].to_f}
+    if amounts_arr.sum != filter_params[:amount].to_f
+      render_202("Sum does not add up to the amount #{filter_params[:amount]}") and return
+    end
 
     # split_tr_ids = []
     # filter_params[:transactions].each do |transaction|
