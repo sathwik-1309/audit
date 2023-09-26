@@ -21,17 +21,17 @@ describe TransactionController do
 
     it 'throw error if mop_id is invalid' do
       post :debit, params: { amount: 100, mop_id: 1000 }
-      validate_error_response(response, 400, 'mop_id or account_id is invalid')
+      validate_response(response, 202, 'mop_id or account_id is invalid')
     end
 
     it 'throw error if mop_id is invalid' do
       post :debit, params: { amount: 100 }
-      validate_error_response(response, 400, 'Either mop_id or account_id must be sent in request')
+      validate_response(response, 202, 'Either mop_id or account_id must be sent in request')
     end
 
     it 'throw error if account_id is invalid' do
       post :debit, params: { amount: 100, account_id: 100 }
-      validate_error_response(response, 400, 'mop_id or account_id is invalid')
+      validate_response(response, 202, 'mop_id or account_id is invalid')
     end
 
     it 'creates new debit transaction' do
@@ -137,12 +137,12 @@ describe TransactionController do
 
     it 'throw error if account_id is invalid' do
       post :credit, params: { amount: 100, account_id: 1000 }
-      validate_error_response(response, 400, 'account not found')
+      validate_response(response, 202, 'account not found')
     end
 
     it 'throw error if account_id is not sent' do
       post :credit, params: { amount: 100 }
-      validate_error_response(response, 400, 'account not found')
+      validate_response(response, 202, 'account not found')
     end
 
     it 'creates new credit transaction' do
@@ -398,6 +398,7 @@ describe TransactionController do
       Sidekiq::Testing.inline! do
         post :split, params: { amount: 100, account_id: @account.id, transactions: tr_array }
         validate_response(response, 200, "Split transactions will be added")
+        
         expect(owed1.reload.balance).to eq 20
         expect(@account.reload.balance).to eq 900
       end

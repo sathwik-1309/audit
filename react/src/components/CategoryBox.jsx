@@ -42,7 +42,6 @@ function CategoryBox(props) {
     }
 
     let { theme } = useContext(ThemeContext);
-    let edit_button = selectCategory ? '' : 'EDIT'
   return (
     <div className={`flex flex-col ${selectCategory ? `${theme}-c2 ${theme}-bg2` : `${theme}-bg1 ${theme}-c1`}   mt-3 font-semibold h-fit rounded`}>
       <div className='flex flex-row'>

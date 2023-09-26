@@ -75,11 +75,15 @@ class Account < ApplicationRecord
   end
 
   def self.list(user, owed=false)
+    array = []
     accounts = user.accounts.where(creditcard: false, owed: owed)
     accounts.each do |account|
       account['name'] = account['name'].titleize
+      temp = account.attributes
+      temp['transactions'] = account.transactions.order(date: :desc).limit(5).map{|t| t.transaction_box }
+      array << temp
     end
-    accounts
+    array
   end
 
   def auto_generated_mop

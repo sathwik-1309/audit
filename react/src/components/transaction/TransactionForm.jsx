@@ -12,8 +12,7 @@ function TransactionForm(props) {
   const [comments, setComments] = useState('');
   const [category, setCategory] = useState('');
   
-  const today_date = new Date().toJSON().slice(0, 10);
-  const [date, setDate] = useState(today_date);
+  const [date, setDate] = useState('');
   const [error, setError] = useState('');
   const method = props.method;
   let { theme } = useContext(ThemeContext);

@@ -100,20 +100,9 @@ class Transaction < ApplicationRecord
   end
 
   def create_split_transactions(tr_array)
-    parsed_hashes = []
-    tr_array.each do |data_string|
-      # Convert the JSON-like string into a Ruby-like hash using eval
-      ruby_like_hash = eval(data_string)
-
-      # Convert the Ruby-like hash to a real Ruby hash
-      real_hash = ruby_like_hash.transform_keys(&:to_sym)
-
-      # Add the real hash to the parsed_hashes array
-      parsed_hashes << real_hash
-    end
     child_tr_ids = []
-    parsed_hashes.each do |tr_json|
-      if tr_json[:user]
+    tr_array.each do |tr_json|
+      if tr_json['user']
         transaction = self.add_split_debit(tr_json)
       else
         transaction = self.add_split_paid_by_you(tr_json)
@@ -126,7 +115,7 @@ class Transaction < ApplicationRecord
 
   def add_split_debit(args)
     meta = { "parent_tr_id" => self.id }
-    transaction = Transaction.new(amount: args[:amount], ttype: DEBIT, date: self.date, category_id: self.category_id,
+    transaction = Transaction.new(amount: args['amount'], ttype: DEBIT, date: self.date, category_id: self.category_id,
                                    pseudo: true, balance_before: self.balance_before, balance_after: self.balance_after,
                                    meta: meta, comments: self.comments, sub_category_id: self.sub_category_id,
                                    mop_id: self.mop_id, account_id: self.account_id, user_id: self.user_id)
@@ -140,12 +129,12 @@ class Transaction < ApplicationRecord
 
   def add_split_paid_by_you(args)
     meta = { "parent_tr_id" => self.id }
-    transaction = Transaction.new(amount: args[:amount], ttype: PAID_BY_YOU, date: self.date, party: args[:party],
+    transaction = Transaction.new(amount: args['amount'], ttype: PAID_BY_YOU, date: self.date, party: args['party'],
                                   pseudo: true, meta: meta, comments: self.comments, mop_id: self.mop_id,
                                   account_id: self.account_id, user_id: self.user_id)
     begin
       transaction.save!
-      owed_acc = self.user.accounts.find_by_id(args[:party])
+      owed_acc = self.user.accounts.find_by_id(args['party'])
       owed_acc.update_balance(transaction)
       owed_acc.update_daily_log(transaction)
       prev_tr = transaction.get_previous(owed_acc)
@@ -157,10 +146,20 @@ class Transaction < ApplicationRecord
     rescue StandardError => ex
       puts ex.message
     end
+  end
 
-    def self.validate_split(amount, tr_json)
-      return
+  def transaction_box
+    hash = self.attributes
+    hash['sub_category'] =  self.sub_category.name unless self.sub_category.nil?
+    hash['comments_mob'] = hash['comments']
+    if hash['comments'] and hash['comments'].length > 20
+      hash['comments_mob'] = hash['comments'][..20] + '...'
     end
+    hash
+  end
+
+  def self.validate_split(amount, tr_json)
+    return
   end
 
   private

@@ -3,7 +3,7 @@ class AccountController < ApplicationController
 
   def index
     accounts = Account.list(@current_user)
-    render(:json => accounts.to_json)
+    render(:json => accounts)
   end
 
   def index_owed

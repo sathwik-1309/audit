@@ -69,7 +69,7 @@ function Accounts() {
             <AccountForm onSubmit={handleCreateAccount} onCancel={handleCloseForm} />
         )}
         {data.map((account, index) => (
-          <AccountBox account={account} index={index} />
+          <AccountBox account={account} index={index}/>
         ))}
       </div>
     </div>

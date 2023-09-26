@@ -58,11 +58,11 @@ class TransactionController < ApplicationController
     elsif filter_params[:account_id].present?
       mop = @current_user.mops.where(account_id: filter_params[:account_id]).find{|m| m.is_auto_generated? }
     else
-      render_400("Either mop_id or account_id must be sent in request") and return
+      render_202("Either mop_id or account_id must be sent in request") and return
     end
 
     if mop.nil?
-      render_400("mop_id or account_id is invalid") and return
+      render_202("mop_id or account_id is invalid") and return
     end
 
     unless attributes[:sub_category_id].nil?
@@ -93,7 +93,7 @@ class TransactionController < ApplicationController
     attributes = filter_params.slice(:amount, :category, :comments, :account_id)
     @account = Account.find_by_id(filter_params[:account_id])
     if @account.nil?
-      render_400("account not found") and return
+      render_202("account not found") and return
     end
 
     attributes[:user_id] = @current_user.id
@@ -271,21 +271,16 @@ class TransactionController < ApplicationController
     attributes[:account_id] = mop.account_id
     attributes[:ttype] = SPLIT
     attributes[:date] = filter_params[:date].present? ? filter_params[:date] : Date.today
-    # Transaction.validate_split(attributes[:amount], params[:transactions])
-    amounts_arr = params[:transactions].map{|t| t['amount'].to_f}
+    tr_array = filter_params[:transactions].map(&:to_h)
+    amounts_arr = tr_array.map{|t| t['amount'].to_f}
     if amounts_arr.sum != filter_params[:amount].to_f
       render_202("Sum does not add up to the amount #{filter_params[:amount]}") and return
     end
 
-    # split_tr_ids = []
-    # filter_params[:transactions].each do |transaction|
-    #   split_tr_ids <<
-    # end
-    # attributes[:meta] = { "child_transactions" => split_tr_ids}
     begin
       @transaction = Transaction.create(attributes)
       @transaction.save!
-      LazyWorker.perform_async('create_split_transactions', { "transaction_id" => @transaction.id, "tr_array" => params[:transactions] } )
+      LazyWorker.perform_async('create_split_transactions', { "transaction_id" => @transaction.id, "tr_array" => tr_array } )
       msg = @transaction.attributes
       render_200("Split transactions will be added", msg) and return
     rescue StandardError => ex
@@ -307,7 +302,7 @@ class TransactionController < ApplicationController
   private
 
   def filter_params
-    params.permit(:account_id, :mop_id, :amount, :ttype, :date, :party, :meta, :comments, :card_id, :sub_category_id, :transactions)
+    params.permit(:account_id, :mop_id, :amount, :ttype, :date, :party, :meta, :comments, :card_id, :sub_category_id, transactions: [:amount, :user, :party])
   end
 
 end
