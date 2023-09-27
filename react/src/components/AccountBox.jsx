@@ -6,6 +6,8 @@ import ApiPut from '../axios/putapi';
 import ApiDelete from '../axios/deleteapi';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import Transactions from './Transactions';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 function AccountBox(props) {
     const account = props.account;
@@ -62,19 +64,10 @@ function AccountBox(props) {
                 <div className={`${theme}-c1 font-bold pl-3`}>₹ {account.balance}</div>
                 </div>
             </div>
-            <div className={`${theme}-c3 font-medium text-xs cursor-pointer flex items-center justify-center w-1/4`} onClick={handleEdit}>
-                {edit ? (
-                <div className='flex flex-col items-between h-24 justify-evenly'>
-                    <div onClick={handleSave} className={`cursor-pointer ${theme}-button-submit w-16 h-6`}>
-                        SAVE
-                    </div>
-                    <div className='flex justify-center w-18'>Cancel</div>
-                    <div className={`${theme}-button h-6`} onClick={handleDelete}>Delete</div>
-                </div>
-                ) : (
-                // Display "EDIT" when not in edit mode
-                'EDIT'
-                )}
+            <div className={`${theme}-c3 font-medium text-xs cursor-pointer flex items-center justify-center w-1/4`} onClick={(e)=>{setOpenTransactions(!openTransactions)}}>
+                {
+                    openTransactions ? <VisibilityOffIcon/> : <VisibilityIcon/>
+                }
             </div>
       </div>
       {

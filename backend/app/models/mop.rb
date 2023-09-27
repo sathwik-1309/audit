@@ -19,6 +19,12 @@ class Mop < ApplicationRecord
     return mop
   end
 
+  def processed_name
+    return "Account" if self.is_auto_generated?
+    return "Card" if self.is_card?
+    self.name
+  end
+
   def is_auto_generated?
     return true if self.meta["auto_generated"] and  self.meta["auto_generated"] == true
     return false

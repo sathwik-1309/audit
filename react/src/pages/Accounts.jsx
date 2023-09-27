@@ -8,6 +8,7 @@ import { refreshWebSocket } from '../context/WebSocketContext';
 import AccountBox from '../components/AccountBox';
 import AccountForm from "../components/AccountForm.jsx";
 import ApiPost from '../axios/postapi';
+import Owed from './Owed';
 
 function Accounts() {
   let { theme } = useContext(ThemeContext);
@@ -72,6 +73,7 @@ function Accounts() {
           <AccountBox account={account} index={index}/>
         ))}
       </div>
+      <Owed/>
     </div>
   );
 }

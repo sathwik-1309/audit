@@ -114,8 +114,6 @@ function SplitForm(props) {
         payload.date = date
     }
 
-    console.log(transactions);
-    console.log(userSplit);
     const user_split_json = {
         amount: userSplit,
         user: true
@@ -239,7 +237,7 @@ function SplitForm(props) {
                 </div>
             }
 
-            <div className='h-fit pl-3 mb-3 flex items-center w-64'>
+            <div className='h-fit pl-3 mb-3 flex items-center w-64 border mt-2'>
                 <div className='h-12'>
                 <PersonIcon style={{
                     height: '100%',
@@ -251,7 +249,7 @@ function SplitForm(props) {
                     value={personName}
                     onChange={handleChange}
                     input={<OutlinedInput style={{
-                        border: 'none'
+                        border: '0px'
                     }}
                           />}
                     renderValue={(selected) => (

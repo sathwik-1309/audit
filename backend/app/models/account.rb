@@ -80,7 +80,7 @@ class Account < ApplicationRecord
     accounts.each do |account|
       account['name'] = account['name'].titleize
       temp = account.attributes
-      temp['transactions'] = account.transactions.order(date: :desc).limit(5).map{|t| t.transaction_box }
+      temp['transactions'] = account.transactions.order(date: :desc, updated_at: :desc).limit(5).map{|t| t.transaction_box }
       array << temp
     end
     array
