@@ -15,6 +15,9 @@ import { ThemeProvider } from './context/ThemeContext';
 import { WebSocketProvider } from './context/WebSocketContext';
 import Categories from './pages/Categories';
 import Owed from './pages/Owed';
+import ForgotPassword from './pages/ForgotPassword';
+import Settings from './pages/Settings';
+import Account from './pages/Account';
 
 function App() {
   return (
@@ -30,12 +33,15 @@ function App() {
       <Routes>
           <Route path="/" element={<Loginpage/>}/>
           <Route path="/sign_up" element={<Signuppage/>}/>
+          <Route path="/forgot_password" element={<ForgotPassword/>}/>
           <Route path="/dashboard" element={<Dashboard/>}/>
           <Route path="/accounts" element={<Accounts/>}/>
+          <Route path="/account/:id" element={<Account/>}/>
           <Route path="/cards" element={<Cards/>}/>
           <Route path="/mops" element={<Mops/>}/>
           <Route path="/categories" element={<Categories/>}/>
           <Route path="/owed" element={<Owed/>}/>
+          <Route path="/settings" element={<Settings/>}/>
       </Routes>
     </Router>
     </ThemeProvider>

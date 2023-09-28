@@ -12,6 +12,10 @@ Rails.application.routes.draw do
     get '/check' => 'user#check'
     post '/create' => 'user#create'
     put '/update' => 'user#update'
+    get '/send_otp' => 'user#send_otp'
+    get '/otp_match' => 'user#otp_match'
+    put '/reset_password' => 'user#reset_password'
+    get '/settings' => 'user#settings'
   end
 
   scope :accounts do
@@ -22,6 +26,8 @@ Rails.application.routes.draw do
     put '/:id/update' => 'account#update'
     delete '/:id/delete' => 'account#delete'
     get '/home' => 'account#home'
+    get ':id/home_page' => 'account#home_page'
+    get ':id/paginate_transactions' => 'account#paginate_transactions'
   end
 
   scope :mops do

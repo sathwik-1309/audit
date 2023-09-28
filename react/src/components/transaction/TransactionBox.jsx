@@ -11,7 +11,7 @@ function TransactionBox(props) {
   const color = data.ttype === 'debit' ? 'red' : 'green'
   let chip_color = theme == 'light' ? '#473157' : 'white'
   return (
-    <div className={`flex flex-col ${theme}-bg1 m-1 p-1`}>
+    <div className={`flex flex-col ${theme}-bg1 m-1 p-1 font-bold`}>
         <div className={`flex flex-row ${theme}-c3 text-xs font-semibold`} style={{
             height: '1.2rem'
         }}>

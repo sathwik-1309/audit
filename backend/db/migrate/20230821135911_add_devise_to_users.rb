@@ -13,6 +13,7 @@ class AddDeviseToUsers < ActiveRecord::Migration[7.0]
 
       ## Rememberable
       t.datetime :remember_created_at
+      t.json :meta, default: {}
 
       ## Trackable
       # t.integer  :sign_in_count, default: 0, null: false

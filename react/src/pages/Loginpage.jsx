@@ -12,6 +12,10 @@ function Loginpage() {
 });
 const [sign_in_error, set_sign_in_error] = useState('')
 
+const redirectToSignin = () => {
+    window.location.replace(`${FRONTEND_API_URL}/sign_up`);
+}
+
 async function handleSubmit(event) {
   event.preventDefault();
 
@@ -83,18 +87,28 @@ const handleInputChange = (event) => {
               onChange={handleInputChange}
               />
             </div>
-            <div className='buttons flex flex-row justify-center'>
-              <div className='bg-purple-800 w-32 m-5 h-10 flex items-center justify-center font-bold rounded text-white hover:bg-purple-500 cursor-pointer'
-              onClick={handleSubmit}
-              >
-                Login
+            <div className='flex flex-col text-gray-600 text-sm justify-center'>
+              {/* <div className='flex justify-end pr-2 h-6 items-end hover:text-blue-600 cursor-pointer'>Forgot password?</div> */}
+              <div>
+                <div className='bg-purple-800 h-10 mt-6 flex m-4 items-center justify-center font-bold rounded text-white hover:bg-purple-500 cursor-pointer'
+                onClick={handleSubmit}
+                >
+                  Login
+                </div>
               </div>
-              <a className='bg-purple-800 w-32 m-5 h-10 flex items-center justify-center font-bold rounded text-white hover:bg-purple-500 hover:text-white cursor-pointer no-underline'
+              <div className='pt-3'>Dont have an account? <span className='text-blue-600 cursor-pointer' onClick={redirectToSignin}>Sign up</span></div>
+              <div className='pt-3 hover:text-blue-600 cursor-pointer' onClick={()=>{window.location.replace(`${FRONTEND_API_URL}/forgot_password`)}}>Forgot password?</div>
+            </div>
+            <div className='buttons flex flex-row justify-center'>
+              
+              {/* <a className='bg-purple-800 w-32 m-5 h-10 flex items-center justify-center font-bold rounded text-white hover:bg-purple-500 hover:text-white cursor-pointer no-underline'
               href={`${FRONTEND_API_URL}/sign_up`}>
                 Sign up
-              </a>
+              </a> */}
             </div>
+            
         </div>
+        
     </div>
   )
 }

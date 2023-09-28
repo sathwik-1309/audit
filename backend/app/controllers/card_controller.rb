@@ -9,7 +9,7 @@ class CardController < ApplicationController
       if card.ctype == CREDITCARD
         json[CREDITCARD] << card_json
       else
-        card_json['account'] = card.account.name.titleize
+        card_json['account'] = card.account.name
         json[DEBITCARD] << card_json
       end
     end
@@ -17,11 +17,13 @@ class CardController < ApplicationController
   end
 
   def create
+    name = Util.processed_name(filter_params[:name])
     if CTYPES.exclude? filter_params[:ctype]
       render_400("Invalid ctype") and return
     end
-    account = Account.create_credit_card_account(filter_params[:name], @current_user) if filter_params[:ctype] == CREDITCARD
-    attributes = filter_params.slice(:name, :ctype)
+    account = Account.create_credit_card_account(name, @current_user) if filter_params[:ctype] == CREDITCARD
+    attributes = filter_params.slice(:ctype)
+    attributes[:name] = name
     attributes[:account_id] = filter_params[:ctype] == DEBITCARD ? filter_params[:account_id] : account.reload.id
     attributes[:user_id] = @current_user.id
     @card = Card.new(attributes)

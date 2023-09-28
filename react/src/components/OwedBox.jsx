@@ -1,13 +1,14 @@
 import React, { useState } from 'react'
 import { useContext } from 'react';
 import ThemeContext from '../context/ThemeContext';
-import { BACKEND_API_URL } from '../config';
+import { BACKEND_API_URL, FRONTEND_API_URL } from '../config';
 import ApiPut from '../axios/putapi';
 import ApiDelete from '../axios/deleteapi';
 import PersonIcon from '@mui/icons-material/Person';
 import Transactions from './Transactions';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { redirect } from 'react-router-dom';
 
 function OwedBox(props) {
     const account = props.account;
@@ -34,9 +35,13 @@ function OwedBox(props) {
     };
 
     const handleDelete = async() => {
-        await ApiDelete(`${BACKEND_API_URL}/accounts/${account.id}/delete`);
+        await ApiDelete(`${BACKEND_API_URL}/account/${account.id}/delete`);
         console.log('Deleted Account:', editedName);
         setEdit(false);
+    }
+
+    const redirectOwed = () => {
+        window.location.replace(`${FRONTEND_API_URL}/account/${account.id}`)
     }
 
     let { theme } = useContext(ThemeContext);
@@ -44,7 +49,7 @@ function OwedBox(props) {
     <div className={`flex flex-col`}>
         <div className={`flex flex-row ${theme}-c1 ${theme}-bg1 mt-3 font-semibold h-24 rounded`}>
         <div className='flex flex-col p-1 w-3/4'>
-        <div className='flex flex-row h-1/2 pb-1 pl-3'>
+        <div className='flex flex-row h-1/2 pb-1 pl-3 cursor-pointer' onClick={redirectOwed}>
             <PersonIcon style={{
                 height: '100%',
             }}/>
@@ -72,7 +77,7 @@ function OwedBox(props) {
         </div>
         {
             openTransactions &&
-            <Transactions data={transactions} theme={theme}/>
+            <Transactions data={transactions} theme={theme} header='Last 5 Transactions'/>
         }
     </div>
   );

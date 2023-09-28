@@ -152,7 +152,7 @@ class Transaction < ApplicationRecord
     hash = self.attributes
     hash['sub_category'] =  self.sub_category.name unless self.sub_category.nil?
     hash['comments_mob'] = hash['comments']
-    hash['mop_name'] = self.mop.processed_name
+    hash['mop_name'] = self.mop&.processed_name
     if hash['comments'] and hash['comments'].length > 33
       hash['comments_mob'] = hash['comments'][..30] + '...'
     end

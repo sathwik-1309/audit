@@ -112,6 +112,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_30_075521) do
     t.string "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
+    t.json "meta", default: {}
     t.string "authentication_token", limit: 30
     t.index ["authentication_token"], name: "index_users_on_authentication_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true

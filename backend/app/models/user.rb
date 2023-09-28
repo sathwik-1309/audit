@@ -21,4 +21,16 @@ class User < ApplicationRecord
     self.cards.where(ctype: CREDITCARD)
   end
 
+  def send_reset_password_otp
+    otp = rand(100_0..999_9)
+    begin
+      self.meta['reset_password_otp'] = [] if self.meta['reset_password_otp'].nil?
+      self.meta['reset_password_otp'] << otp
+      self.save!
+      UserMailer.reset_password_otp(self.email, otp).deliver_now
+    rescue StandardError => ex
+      puts ex.message
+    end
+  end
+
 end
