@@ -8,6 +8,7 @@ backend/public/assets
 backend/public/packs
 backend/node_modules
 backend/yarn-error.log
+backend/public/images/*
 
 
 # Logs

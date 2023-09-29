@@ -50,7 +50,7 @@ function SettledbyYouForm2(props) {
   }
 
   return (
-    <div className={`flex justify-center flex-col items-center rounded sm:w-[450px] w-full mb-1 rounded ${props.type === method ? `${theme}-bg1 m-4` : ''}`}>
+    <div className={`flex justify-center flex-col items-center rounded sm:w-[450px] w-full mb-1 rounded ${theme}-c1 ${props.type === method ? `${theme}-bg1 m-4` : ''}`}>
       <div
         className={`w-64 h-8 m-3 flex items-center justify-center cursor-pointer font-bold text-sm rounded ${
           method === `${props.type}` ? `${theme}-bg3 ${theme}-c1 ${theme}-border-c1` : `${theme}-bg2 ${theme}-c2`

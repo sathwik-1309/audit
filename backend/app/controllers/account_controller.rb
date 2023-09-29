@@ -114,6 +114,18 @@ class AccountController < ApplicationController
     render(:json => json)
   end
 
+  def stats
+    json = {}
+    @account = @current_user.accounts.find_by_id(filter_params[:id])
+    period = 'week'
+    if params[:period].present? and PERIODS.include? params[:period]
+      period = params[:period]
+    end
+    json['stats'] = @account.stats(period)
+    json['account'] = @account.attributes
+    render(:json => json)
+  end
+
   def paginate_transactions
     page_number = filter_params[:page_number].to_i.positive? ? filter_params[:page_number].to_i : 1
     page_size = filter_params[:page_size].to_i

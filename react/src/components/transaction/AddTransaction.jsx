@@ -23,8 +23,6 @@ function AddTransaction(props) {
         <CreditForm type={'credit'} click={handleMethodChange} method={method} data={props.data} setMethod={setMethod}/>
         <PaidbyPartyForm type={'paid_by_party'} click={handleMethodChange} method={method} data={props.data} setMethod={setMethod}/>
         <PaidbyYouForm type={'paid_by_you'} click={handleMethodChange} method={method} data={props.data} setMethod={setMethod}/>
-        <SettledbyPartyForm type={'settled_by_party'} click={handleMethodChange} method={method} data={props.data} setMethod={setMethod}/>
-        <SettledbyYouForm type={'settled_by_you'} click={handleMethodChange} method={method} data={props.data} setMethod={setMethod}/>
         <SplitForm type={'split'} click={handleMethodChange} method={method} data={props.data} setMethod={setMethod}/>
     </div>
   )

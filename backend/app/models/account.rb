@@ -155,4 +155,29 @@ class Account < ApplicationRecord
     return [] unless self.owed
     self.user.transactions.where(party: self.id)
   end
+
+  def stats(period)
+    transactions = self.transactions.where(pseudo: false)
+    case period
+    when 'today'
+      transactions = transactions.where(date: Date.today)
+    when 'week'
+      start_of_week = Date.today.beginning_of_week
+      end_of_week = Date.today.end_of_week
+      transactions = transactions.where("date BETWEEN ? AND ?", start_of_week, end_of_week)
+    when 'month'
+      start_of_month = Date.today.beginning_of_month
+      end_of_month = Date.today.end_of_month
+      transactions = transactions.where("date BETWEEN ? AND ?", start_of_month, end_of_month)
+    end
+    total = { CREDIT => 0, DEBIT => 0}
+    transactions.each do |transaction|
+      if transaction.get_difference(self) > 0
+        total[CREDIT] += transaction.amount
+      else
+        total[DEBIT] += transaction.amount
+      end
+    end
+    total
+  end
 end

@@ -28,6 +28,7 @@ Rails.application.routes.draw do
     get '/home' => 'account#home'
     get ':id/home_page' => 'account#home_page'
     get ':id/paginate_transactions' => 'account#paginate_transactions'
+    get ':id/stats' => 'account#stats'
   end
 
   scope :mops do

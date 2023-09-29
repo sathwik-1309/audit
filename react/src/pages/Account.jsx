@@ -9,6 +9,7 @@ import Categories from './Categories';
 import PaginateTransactions from '../components/transaction/PaginateTransactions';
 import BookmarksIcon from '@mui/icons-material/Bookmarks';
 import PiechartSummary from '../components/piechart/PiechartSummary';
+import AccountStatBox from '../components/AccountStatBox';
 
 function Account() {
   const { theme } = useContext(ThemeContext);
@@ -52,9 +53,10 @@ function Account() {
     <div className={`${theme}-bg1 w-screen h-screen overflow-auto p-3`}>
       <Navbar page="Accounts" />
       <div className='flex sm:flex-row flex-col'>
+        <AccountStatBox/>
         <div className='flex flex-col sm:m-3'>
             {
-                data.pie_chart == [] ?
+                data.pie_chart.length == 0 ?
                 <PiechartSummary data={empty_pie_data} header='Categories'/> :
                 <PiechartSummary data={data.pie_chart} header='Categories'/>
             }

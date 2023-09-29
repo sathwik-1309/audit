@@ -5,4 +5,3 @@ class AccountsChannel < ApplicationCable::Channel
 
   # Other channel methods...
 end
-  
