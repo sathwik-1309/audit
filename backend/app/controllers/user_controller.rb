@@ -29,7 +29,9 @@ before_action :set_current_user
   end
 
   def create
-    attributes = filter_params.slice(:name, :email, :password)
+    name = Util.processed_name(filter_params[:name])
+    attributes = filter_params.slice(:email, :password)
+    attributes[:name] = name
     if User.find_by_email(filter_params[:email]).present?
       render_202("Email already taken") and return
     end
@@ -51,8 +53,11 @@ before_action :set_current_user
       render_400("Unauthorized, Please sign in") and return
     end
     @user = @current_user
-    @user.assign_attributes(filter_params)
     begin
+      if params[:image].present?
+        @user.upload(params[:image])
+      end
+      @user.assign_attributes(filter_params.slice(:name, :email))
       @user.save!
       msg = {
         "@user": {
@@ -66,9 +71,60 @@ before_action :set_current_user
     end
   end
 
+  def send_otp
+    @user = User.find_by_email(filter_params[:email])
+    if @user.nil?
+      render_202("No user with this email") and return
+    end
+    @user.send_reset_password_otp
+    render_200("Otp sent to email")
+  end
+
+  def otp_match
+    @user = User.find_by_email(filter_params[:email])
+    if @user.nil?
+      render_202("No user with this email") and return
+    end
+    if @user.meta['reset_password_otp'].include? filter_params[:otp].to_i
+      @user.meta['reset_password_otp'] = []
+      begin
+        @user.save!
+        msg = { "user_id"=> @user.id }
+        render_200("Password Reset", msg)
+      rescue StandardError => ex
+        render_202(ex.message)
+      end
+    else
+      render_202("invalid OTP")
+    end
+  end
+
+  def reset_password
+    @user = User.find_by_id(filter_params[:user_id])
+    if @user.nil?
+      render_202("user not found") and return
+    end
+    @user.password = filter_params[:password]
+    begin
+      @user.save!
+      render_200("Password reset for #{@user.name}")
+    rescue StandardError => ex
+      render_202(ex.message)
+    end
+  end
+
+  def settings
+    json = {}
+    unless @current_user.present?
+      render_400("Unauthorized, Please sign in") and return
+    end
+    json['user_details'] = @current_user.attributes
+    render(:json => json)
+  end
+
   private
 
   def filter_params
-    params.permit(:name, :email, :password, :theme)
+    params.permit(:name, :email, :password, :theme, :otp, :user_id)
   end
 end

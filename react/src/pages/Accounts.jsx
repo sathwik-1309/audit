@@ -8,6 +8,7 @@ import { refreshWebSocket } from '../context/WebSocketContext';
 import AccountBox from '../components/AccountBox';
 import AccountForm from "../components/AccountForm.jsx";
 import ApiPost from '../axios/postapi';
+import Owed from './Owed';
 
 function Accounts() {
   let { theme } = useContext(ThemeContext);
@@ -69,9 +70,10 @@ function Accounts() {
             <AccountForm onSubmit={handleCreateAccount} onCancel={handleCloseForm} />
         )}
         {data.map((account, index) => (
-          <AccountBox account={account} index={index} />
+          <AccountBox account={account} index={index}/>
         ))}
       </div>
+      <Owed/>
     </div>
   );
 }

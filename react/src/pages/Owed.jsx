@@ -58,11 +58,11 @@ function Owed() {
   }
 
   return (
-    <div className={`${theme}-bg1 w-screen h-screen overflow-auto p-3`}>
-      <Navbar page="Owed" />
+    <div className={`${theme}-bg1 overflow-auto`}>
+      {/* <Navbar page="Owed" /> */}
       <div className={`flex flex-col ${theme}-c1 font-bold text-lg p-3 mt-10 ${theme}-bg3 sm:w-[450px] w-full`}>
         <div className={`flex flex-row pb-3 border-b-2 ${theme}-border mb-3`}>
-            <div className={`flex items-center pl-8 w-1/2`}>Accounts</div>
+            <div className={`flex items-center pl-8 w-1/2`}>Owed</div>
             <div onClick={handleCreateClick} className={`w-1/2 font-semibold ${theme}-c3 cursor-pointer flex justify-end pr-3`}>ADD</div>
         </div>
         {showForm && (

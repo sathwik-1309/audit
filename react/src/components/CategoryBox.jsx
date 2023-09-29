@@ -6,6 +6,8 @@ import ApiPut from '../axios/putapi';
 import ApiDelete from '../axios/deleteapi';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import SubCategories from './SubCategories';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 function CategoryBox(props) {
     const category = props.category;
@@ -42,7 +44,6 @@ function CategoryBox(props) {
     }
 
     let { theme } = useContext(ThemeContext);
-    let edit_button = selectCategory ? '' : 'EDIT'
   return (
     <div className={`flex flex-col ${selectCategory ? `${theme}-c2 ${theme}-bg2` : `${theme}-bg1 ${theme}-c1`}   mt-3 font-semibold h-fit rounded`}>
       <div className='flex flex-row'>
@@ -62,7 +63,12 @@ function CategoryBox(props) {
                 <div className='flex items-center pl-3 text-md font-bold'>{category.name}</div>   
             )}
             </div>
-            {
+            <div className='flex justify-center items-center cursor-pointer w-1/4' onClick={()=>{setSelectCategory(!selectCategory)}}>
+                {
+                    selectCategory ? <VisibilityOffIcon/> : <VisibilityIcon/>
+                }
+            </div>
+            {/* {
                 !selectCategory &&
                 <div className={`${theme}-c3 font-medium text-xs cursor-pointer flex items-center justify-center w-1/4`} onClick={handleEdit}>
                     {edit ? (
@@ -77,7 +83,7 @@ function CategoryBox(props) {
                         'EDIT'
                     )}
                 </div>
-            }
+            } */}
       </div>
       {
         selectCategory && (

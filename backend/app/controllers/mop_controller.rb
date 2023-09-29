@@ -16,7 +16,12 @@ class MopController < ApplicationController
   end
 
   def create
-    attributes = filter_params.slice(:account_id, :name)
+    name = Util.processed_name(filter_params[:name])
+    if @current_user.accounts.find_by_id(filter_params[:account_id]).mops.pluck(:name).include? name
+      render_202("Payment method already present") and return
+    end
+    attributes = filter_params.slice(:account_id)
+    attributes[:name] = name
     attributes[:user_id] = @current_user.id
     @mop = Mop.new(attributes)
     begin

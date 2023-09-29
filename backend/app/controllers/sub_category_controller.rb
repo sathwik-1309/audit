@@ -7,16 +7,17 @@ class SubCategoryController < ApplicationController
   end
 
   def create
-    name = filter_params[:name].downcase
+    name = Util.processed_name(filter_params[:name])
     category = @current_user.categories.find_by_id(filter_params[:category_id])
     if category.nil?
       render_202("Invalid Category") and return
     end
     if category.sub_categories.pluck(:name).include? name
-      render_202("Sub-category #{filter_params[:name]} already exists in this category") and return
+      render_202("Sub-category #{name} already exists in this category") and return
     end
-    attributes = filter_params.slice(:name, :category_id)
+    attributes = filter_params.slice(:category_id)
     attributes[:user_id] = @current_user.id
+    attributes[:name] = name
     @sub_category = SubCategory.new(attributes)
     begin
       @sub_category.save!

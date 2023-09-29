@@ -19,6 +19,17 @@ Rails.application.configure do
 
   config.action_mailer.default_url_options = { host: 'localhost', port: 3001 }
 
+  # config.action_mailer.delivery_method = :smtp
+  # config.action_mailer.smtp_settings = {
+  #   address: 'smtp.gmail.com',
+  #   port: 587,
+  #   domain: 'example.com', # Replace with your domain
+  #   user_name: ENV['GMAIL_EMAIL'], # Replace with your Gmail email address
+  #   password: ENV['GMAIL_PASSWORD'], # Replace with your Gmail password or App Password
+  #   authentication: 'plain',
+  #   enable_starttls_auto: true
+  # }
+
   # Enable/disable caching. By default caching is disabled.
   # Run rails dev:cache to toggle caching.
   if Rails.root.join("tmp/caching-dev.txt").exist?
@@ -64,8 +75,11 @@ Rails.application.configure do
   config.active_job.queue_adapter = :sidekiq
 
   config.action_cable.disable_request_forgery_protection = true
-  config.action_cable.url = "ws://localhost:3001/cable"
-  config.action_cable.allowed_request_origins = [ /http:\/\/localhost:\d+/ ]
+  config.action_cable.url = "ws://#{ENV['HOST_IP']}:3001/cable"
+  config.action_cable.allowed_request_origins = [
+    "http://#{ENV['HOST_IP']}:3000", # Replace with your HOST_IP and port
+    "http://#{ENV['HOST_IP']}:3001" # Replace with your HOST_IP and secure port (if applicable)
+  ]
 
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true

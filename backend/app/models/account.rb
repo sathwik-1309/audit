@@ -75,11 +75,76 @@ class Account < ApplicationRecord
   end
 
   def self.list(user, owed=false)
+    array = []
     accounts = user.accounts.where(creditcard: false, owed: owed)
     accounts.each do |account|
-      account['name'] = account['name'].titleize
+      temp = account.attributes
+      if owed
+        transactions = account.owed_transactions
+      else
+        transactions = account.transactions
+      end
+      temp['transactions'] = transactions.order(date: :desc, updated_at: :desc).limit(5).map{|t| t.transaction_box }
+      array << temp
     end
-    accounts
+    array
+  end
+
+  def pie_chart_meta
+    meta_array = []
+    meta = {}
+    transactions = self.transactions.where(ttype: [DEBIT, PAID_BY_PARTY])
+    transactions.each do|transaction|
+      if transaction.category.present?
+        meta[transaction.category.name] = 0 unless meta.has_key? transaction.category.name
+        meta[transaction.category.name] += transaction.amount
+      else
+        meta['other'] = 0 unless meta.has_key? 'other'
+        meta['other'] += transaction.amount
+      end
+    end
+
+    total_amount = meta.values.sum
+    id = 0
+    meta.each do |category, amount|
+      meta_array << {
+        "id" => id,
+        "value" => amount,
+        "color" => PIE_CHART_COLORS[id],
+        "percentage" => (amount*100/total_amount).round(2),
+        "label" => category
+      }
+      id += 1
+    end
+    meta_array
+  end
+
+  def pie_chart_meta_sub_category(category)
+    meta_array = []
+    meta = {}
+    transactions = self.transactions.where(ttype: [DEBIT, PAID_BY_PARTY], category_id: category.id)
+    transactions.each do|transaction|
+      if transaction.sub_category.present?
+        meta[transaction.sub_category.name] = 0 unless meta.has_key? transaction.sub_category.name
+        meta[transaction.sub_category.name] += transaction.amount
+      else
+        meta['other'] = 0 unless meta.has_key? 'other'
+        meta['other'] += transaction.amount
+      end
+    end
+    total_amount = meta.values.sum
+    id = 0
+    meta.each do |sub_category, amount|
+      meta_array << {
+        "id" => id,
+        "value" => amount,
+        "color" => PIE_CHART_COLORS[id],
+        "percentage" => (amount*100/total_amount).round(2),
+        "label" => sub_category
+      }
+      id += 1
+    end
+    meta_array
   end
 
   def auto_generated_mop
@@ -87,7 +152,32 @@ class Account < ApplicationRecord
   end
 
   def owed_transactions
-    return nil unless self.owed
+    return [] unless self.owed
     self.user.transactions.where(party: self.id)
+  end
+
+  def stats(period)
+    transactions = self.transactions.where(pseudo: false)
+    case period
+    when 'today'
+      transactions = transactions.where(date: Date.today)
+    when 'week'
+      start_of_week = Date.today.beginning_of_week
+      end_of_week = Date.today.end_of_week
+      transactions = transactions.where("date BETWEEN ? AND ?", start_of_week, end_of_week)
+    when 'month'
+      start_of_month = Date.today.beginning_of_month
+      end_of_month = Date.today.end_of_month
+      transactions = transactions.where("date BETWEEN ? AND ?", start_of_month, end_of_month)
+    end
+    total = { CREDIT => 0, DEBIT => 0}
+    transactions.each do |transaction|
+      if transaction.get_difference(self) > 0
+        total[CREDIT] += transaction.amount
+      else
+        total[DEBIT] += transaction.amount
+      end
+    end
+    total
   end
 end

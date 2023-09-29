@@ -28,5 +28,10 @@ class LazyWorker
     end
   end
 
+  def create_split_transactions(args)
+    transaction = Transaction.find_by_id(args['transaction_id'])
+    transaction.create_split_transactions(args['tr_array'])
+  end
+
 end
   

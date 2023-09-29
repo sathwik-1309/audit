@@ -4,6 +4,7 @@ import email_icon from '../assets/email.png'
 import password_icon from '../assets/password.png'
 import { BACKEND_API_URL, FRONTEND_API_URL } from '../config'
 import axios from 'axios'
+import { redirect } from 'react-router-dom'
 
 function Signuppage() {
   const [formData, setFormData] = useState({
@@ -20,7 +21,11 @@ function Signuppage() {
         ...formData,
         [name]: value,
     });
-};
+  }
+  
+  const redirectToLogin = () => {
+    window.location.replace(`${FRONTEND_API_URL}/`)
+  }
 
 async function handleSubmit(event) {
   event.preventDefault();
@@ -99,11 +104,14 @@ async function handleSubmit(event) {
                 onChange={handleInputChange}
               />
             </div>
-            <div className='flex justify-center'>
-              <div className='bg-purple-800 w-32 m-5 h-10 flex items-center justify-center font-bold rounded text-white hover:bg-purple-500 cursor-pointer'
+            <div className='flex justify-center flex-col'>
+              <div className='bg-purple-800 m-5 mt-6 h-10 flex items-center justify-center font-bold rounded text-white hover:bg-purple-500 cursor-pointer'
               onClick={handleSubmit}
               >
                   Sign up
+              </div>
+              <div className='text-gray-500 text-sm'>
+                Already registered? <span className='text-blue-600 cursor-pointer' onClick={redirectToLogin}>Log in</span>
               </div>
             </div>
         </div>

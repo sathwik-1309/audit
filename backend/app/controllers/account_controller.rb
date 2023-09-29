@@ -3,7 +3,7 @@ class AccountController < ApplicationController
 
   def index
     accounts = Account.list(@current_user)
-    render(:json => accounts.to_json)
+    render(:json => accounts)
   end
 
   def index_owed
@@ -11,13 +11,20 @@ class AccountController < ApplicationController
     render(:json => accounts.to_json)
   end
 
+  # def show_owed
+  #   owed = @current_user.accounts.find_by_id(filter_params[:id])
+  #   render(:json => owed.attributes)
+  # end
+
   # required - name
   # optional - owed
   def create
-    if @current_user.accounts.pluck(:name).include? filter_params[:name]
+    name = Util.processed_name(filter_params[:name])
+    if @current_user.accounts.pluck(:name).include? name
       render_400("An account with the same name already exists") and return
     end
-    attributes = filter_params.slice(:name)
+    attributes = {}
+    attributes[:name] = name
     attributes[:user_id] = @current_user.id
     attributes[:balance] = filter_params[:balance]
     attributes[:opening_date] = filter_params[:date].present? ? filter_params[:date] : Date.today
@@ -32,10 +39,12 @@ class AccountController < ApplicationController
   end
 
   def create_owed
-    if @current_user.accounts.pluck(:name).include? filter_params[:name]
+    name = Util.processed_name(filter_params[:name])
+    if @current_user.accounts.pluck(:name).include? name
       render_400("An account with the same name already exists") and return
     end
-    attributes = filter_params.slice(:name)
+    attributes = {}
+    attributes[:name] = name
     attributes[:user_id] = @current_user.id
     attributes[:balance] = 0
     attributes[:opening_date] = Date.today - 365
@@ -85,15 +94,55 @@ class AccountController < ApplicationController
   def home
     json = {
       "theme" => @current_user.theme,
-      "username" => @current_user.name.titleize
+      "username" => @current_user.name
     }
+    render(:json => json)
+  end
+
+  def home_page
+    json = {}
+    @account = @current_user.accounts.find_by_id(filter_params[:id])
+    categories = @current_user.categories
+    json['pie_chart'] = @account.pie_chart_meta
+
+    sub_category_json = {}
+    categories.each do |category|
+      sub_category_json["category_#{category.id}"] = @account.pie_chart_meta_sub_category(category)
+    end
+    json['pie_chart_sub_category'] = sub_category_json
+    json['categories'] = categories.map{|c| { "id"=> c.id, "name"=> c.name}}
+    render(:json => json)
+  end
+
+  def stats
+    json = {}
+    @account = @current_user.accounts.find_by_id(filter_params[:id])
+    period = 'week'
+    if params[:period].present? and PERIODS.include? params[:period]
+      period = params[:period]
+    end
+    json['stats'] = @account.stats(period)
+    json['account'] = @account.attributes
+    render(:json => json)
+  end
+
+  def paginate_transactions
+    page_number = filter_params[:page_number].to_i.positive? ? filter_params[:page_number].to_i : 1
+    page_size = filter_params[:page_size].to_i
+    @account = @current_user.accounts.find_by_id(filter_params[:id])
+    transactions = @account.owed ? @account.owed_transactions : @account.transactions
+    transactions = transactions.order(date: :desc).limit(page_size).offset(page_size*(page_number-1))
+    json = []
+    transactions.each do|transaction|
+      json << transaction.transaction_box
+    end
     render(:json => json)
   end
 
   private
 
   def filter_params
-    params.permit(:name, :id, :owed, :balance, :date)
+    params.permit(:name, :id, :owed, :balance, :date, :page_number, :page_size)
   end
 
 end

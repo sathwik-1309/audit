@@ -12,6 +12,10 @@ Rails.application.routes.draw do
     get '/check' => 'user#check'
     post '/create' => 'user#create'
     put '/update' => 'user#update'
+    get '/send_otp' => 'user#send_otp'
+    get '/otp_match' => 'user#otp_match'
+    put '/reset_password' => 'user#reset_password'
+    get '/settings' => 'user#settings'
   end
 
   scope :accounts do
@@ -22,6 +26,9 @@ Rails.application.routes.draw do
     put '/:id/update' => 'account#update'
     delete '/:id/delete' => 'account#delete'
     get '/home' => 'account#home'
+    get ':id/home_page' => 'account#home_page'
+    get ':id/paginate_transactions' => 'account#paginate_transactions'
+    get ':id/stats' => 'account#stats'
   end
 
   scope :mops do
@@ -49,6 +56,7 @@ Rails.application.routes.draw do
     post '/settled_by_party' => 'transaction#settled_by_party'
     post '/settled_by_you' => 'transaction#settled_by_you'
     get 'dashboard' => 'transaction#dashboard'
+    post '/split' => 'transaction#split'
   end
 
   scope :sessions do
@@ -66,5 +74,11 @@ Rails.application.routes.draw do
     post '/create' => 'sub_category#create'
     delete '/:id/delete' => 'sub_category#delete'
   end
+
+  scope :images do
+    get '/profile_pic', to: 'image#profile_pic', as: :uploaded_image
+    post '/upload' => 'image#upload'
+  end
+  
 
 end

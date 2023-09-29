@@ -8,6 +8,9 @@ import ThemeContext from '../context/ThemeContext';
 import { useContext } from 'react';
 import ApiPut from '../axios/putapi';
 import ToggleBar from './Togglebar';
+import NavbarItem from './NavbarItem';
+import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
+import ProfilePic from './ProfilePic';
 
 function Navbar(props) {
   let { theme, setTheme, name } = useContext(ThemeContext);
@@ -60,23 +63,19 @@ function Navbar(props) {
 
   return (
     <nav className={`h-14 ${theme}-bg2 flex flex-row rounded ${theme}-c2`}>
-        <div className='flex items-center pl-8 font-bold'>
-          {name}
+        <div className='flex flex-row items-center pl-3 font-bold h-14 cursor-pointer' onClick={()=>{window.location.replace(`${FRONTEND_API_URL}/settings`)}}>
+          <ProfilePic src={`${BACKEND_API_URL}/images/profile_pic`} height={'2rem'}/>
+          <div>{name}</div>
         </div>
+        <div className='sm:m-6 m-4 flex justify-center items-center'><ToggleBar/></div>
 
         <div className='sm:flex hidden flex-row justify-end flex-grow pr-8'>
-        <ToggleBar/>
           {
             navbar_items.map((nav, index) => (
-              <a 
-                key={nav.title}
-                className={`w-24 flex justify-center items-center font-semibold rounded m-1 cursor-pointer color-inherit ${theme}-c1-hover ${ active === nav.title ? `${theme}-bg1 ${theme}-c1` : `${theme}-bg3-hover ${theme}-c2` }`}
-                href={`${FRONTEND_API_URL}${nav.url}`}
-                >
-                  {nav.title}
-              </a>
+              <NavbarItem nav={nav} active={active} display='webpage'/>
             ))
           }
+          
           <div 
             className={`w-24 rounded m-2 flex justify-center items-center font-semibold ${theme}-button cursor-pointer`}
             onClick={handleLogout}
@@ -86,7 +85,6 @@ function Navbar(props) {
         </div>
 
         <div className='sm:hidden flex justify-end items-center flex-grow pr-8'>
-          <ToggleBar/>
           <img
           src={toggle ? close : menu}
           alt="menu"
@@ -95,23 +93,18 @@ function Navbar(props) {
           <div className={`${ toggle? "" : "hidden" } flex flex-col absolute top-20 right-3 ${theme}-bg2 rounded`}>
             {
               navbar_items.map((nav, index) => (
-                <a 
-                  key={nav.title}
-                  className={`w-24 h-10 flex justify-center items-center font-semibold rounded m-1 cursor-pointer color-inherit ${theme}-c1-hover ${ active === nav.title ? `${theme}-bg1 ${theme}-c1` : `${theme}-bg3-hover ${theme}-c2` }`}
-                  href={`${FRONTEND_API_URL}${nav.url}`}
-                  >
-                    {nav.title}
-                </a>
+                <NavbarItem nav={nav} active={active} display='mobile'/>
               ))
             }
             <div 
-              className={`w-24 h-10 rounded m-1 flex justify-center items-center font-semibold ${theme}-button cursor-pointer`}
+              className={`w-28 h-10 rounded m-1 flex justify-center items-center font-semibold ${theme}-button cursor-pointer`}
               onClick={handleLogout}
             >
-            Log out
+              Log out
+            </div>
+            
+            
           </div>
-          </div>
-
         </div>
     </nav>
   )
