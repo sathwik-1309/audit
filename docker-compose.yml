@@ -1,14 +1,14 @@
 version: '3'
 services:
   rails:
-    image: sathwik139/audit:rails-v4
+    image: sathwik139/audit:rails-v5
     command: >
       /bin/sh -c "rails db:drop && rails db:create && rails db:migrate && puma -C config/puma.rb"
     environment:
       RAILS_ENV: production
       DISABLE_DATABASE_ENVIRONMENT_CHECK: 1
       REDIS_URL: redis://redis:6379/1
-      HOST_IP: '3.109.202.207'
+      HOST_IP: localhost
       GMAIL_EMAIL: 'audit.app.mail@gmail.com'
       GMAIL_PASSWORD: 'zuka ydyi punm bzyb'
     depends_on:
@@ -16,13 +16,13 @@ services:
     ports:
       - "3001:3001"
   sidekiq:
-    image: sathwik139/audit:rails-v4
+    image: sathwik139/audit:rails-v5
     command: bundle exec sidekiq -c 2 -q low
     environment:
       RAILS_ENV: production
       DISABLE_DATABASE_ENVIRONMENT_CHECK: 1
       REDIS_URL: redis://redis:6379/1
-      HOST_IP: '3.109.202.207'
+      HOST_IP: localhost
       GMAIL_EMAIL: 'audit.app.mail@gmail.com'
       GMAIL_PASSWORD: 'zuka ydyi punm bzyb'
     depends_on:
@@ -30,9 +30,9 @@ services:
   redis:
     image: redis:latest
   react:
-    image: sathwik139/audit:react-v3
+    image: sathwik139/audit:react-v4
     environment:
-      VITE_HOST: '3.109.202.207'
+      VITE_HOST: localhost
       VITE_PORT: 5173
     ports:
       - "5173:5173"

@@ -83,6 +83,5 @@ gem "devise", "~> 4.9"
 gem "simple_token_authentication"
 gem "oj"
 gem "sidekiq"
-gem 'kaminari'
 
 

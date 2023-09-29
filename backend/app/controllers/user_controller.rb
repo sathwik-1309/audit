@@ -53,8 +53,11 @@ before_action :set_current_user
       render_400("Unauthorized, Please sign in") and return
     end
     @user = @current_user
-    @user.assign_attributes(filter_params)
     begin
+      if params[:image].present?
+        @user.upload(params[:image])
+      end
+      @user.assign_attributes(filter_params.slice(:name, :email))
       @user.save!
       msg = {
         "@user": {
@@ -111,7 +114,12 @@ before_action :set_current_user
   end
 
   def settings
-    render_200("yes")
+    json = {}
+    unless @current_user.present?
+      render_400("Unauthorized, Please sign in") and return
+    end
+    json['user_details'] = @current_user.attributes
+    render(:json => json)
   end
 
   private

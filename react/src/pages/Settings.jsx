@@ -1,6 +1,10 @@
 import { React, useContext, useState, useEffect} from 'react'
-import Navbar from '../components/navbar'
+import Navbar from '../components/Navbar'
 import ThemeContext from '../context/ThemeContext';
+import Profile from '../components/Profile';
+import ApiGet from '../axios/getapi';
+import { BACKEND_API_URL } from '../config';
+import { refreshWebSocket } from '../context/WebSocketContext';
 
 function Settings() {
     let { theme } = useContext(ThemeContext);
@@ -20,15 +24,16 @@ function Settings() {
     temp();
 
   }, [refresh])
+
+  refreshWebSocket('UserChannel', refresh, setRefresh);
+
+  if (!data) {
+    return <></>
+  }
   return (
     <div className={`${theme}-bg1 w-screen h-screen p-3`}>
         <Navbar page='Settings'/>
-        <div className={`flex flex-col ${theme}-c1 font-bold text-lg p-3 mt-10 ${theme}-bg3 sm:w-[450px] w-full`}>
-        <div className={`flex flex-row pb-3 border-b-2 ${theme}-border mb-3`}>
-            <div className={`flex items-center pl-8 w-1/2`}>Profile</div>
-            <div className={`w-1/2 font-semibold ${theme}-c3 cursor-pointer flex justify-end pr-3`}>EDIT</div>
-        </div>
-        </div>
+        <Profile data={data.user_details}/>
     </div>
   )
 }

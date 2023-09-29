@@ -292,7 +292,11 @@ class TransactionController < ApplicationController
   def dashboard
     json = {}
     json['accounts'] = Account.list(@current_user)
-    json['owed_accounts'] = Account.list(@current_user, true)
+    if params[:owed_id].present?
+      json['owed_account'] = @current_user.accounts.find_by_id(params[:owed_id]).attributes
+    else
+      json['owed_accounts'] = Account.list(@current_user, true)
+    end
     json['mops'] = @current_user.mops.select{|m| !m.is_auto_generated? and !m.is_card? }.map {|m| { "id"=> m.id, "name" => m.name}}
     json['cards'] = @current_user.cards.map {|c| {"id"=>c.id, "name"=> c.name}}
     json['sub_categories'] = @current_user.sub_categories.map{|c| {"id"=> c.id, "name"=> c.name}}

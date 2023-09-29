@@ -18,6 +18,7 @@ import Owed from './pages/Owed';
 import ForgotPassword from './pages/ForgotPassword';
 import Settings from './pages/Settings';
 import Account from './pages/Account';
+import OwedAccount from './pages/OwedAccount';
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
           <Route path="/mops" element={<Mops/>}/>
           <Route path="/categories" element={<Categories/>}/>
           <Route path="/owed" element={<Owed/>}/>
+          <Route path="/owed/:id" element={<OwedAccount/>}/>
           <Route path="/settings" element={<Settings/>}/>
       </Routes>
     </Router>

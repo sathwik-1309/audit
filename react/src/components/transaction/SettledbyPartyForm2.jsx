@@ -9,9 +9,8 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import PersonIcon from '@mui/icons-material/Person';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 
-function SettledbyYouForm(props) {
+function SettledbyPartyForm2(props) {
   const method = props.method
-  const [party, setParty] = useState('');
   const [amount, setAmount] = useState(0);
   const [comments, setComments] = useState('');
   const [account, setAccount] = useState('');
@@ -21,20 +20,11 @@ function SettledbyYouForm(props) {
 
   let { theme } = useContext(ThemeContext);
 
-  const changeParty = (event) => {
-    const value = event.target.value;
-    setParty(value);
-  }
-
   const handleCreate = async (e) => {
     e.preventDefault();
-    if (party=='') {
-        setError("Please select a person or owed account")
-        return
-    }
     const payload = {
       amount: amount,
-      party: party,
+      party: props.data.owed_account.id,
       account_id: account
     }
     
@@ -45,11 +35,11 @@ function SettledbyYouForm(props) {
         payload.date = date
     }
 
-    const response = await ApiPost(`${BACKEND_API_URL}/transactions/settled_by_you`, payload);
+    const response = await ApiPost(`${BACKEND_API_URL}/transactions/settled_by_party`, payload);
     if (response.status === 202) {
         setError(response.data.message);
     }else {
-        console.log('Creating settled_by_you transaction:', payload);
+        console.log('Creating settled_by_party transaction:', payload);
         setError('');
         props.setMethod('');
     }
@@ -62,15 +52,15 @@ function SettledbyYouForm(props) {
   return (
     <div className={`flex justify-center flex-col items-center rounded sm:w-[450px] w-full mb-1 rounded ${props.type === method ? `${theme}-bg1 m-4` : ''}`}>
       <div
-        className={`w-32 h-8 m-3 flex items-center justify-center cursor-pointer font-bold text-sm rounded ${
+        className={`w-64 h-8 m-3 flex items-center justify-center cursor-pointer font-bold text-sm rounded ${
           method === `${props.type}` ? `${theme}-bg3 ${theme}-c1 ${theme}-border-c1` : `${theme}-bg2 ${theme}-c2`
         }`}
         onClick={() => props.click(`${props.type}`)}
       >
-        SETTLED UP
+        Settled by {props.data.owed_account.name}
       </div>
       {
-        method === 'settled_by_you' &&
+        method === 'settled_by_party' &&
         <div>
           <form onSubmit={handleCreate} className='mb-3'>
             {
@@ -88,7 +78,7 @@ function SettledbyYouForm(props) {
                 onChange={(e) => setAmount(e.target.value)} 
                 placeholder='Amount' required/>
             </div>
-            <div className='flex flex-row items-center mt-2 border rounded'>
+            {/* <div className='flex flex-row items-center mt-2 border rounded'>
                 <PersonIcon style={{
                     height: '100%',
                     marginLeft: '0.75rem',
@@ -100,7 +90,7 @@ function SettledbyYouForm(props) {
                     return <option value={account.id}>{account.name}</option>;
                 })}
                 </select>
-            </div>
+            </div> */}
             <div className='flex flex-row items-center mt-2 border rounded'>
                 <AccountBalanceWalletIcon style={{
                     height: '100%',
@@ -154,4 +144,4 @@ function SettledbyYouForm(props) {
 
 
 
-export default SettledbyYouForm
+export default SettledbyPartyForm2

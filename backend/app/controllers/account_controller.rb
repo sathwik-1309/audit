@@ -11,6 +11,11 @@ class AccountController < ApplicationController
     render(:json => accounts.to_json)
   end
 
+  # def show_owed
+  #   owed = @current_user.accounts.find_by_id(filter_params[:id])
+  #   render(:json => owed.attributes)
+  # end
+
   # required - name
   # optional - owed
   def create
@@ -113,7 +118,8 @@ class AccountController < ApplicationController
     page_number = filter_params[:page_number].to_i.positive? ? filter_params[:page_number].to_i : 1
     page_size = filter_params[:page_size].to_i
     @account = @current_user.accounts.find_by_id(filter_params[:id])
-    transactions = @account.transactions.order(date: :desc).limit(page_size).offset(page_size*(page_number-1))
+    transactions = @account.owed ? @account.owed_transactions : @account.transactions
+    transactions = transactions.order(date: :desc).limit(page_size).offset(page_size*(page_number-1))
     json = []
     transactions.each do|transaction|
       json << transaction.transaction_box

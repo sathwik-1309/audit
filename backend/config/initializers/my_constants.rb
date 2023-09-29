@@ -19,6 +19,7 @@ CARDS_CHANNEL = "CardsChannel"
 MOPS_CHANNEL = "MopsChannel"
 CATEGORY_CHANNEL = "CategoryChannel"
 SUBCATEGORY_CHANNEL = "SubcategoryChannel"
+USER_CHANNEL = "UserChannel"
 
 #react
 PIE_CHART_COLORS = ['orange', '#32a852', '#1d81de', 'violet', 'brown', 'red', 'blue']

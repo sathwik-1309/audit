@@ -23,10 +23,5 @@ export const navbar_items = [
         title: "Categories",
         name: "Categories",
         url: "/categories"
-    },
-    {
-        title: "Settings",
-        name: "Settings",
-        url: "/settings"
     }
 ]

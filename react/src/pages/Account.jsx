@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import ThemeContext from '../context/ThemeContext';
-import Navbar from '../components/navbar';
+import Navbar from '../components/Navbar';
 import PieChartWrapper from '../components/PieChartWrapper';
 import ApiGet from '../axios/getapi';
 import { BACKEND_API_URL, theme_colors } from '../config';
@@ -34,6 +34,15 @@ function Account() {
     setCategory(e.target.value);
     setSubcategory(data.pie_chart_sub_category[e.target.value]);
   }
+
+  const empty_pie_data = [
+    {
+        id: 1,
+        value: 1,
+        color: 'orange',
+        label: 'No transactions'
+    }
+  ]
   
   if (!data) {
     return <></>
@@ -44,24 +53,34 @@ function Account() {
       <Navbar page="Accounts" />
       <div className='flex sm:flex-row flex-col'>
         <div className='flex flex-col sm:m-3'>
-            <PiechartSummary data={data.pie_chart} header='Categories'/>
-            <div className='flex flex-row items-center mt-2 border rounded ml-10 mr-10 mt-6 mb-2'>
-                <BookmarksIcon style={{
-                    height: '100%',
-                    marginLeft: '0.75rem',
-                    marginRight: '0.75rem',
-                    color: theme == 'dark' ? theme_colors.dark_c1 : theme_colors.light_c1
-                }}/>
-                <select onChange={selectCategory} value={category} className={`${theme}-c1 bg-transparent w-full p-2`}>
-                    <option value=''>select</option>
-                    {data.categories.map((category, index) => {
-                        return <option value={`category_${category.id}`}>{category.name}</option>;
-                    })}
-                </select>
-            </div>
             {
-                category != '' &&
-                <PiechartSummary data={sub_category} header='Sub Categories'/>
+                data.pie_chart == [] ?
+                <PiechartSummary data={empty_pie_data} header='Categories'/> :
+                <PiechartSummary data={data.pie_chart} header='Categories'/>
+            }
+            
+            {
+                data.pie_chart != [] &&
+                <>
+                    <div className='flex flex-row items-center mt-2 border rounded ml-10 mr-10 mt-6 mb-2'>
+                        <BookmarksIcon style={{
+                            height: '100%',
+                            marginLeft: '0.75rem',
+                            marginRight: '0.75rem',
+                            color: theme == 'dark' ? theme_colors.dark_c1 : theme_colors.light_c1
+                        }}/>
+                        <select onChange={selectCategory} value={category} className={`${theme}-c1 bg-transparent w-full p-2`}>
+                            <option value=''>select</option>
+                            {data.categories.map((category, index) => {
+                                return <option value={`category_${category.id}`}>{category.name}</option>;
+                            })}
+                        </select>
+                    </div>
+                    {
+                        sub_category != '' &&
+                        <PiechartSummary data={sub_category} header='Sub Categories'/>
+                    }
+                </>
             }
         </div>
         <div className={`sm:hidden mt-3 ${theme}-bg3 h-fit pb-2`}>

@@ -41,7 +41,7 @@ function OwedBox(props) {
     }
 
     const redirectOwed = () => {
-        window.location.replace(`${FRONTEND_API_URL}/account/${account.id}`)
+        window.location.replace(`${FRONTEND_API_URL}/owed/${account.id}`)
     }
 
     let { theme } = useContext(ThemeContext);

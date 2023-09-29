@@ -74,4 +74,10 @@ Rails.application.routes.draw do
     delete '/:id/delete' => 'sub_category#delete'
   end
 
+  scope :images do
+    get '/profile_pic', to: 'image#profile_pic', as: :uploaded_image
+    post '/upload' => 'image#upload'
+  end
+  
+
 end

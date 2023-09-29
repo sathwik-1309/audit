@@ -7,7 +7,7 @@ function PiechartSummary(props) {
     let { theme } = useContext(ThemeContext);
   return (
     <div className='flex flex-col sm:m-3'>
-        <div className='font-bold'>{props.header}</div>
+        <div className={`font-bold ${theme}-c1`}>{props.header}</div>
         <PieChartWrapper data={data}/>
         {
             data.length !== 0 &&
