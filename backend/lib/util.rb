@@ -1,5 +1,6 @@
 module Util
   def self.processed_name(name)
+    return nil if name.nil?
     if Util.has_upper_case(name)
       return name
     else

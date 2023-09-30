@@ -23,8 +23,8 @@ function CardForm({ onSubmit, onCancel, accounts }) {
     else {
         onSubmit({ name, selectedAccount, ctype });
         setName('');
-        setBalance('');
-        setDate('');
+        setSelectedAccount('');
+        setCardtype('');
     }
     
   };

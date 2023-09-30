@@ -25,12 +25,12 @@ describe AccountController do
     end
 
     it 'creates new owed account' do
-        post :create_owed, params: { name: 'somename' }
+        post :create_owed, params: { name: 'Somename' }
         validate_response(response, 200, 'Owed Account created')
         resp = Oj.load(response.body)
         expect(resp['balance']).to eq 0
         expect(resp['owed']).to eq true
-        expect(resp['name']).to eq 'somename'
+        expect(resp['name']).to eq 'Somename'
       end
 
     it 'returns 400 when tried to create account without name without name' do

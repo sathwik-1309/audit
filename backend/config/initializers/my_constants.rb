@@ -24,3 +24,6 @@ USER_CHANNEL = "UserChannel"
 
 #react
 PIE_CHART_COLORS = ['orange', '#32a852', '#1d81de', 'violet', 'brown', 'red', 'blue']
+
+#env
+ADMIN_MAIL_ID = 'sathwik1309@gmail.com'
