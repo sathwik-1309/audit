@@ -39,6 +39,7 @@ before_action :set_current_user
     begin
       @user.save!
       LazyWorker.perform_async("send_welcome_email", {"name" => @user.name, "email"=> @user.email })
+      LazyWorker.perform_async("send_admin_new_user_mail", {"name" => @user.name })
       render_200("User created", {
         "name": @user.name,
         "email": @user.email
@@ -57,7 +58,7 @@ before_action :set_current_user
       if params[:image].present?
         @user.upload(params[:image])
       end
-      @user.assign_attributes(filter_params.slice(:name, :email))
+      @user.assign_attributes(filter_params.slice(:name, :email, :password))
       @user.save!
       msg = {
         "@user": {

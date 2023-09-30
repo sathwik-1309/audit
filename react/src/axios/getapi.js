@@ -2,7 +2,7 @@ import axios from "axios";
 import { FRONTEND_API_URL} from "../config";
 
 // Make the function asynchronous
-async function ApiGet(url) {
+async function ApiGet(url, payload) {
     try {
         const response = await axios.get(url ,{ withCredentials: true });
         // console.log(response.data);

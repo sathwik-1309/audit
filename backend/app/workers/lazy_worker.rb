@@ -28,6 +28,14 @@ class LazyWorker
     end
   end
 
+  def send_admin_new_user_mail(args)
+    begin
+      UserMailer.admin_new_user_mail(args['name']).deliver_now
+    rescue => ex
+      puts "LazyWorker#send_welcome_email: Error send email: #{ex.message}"
+    end
+  end
+
   def create_split_transactions(args)
     transaction = Transaction.find_by_id(args['transaction_id'])
     transaction.create_split_transactions(args['tr_array'])
