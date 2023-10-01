@@ -4,6 +4,7 @@ class LazyWorker
 
   def perform(method_name, args={})
     if self.respond_to?(method_name)
+      puts "LazyWorker##{method_name}: args: #{args}"
       self.method(method_name).call(args)
     else
       puts "#{method_name} not found"
@@ -30,7 +31,7 @@ class LazyWorker
 
   def send_admin_new_user_mail(args)
     begin
-      UserMailer.admin_new_user_mail(args['name']).deliver_now
+      AdminMailer.new_user_mail(args['name']).deliver_now
     rescue => ex
       puts "LazyWorker#send_welcome_email: Error send email: #{ex.message}"
     end

@@ -123,7 +123,8 @@ class Transaction < ApplicationRecord
       transaction.save!
       return transaction
     rescue StandardError => ex
-      puts ex.message
+      AdminMailer.error_mailer('add_split_debit', ex.message)
+      puts "Error#add_split_debit: #{ex.message}"
     end
   end
 
@@ -144,7 +145,8 @@ class Transaction < ApplicationRecord
       LazyWorker.perform_async("update_subsequent", {"transaction_id" => transaction.id})
       return transaction
     rescue StandardError => ex
-      puts ex.message
+      AdminMailer.error_mailer('add_split_paid_by_you', ex.message)
+      puts "Error#add_split_paid_by_you: #{ex.message}"
     end
   end
 

@@ -410,11 +410,11 @@ describe TransactionController do
       tr_array = [
         {
           "party": owed1.id,
-          "amount": 20,
+          "amount": "20",
         },
         {
           "party": owed2.id,
-          "amount": 80,
+          "amount": "80",
         }
       ]
       Sidekiq::Testing.inline! do
