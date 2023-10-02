@@ -6,11 +6,10 @@ import menu from '../assets/menu.svg'
 import { useState } from 'react';
 import ThemeContext from '../context/ThemeContext';
 import { useContext } from 'react';
-import ApiPut from '../axios/putapi';
 import ToggleBar from './Togglebar';
 import NavbarItem from './NavbarItem';
-import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 import ProfilePic from './ProfilePic';
+import { Link } from 'react-router-dom';
 
 function Navbar(props) {
   let { theme, setTheme, name } = useContext(ThemeContext);
@@ -63,10 +62,10 @@ function Navbar(props) {
 
   return (
     <nav className={`h-14 ${theme}-bg2 flex flex-row rounded ${theme}-c2`}>
-        <div className='flex flex-row items-center pl-3 font-bold h-14 cursor-pointer' onClick={()=>{window.location.replace(`${FRONTEND_API_URL}/settings`)}}>
+        <Link className='flex flex-row items-center pl-3 font-bold h-14 cursor-pointer' to={`${FRONTEND_API_URL}/settings`}>
           <ProfilePic src={`${BACKEND_API_URL}/images/profile_pic`} height={'2rem'}/>
           <div>{name}</div>
-        </div>
+        </Link>
         <div className='sm:m-6 m-4 flex justify-center items-center'><ToggleBar/></div>
 
         <div className='sm:flex hidden flex-row justify-end flex-grow pr-8'>

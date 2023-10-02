@@ -24,6 +24,7 @@ function Settings() {
     temp();
 
   }, [refresh])
+  console.log(refresh)
 
   refreshWebSocket('UserChannel', refresh, setRefresh);
 
@@ -33,7 +34,7 @@ function Settings() {
   return (
     <div className={`${theme}-bg1 w-screen h-screen p-3`}>
         <Navbar page='Settings'/>
-        <Profile data={data.user_details}/>
+        <Profile data={data.user_details} refresh={refresh} setRefresh={setRefresh}/>
     </div>
   )
 }

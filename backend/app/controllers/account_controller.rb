@@ -100,10 +100,12 @@ class AccountController < ApplicationController
   end
 
   def home_page
+    start_date = DateTime.parse(filter_params[:start_date]).strftime("%Y-%m-%d")
+    end_date = DateTime.parse(filter_params[:end_date]).strftime("%Y-%m-%d")
     json = {}
     @account = @current_user.accounts.find_by_id(filter_params[:id])
     categories = @current_user.categories
-    json['pie_chart'] = @account.pie_chart_meta
+    json['pie_chart'] = @account.pie_chart_meta(start_date, end_date)
 
     sub_category_json = {}
     categories.each do |category|
@@ -115,23 +117,23 @@ class AccountController < ApplicationController
   end
 
   def stats
+    start_date = DateTime.parse(filter_params[:start_date]).strftime("%Y-%m-%d")
+    end_date = DateTime.parse(filter_params[:end_date]).strftime("%Y-%m-%d")
     json = {}
     @account = @current_user.accounts.find_by_id(filter_params[:id])
-    period = 'week'
-    if params[:period].present? and PERIODS.include? params[:period]
-      period = params[:period]
-    end
-    json['stats'] = @account.stats(period)
+    json['stats'] = @account.stats(start_date, end_date)
     json['account'] = @account.attributes
     render(:json => json)
   end
 
   def paginate_transactions
+    start_date = DateTime.parse(filter_params[:start_date]).strftime("%Y-%m-%d")
+    end_date = DateTime.parse(filter_params[:end_date]).strftime("%Y-%m-%d")
     page_number = filter_params[:page_number].to_i.positive? ? filter_params[:page_number].to_i : 1
     page_size = filter_params[:page_size].to_i
     @account = @current_user.accounts.find_by_id(filter_params[:id])
     transactions = @account.owed ? @account.owed_transactions : @account.transactions
-    transactions = transactions.order(date: :desc).limit(page_size).offset(page_size*(page_number-1))
+    transactions = transactions.order(date: :desc).where("date BETWEEN ? AND ?", start_date, end_date).limit(page_size).offset(page_size*(page_number-1))
     json = []
     transactions.each do|transaction|
       json << transaction.transaction_box
@@ -142,7 +144,7 @@ class AccountController < ApplicationController
   private
 
   def filter_params
-    params.permit(:name, :id, :owed, :balance, :date, :page_number, :page_size)
+    params.permit(:name, :id, :owed, :balance, :date, :page_number, :page_size, :start_date, :end_date)
   end
 
 end

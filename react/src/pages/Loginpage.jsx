@@ -3,28 +3,24 @@ import email_icon from '../assets/email.png'
 import password_icon from '../assets/password.png'
 import { FRONTEND_API_URL, BACKEND_API_URL } from '../config'
 import axios from 'axios'
-import ApiPost from '../axios/postapi'
+import {Link} from 'react-router-dom'
 
 function Loginpage() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
 });
-const [sign_in_error, set_sign_in_error] = useState('')
+  const [sign_in_error, set_sign_in_error] = useState('')
 
-const redirectToSignin = () => {
-    window.location.replace(`${FRONTEND_API_URL}/sign_up`);
-}
+  async function handleSubmit(event) {
+    event.preventDefault();
 
-async function handleSubmit(event) {
-  event.preventDefault();
+    const { email, password } = formData;
 
-  const { email, password } = formData;
-
-  const payload = {
-    email: email,
-    password: password,
-  };
+    const payload = {
+      email: email,
+      password: password,
+    };
 
   try {
       const checkResponse = await axios.get(`${BACKEND_API_URL}/users/check?email=${email}&password=${password}`);
@@ -96,8 +92,8 @@ const handleInputChange = (event) => {
                   Login
                 </div>
               </div>
-              <div className='pt-3'>Dont have an account? <span className='text-blue-600 cursor-pointer' onClick={redirectToSignin}>Sign up</span></div>
-              <div className='pt-3 hover:text-blue-600 cursor-pointer' onClick={()=>{window.location.replace(`${FRONTEND_API_URL}/forgot_password`)}}>Forgot password?</div>
+              <div className='pt-3'>Dont have an account? <Link className='text-blue-600 cursor-pointer' to={`${FRONTEND_API_URL}/sign_up`}>Sign up</Link></div>
+              <Link className='pt-3 hover:text-blue-600 cursor-pointer' to={`${FRONTEND_API_URL}/forgot_password`}>Forgot password?</Link>
             </div>
             <div className='buttons flex flex-row justify-center'>
               

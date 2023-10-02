@@ -282,6 +282,7 @@ DEPENDENCIES
   byebug
   cable_ready
   capybara
+  date
   debug
   devise (~> 4.9)
   factory_bot_rails

@@ -8,7 +8,11 @@ default: &default
 
 development:
   <<: *default
-  database: audit_dev   # Replace with your development database name
+  database: audit  # Replace with your production database name
+  host: localhost  # Use the container name defined in docker-compose.yml
+  port: 5432                  # PostgreSQL container's default port
+  username: sathwik       # Replace with your PostgreSQL username
+  password: sath139   # Replace with your development database name
 
 test:
   <<: *default

@@ -82,3 +82,8 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+a, a:link, a:visited, a:hover {
+  text-decoration: none !important;
+  color: inherit
+}

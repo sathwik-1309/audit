@@ -19,6 +19,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import Settings from './pages/Settings';
 import Account from './pages/Account';
 import OwedAccount from './pages/OwedAccount';
+import AuthTokenLogin from './pages/AuthTokenLogin';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
     <link/>
       <Routes>
           <Route path="/" element={<Loginpage/>}/>
+          <Route path="/auth_token/:token" element={<AuthTokenLogin/>}/>
           <Route path="/sign_up" element={<Signuppage/>}/>
           <Route path="/forgot_password" element={<ForgotPassword/>}/>
           <Route path="/dashboard" element={<Dashboard/>}/>

@@ -23,16 +23,8 @@ function PaginateTransactions(props) {
         set_page_number(page_number-1)
     }
   }
-
-  const increasePageNumber = () => {
-    if (page_number <= 1){
-        return
-    }else{
-        set_page_number(page_number+1)
-    }
-  }
   
-  let url = `${BACKEND_API_URL}/accounts/${id}/paginate_transactions?page_size=${page_size}&page_number=${page_number}`
+  let url = `${BACKEND_API_URL}/accounts/${id}/paginate_transactions?page_size=${page_size}&page_number=${page_number}&start_date=${props.start_date}&end_date=${props.end_date}`
   useEffect(() => {
     async function temp() {
       try{
@@ -44,7 +36,7 @@ function PaginateTransactions(props) {
       }
     }
     temp();
-  }, [url])
+  }, [props.end_date])
 
   if (!data){
     return <></>

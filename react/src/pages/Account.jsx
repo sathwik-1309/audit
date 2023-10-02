@@ -16,12 +16,25 @@ function Account() {
   const [data, setData] = useState(null)
   const [category, setCategory] = useState('');
   const [sub_category, setSubcategory] = useState('')
-  console.log(category)
+  const [period, setPeriod] = useState('week')
+
+  const today = new Date()
+  const startOfWeek = new Date(today);
+  startOfWeek.setDate(today.getDate() - today.getDay())
+  const endOfWeek = new Date(today);
+  endOfWeek.setDate(today.getDate() + (6 - today.getDay()))
+  const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+  const [startDate, setStartDate] = useState(startOfWeek.toISOString().slice(0, 10))
+  const [endDate, setEndDate] = useState(endOfWeek.toISOString().slice(0, 10))
+
+  
   let { id } = useParams();
   useEffect(() => {
     async function temp() {
       try{
-        let response = await ApiGet(`${BACKEND_API_URL}/accounts/${id}/home_page`);
+        let response = await ApiGet(`${BACKEND_API_URL}/accounts/${id}/home_page?start_date=${startDate}&end_date=${endDate}`);
         console.log(response.data);
         setData(response.data)
       }catch (error) {
@@ -29,11 +42,31 @@ function Account() {
       }
     }
     temp();
-  }, [])
+  }, [endDate])
 
   const selectCategory = (e) => {
     setCategory(e.target.value);
     setSubcategory(data.pie_chart_sub_category[e.target.value]);
+  }
+
+  const changePeriod = (p) => {
+    setPeriod(p)
+    switch (p){
+      case 'today':
+        setStartDate(today.toISOString().slice(0, 10))
+        setEndDate(today.toISOString().slice(0, 10))
+        break;
+      case 'week':
+        setStartDate(startOfWeek.toISOString().slice(0, 10))
+        setEndDate(endOfWeek.toISOString().slice(0, 10))
+        break;
+      case 'month':
+        setStartDate(startOfMonth.toISOString().slice(0, 10))
+        setEndDate(endOfMonth.toISOString().slice(0, 10))
+        break;
+      default:
+        break;
+    }
   }
 
   const empty_pie_data = [
@@ -53,7 +86,7 @@ function Account() {
     <div className={`${theme}-bg1 w-screen h-screen overflow-auto p-3`}>
       <Navbar page="Accounts" />
       <div className='flex sm:flex-row flex-col'>
-        <AccountStatBox/>
+        <AccountStatBox period={period} changePeriod={changePeriod} startDate={startDate} endDate={endDate} setStartDate={setStartDate} setEndDate={setEndDate}/>
         <div className='flex flex-col sm:m-3'>
             {
                 data.pie_chart.length == 0 ?
@@ -86,10 +119,10 @@ function Account() {
             }
         </div>
         <div className={`sm:hidden mt-3 ${theme}-bg3 h-fit pb-2`}>
-            <PaginateTransactions header='Transactions' page_size={5} />
+            <PaginateTransactions header='Transactions' page_size={5} start_date={startDate} end_date={endDate}/>
         </div>
         <div className={`sm:flex hidden m-3 ${theme}-bg3 h-fit pb-2`}>
-            <PaginateTransactions header='Transactions' page_size={10} />
+            <PaginateTransactions header='Transactions' page_size={10} start_date={startDate} end_date={endDate}/>
         </div>
         
       </div>
