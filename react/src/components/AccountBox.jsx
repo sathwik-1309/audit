@@ -8,6 +8,7 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import Transactions from './Transactions';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { Link } from 'react-router-dom';
 
 function AccountBox(props) {
     const account = props.account;
@@ -39,15 +40,11 @@ function AccountBox(props) {
         setEdit(false);
     }
 
-    const redirectAccount = () => {
-        window.location.replace(`${FRONTEND_API_URL}/account/${account.id}`)
-    }
-
     let { theme } = useContext(ThemeContext);
   return (
     <div className={`flex flex-col`}>
         <div className={`flex flex-row ${theme}-c1 ${theme}-bg1 mt-3 font-semibold h-24 rounded`}>
-            <div className='flex flex-col p-1 w-3/4 cursor-pointer' onClick={redirectAccount}>
+            <Link className='flex flex-col p-1 w-3/4 cursor-pointer' to={`${FRONTEND_API_URL}/account/${account.id}`}>
             <div className='flex flex-row h-1/2 pb-1 pl-3'>
                 <AccountBalanceWalletIcon style={{
                     height: '100%',
@@ -67,7 +64,7 @@ function AccountBox(props) {
                 <div className={`${theme}-c3 pl-12 text-sm font-semibold`}>Balance:</div>
                 <div className={`${theme}-c1 font-bold pl-3`}>₹ {account.balance}</div>
                 </div>
-            </div>
+            </Link>
             <div className={`${theme}-c3 font-medium text-xs cursor-pointer flex items-center justify-center w-1/4`} onClick={(e)=>{setOpenTransactions(!openTransactions)}}>
                 {
                     openTransactions ? <VisibilityOffIcon/> : <VisibilityIcon/>

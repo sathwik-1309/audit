@@ -16,7 +16,6 @@ async function ApiDelete(url, payload) {
         return response
     } catch (error) {
         console.error(error);
-        // window.location.replace(`${FRONTEND_API_URL}/`);
     }
 
 }
