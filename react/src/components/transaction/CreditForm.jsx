@@ -76,7 +76,7 @@ function CreditForm(props) {
                 {error}
             </div>
             }
-            <div className={`flex flex-row pl-3 font-semibold mt-2 h-10 border rounded `}>
+            <div className={`flex flex-row pl-3 font-semibold mt-2 h-10 border rounded`} style={{borderColor: 'red'}}>
                 <CurrencyRupeeIcon style={{
                     height: '100%',
                 }}/>
@@ -85,7 +85,7 @@ function CreditForm(props) {
                 onChange={(e) => setAmount(e.target.value)} 
                 placeholder='Amount' required/>
             </div>
-            <div className='flex flex-row items-center mt-2 border rounded'>
+            <div className='flex flex-row items-center mt-2 border rounded' style={{borderColor: 'red'}}>
                 <AccountBalanceWalletIcon style={{
                     height: '100%',
                     marginLeft: '0.75rem',

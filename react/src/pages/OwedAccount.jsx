@@ -26,6 +26,9 @@ function OwedAccount() {
 
   }, [])
 
+  const startDate = '01-01-2020'
+  const endDate = '01-01-2030'
+
   if (!data) {
     return <></>
   }
@@ -34,14 +37,13 @@ function OwedAccount() {
         <div className={`${theme}-bg1 w-screen h-screen overflow-auto p-3`}>
             <Navbar page="Accounts" />
             <div className='flex sm:flex-row flex-col'>
+                <SettlementBox id={id} data={data}/>
                 <div className={`sm:hidden mt-3 ${theme}-bg3 h-fit pb-2`}>
-                    <PaginateTransactions header='Transactions' page_size={5} />
+                    <PaginateTransactions header='Transactions' page_size={10} start_date={startDate} end_date={endDate}/>
                 </div>
                 <div className={`sm:flex hidden m-3 ${theme}-bg3 h-fit pb-2`}>
-                    <PaginateTransactions header='Transactions' page_size={10} />
+                    <PaginateTransactions header='Transactions' page_size={15} start_date={startDate} end_date={endDate}/>
                 </div>
-
-                <SettlementBox id={id} data={data}/>
             </div>
         </div>
     </div>

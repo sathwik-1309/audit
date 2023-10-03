@@ -96,7 +96,7 @@ function Navbar(props) {
               ))
             }
             <div 
-              className={`w-28 h-10 rounded m-1 flex justify-center items-center font-semibold ${theme}-button cursor-pointer`}
+              className={`w-24 h-10 rounded m-1 flex justify-center items-center font-semibold ${theme}-button cursor-pointer`}
               onClick={handleLogout}
             >
               Log out

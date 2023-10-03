@@ -109,7 +109,7 @@ function DebitForm(props) {
                 {error}
             </div>
             }
-            <div className={`flex flex-row pl-3 font-semibold mt-2 h-10 border rounded `}>
+            <div className={`flex flex-row pl-3 font-semibold mt-2 h-10 border rounded`} style={{borderColor: 'red'}}>
                 <CurrencyRupeeIcon style={{
                     height: '100%',
                 }}/>
@@ -118,13 +118,13 @@ function DebitForm(props) {
                 onChange={(e) => setAmount(e.target.value)} 
                 placeholder='Amount' required/>
             </div>
-            <div className='flex flex-row items-center mt-2 border rounded'>
+            <div className='flex flex-row items-center mt-2 border rounded' style={{borderColor: 'red'}}>
                 <PaidIcon style={{
                     height: '100%',
                     marginLeft: '0.75rem',
                     marginRight: '0.75rem'
                 }}/>
-                <select onChange={changePaymentType} value={paymentType} className={`${theme}-c1 bg-transparent w-full p-2`}>
+                <select onChange={changePaymentType} value={paymentType} className={`${theme}-c1 bg-transparent w-full p-2`} >
                 <option value=''>select</option>
                 {payments.map((paymentType, index) => {
                     return <option value={paymentType}>{paymentType}</option>;
@@ -133,7 +133,7 @@ function DebitForm(props) {
             </div>
             {
                 paymentType === 'MOP' &&
-                <div className='flex flex-row items-center mt-2 border rounded'>
+                <div className='flex flex-row items-center mt-2 border rounded' style={{borderColor: 'red'}}>
                     <PaymentsIcon style={{
                         height: '100%',
                         marginLeft: '0.75rem',

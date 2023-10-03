@@ -46,7 +46,7 @@ function NavbarItem(props) {
     }
 
     let webpage = 
-                <Link className={`${width} h-12 flex flex-row justify-center m-1 color-inherit rounded cursor-pointer ${theme}-c1-hover ${ active === nav.title ? `${theme}-bg1 ${theme}-c1-imp` : `${theme}-bg3-hover ${theme}-c2` }`}
+                <Link className={`w-32 h-12 flex flex-row justify-center m-1 color-inherit rounded cursor-pointer ${theme}-c1-hover ${ active === nav.title ? `${theme}-bg1 ${theme}-c1-imp` : `${theme}-bg3-hover ${theme}-c2` }`}
                     to={`${FRONTEND_API_URL}${nav.url}`}
                 >
                     {icon}
@@ -59,7 +59,7 @@ function NavbarItem(props) {
                 </Link>
     
     let mobile = 
-                <Link className={`w-32 h-10 flex flex-row justify-center m-1 color-inherit rounded cursor-pointer ${theme}-c1-hover ${ active === nav.title ? `${theme}-bg1 ${theme}-c1-imp` : `${theme}-bg3-hover ${theme}-c2` }`}
+                <Link className={`w-24 h-10 flex flex-row justify-center m-1 text-xs color-inherit rounded cursor-pointer ${theme}-c1-hover ${ active === nav.title ? `${theme}-bg1 ${theme}-c1-imp` : `${theme}-bg3-hover ${theme}-c2` }`}
                     to={`${FRONTEND_API_URL}${nav.url}`}
                 >
                     {icon}

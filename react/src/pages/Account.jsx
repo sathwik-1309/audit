@@ -119,10 +119,10 @@ function Account() {
             }
         </div>
         <div className={`sm:hidden mt-3 ${theme}-bg3 h-fit pb-2`}>
-            <PaginateTransactions header='Transactions' page_size={5} start_date={startDate} end_date={endDate}/>
+            <PaginateTransactions header='Transactions' page_size={10} start_date={startDate} end_date={endDate}/>
         </div>
         <div className={`sm:flex hidden m-3 ${theme}-bg3 h-fit pb-2`}>
-            <PaginateTransactions header='Transactions' page_size={10} start_date={startDate} end_date={endDate}/>
+            <PaginateTransactions header='Transactions' page_size={15} start_date={startDate} end_date={endDate}/>
         </div>
         
       </div>
