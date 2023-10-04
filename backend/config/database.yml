@@ -25,3 +25,25 @@ production:
   port: 5432                  # PostgreSQL container's default port
   username: sathwik       # Replace with your PostgreSQL username
   password: sath139    # Replace with your PostgreSQL password
+
+# RDS
+# development:
+#   adapter: postgresql
+#   encoding: utf8
+#   database: audit_dev
+#   pool: 5
+#   username: sathwik
+#   password: sath1399
+#   host: rds-database.cul8kbporqwf.ap-south-1.rds.amazonaws.com
+#   port: 5432 # Default PostgreSQL port
+
+# production:
+#   adapter: postgresql
+#   encoding: utf8
+#   database: audit
+#   pool: 5
+#   username: sathwik
+#   password: sath1399
+#   host: rds-database.cul8kbporqwf.ap-south-1.rds.amazonaws.com
+#   port: 5432 # Default PostgreSQL port
+

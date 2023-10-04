@@ -28,4 +28,5 @@ ENV VITE_PORT $VITE_PORT
 #RUN npm install -g serve
 
 # Set the command to serve the app
-CMD ["npm", "run", "dev"]
+RUN npm run build
+CMD ["npm", "run", "serve"]
