@@ -77,7 +77,6 @@ Rails.application.routes.draw do
 
   scope :images do
     get '/profile_pic', to: 'image#profile_pic', as: :uploaded_image
-    post '/upload' => 'image#upload'
   end
   
 

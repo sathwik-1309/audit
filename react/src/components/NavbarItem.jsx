@@ -8,6 +8,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import PaymentsIcon from '@mui/icons-material/Payments';
 import { red } from '@mui/material/colors';
+import { Link } from 'react-router-dom';
 
 function NavbarItem(props) {
     const nav = props.nav
@@ -15,10 +16,6 @@ function NavbarItem(props) {
     let icon;
     let { theme } = useContext(ThemeContext);
     const width = nav.title === "Logout" ? 'w-20' : 'w-32'
-
-    const redirect = () => {
-        window.location.replace(`${FRONTEND_API_URL}${nav.url}`)
-    }
 
     const style = {
         height: '100%',
@@ -49,31 +46,30 @@ function NavbarItem(props) {
     }
 
     let webpage = 
-                <div className={`${width} h-12 flex flex-row justify-center m-1 color-inherit rounded cursor-pointer ${theme}-c1-hover ${ active === nav.title ? `${theme}-bg1 ${theme}-c1` : `${theme}-bg3-hover ${theme}-c2` }`}
-                    onClick={redirect}
+                <Link className={`w-32 h-12 flex flex-row justify-center m-1 color-inherit rounded cursor-pointer ${theme}-c1-hover ${ active === nav.title ? `${theme}-bg1 ${theme}-c1-imp` : `${theme}-bg3-hover ${theme}-c2` }`}
+                    to={`${FRONTEND_API_URL}${nav.url}`}
                 >
                     {icon}
                     <div 
                         key={nav.title}
-                        className={`h-12 flex justify-center items-center pl-1 font-semibold `}
+                        className={`h-12 flex justify-center items-center pl-1 font-semibold`}
                     >
                         {nav.name}
                     </div>
-                </div>
+                </Link>
     
     let mobile = 
-                <div className={`w-28 h-10 flex flex-row justify-center m-1 color-inherit rounded cursor-pointer ${theme}-c1-hover ${ active === nav.title ? `${theme}-bg1 ${theme}-c1` : `${theme}-bg3-hover ${theme}-c2` }`}
-                    onClick={redirect}
+                <Link className={`w-24 h-10 flex flex-row justify-center m-1 text-xs color-inherit rounded cursor-pointer ${theme}-c1-hover ${ active === nav.title ? `${theme}-bg1 ${theme}-c1-imp` : `${theme}-bg3-hover ${theme}-c2` }`}
+                    to={`${FRONTEND_API_URL}${nav.url}`}
                 >
                     {icon}
                     <div
                         key={nav.title}
-                        className={`h-10 flex justify-center items-center pl-1 font-semibold `}
-                        href={`${FRONTEND_API_URL}${nav.url}`}
+                        className={`h-10 flex justify-center items-center pl-1 font-semibold`}
                     >
                         {nav.title}
                     </div>
-                </div>
+                </Link>
     
   return (
     <div>

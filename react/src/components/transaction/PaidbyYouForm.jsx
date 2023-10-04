@@ -112,7 +112,7 @@ function PaidbyYouForm(props) {
                 {error}
             </div>
             }
-            <div className={`flex flex-row pl-3 font-semibold mt-2 h-10 border rounded `}>
+            <div className={`flex flex-row pl-3 font-semibold mt-2 h-10 border rounded`} style={{borderColor: 'red'}}>
                 <CurrencyRupeeIcon style={{
                     height: '100%',
                 }}/>
@@ -121,20 +121,20 @@ function PaidbyYouForm(props) {
                 onChange={(e) => setAmount(e.target.value)} 
                 placeholder='Amount' required/>
             </div>
-            <div className='flex flex-row items-center mt-2 border rounded'>
+            <div className='flex flex-row items-center mt-2 border rounded' style={{borderColor: 'red'}}>
                 <PersonIcon style={{
                     height: '100%',
                     marginLeft: '0.75rem',
                     marginRight: '0.75rem'
                 }}/>
-                <select onChange={changeParty} value={party} className={`${theme}-c1 bg-transparent w-full p-2`}>
+                <select onChange={changeParty} value={party} className={`${theme}-c1 bg-transparent w-full p-2 font-bold`} style={{color: 'orange'}}>
                 <option>select</option>
                 {props.data.owed_accounts.map((account, index) => {
                     return <option value={account.id}>{account.name}</option>;
                 })}
                 </select>
             </div>
-            <div className='flex flex-row items-center mt-2 border rounded'>
+            <div className='flex flex-row items-center mt-2 border rounded' style={{borderColor: 'red'}}>
                 <PaidIcon style={{
                     height: '100%',
                     marginLeft: '0.75rem',
@@ -149,7 +149,7 @@ function PaidbyYouForm(props) {
             </div>
             {
                 paymentType === 'MOP' &&
-                <div className='flex flex-row items-center mt-2 border rounded'>
+                <div className='flex flex-row items-center mt-2 border rounded' style={{borderColor: 'red'}}>
                     <PaymentsIcon style={{
                         height: '100%',
                         marginLeft: '0.75rem',

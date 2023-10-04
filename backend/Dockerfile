@@ -1,7 +1,8 @@
 FROM ruby:2.7.6-alpine as base
 
 RUN apk update && \
-    apk add bash
+    apk add bash \
+    postgresql-dev
 
 RUN apk add --no-cache tzdata
 ENV TZ=UTC

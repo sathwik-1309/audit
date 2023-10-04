@@ -11,3 +11,6 @@
 ### Redis
     docker run --name some-redis -p 6379:6379 -d redis
 
+### Postgres
+    docker run -e POSTGRES_USER=sathwik -e POSTGRES_PASSWORD=sath139 -p 5432:5432 -d postgres:latest
+

@@ -1,4 +1,4 @@
-import { React, useContext, useState} from 'react'
+import { React, useContext, useEffect, useState} from 'react'
 import ThemeContext from '../context/ThemeContext';
 import EditIcon from '@mui/icons-material/Edit';
 import ProfilePic from './ProfilePic';
@@ -15,9 +15,6 @@ function Profile(props) {
   const [email, setEmail] = useState(data.email)
   const [name, setName] = useState(data.name)
   const [selectedFile, setSelectedFile] = useState(null);
-  const [refresh, setRefresh] = useState(0)
-
-  refreshWebSocket('UserChannel', refresh, setRefresh);
 
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
@@ -40,6 +37,7 @@ function Profile(props) {
       .then((response) => {
         const imageURL = response.data;
         console.log(`Image uploaded and accessible at: ${imageURL}`);
+        setEdit(false)
         window.location.reload()
       })
       .catch((error) => {

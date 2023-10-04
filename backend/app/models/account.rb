@@ -90,10 +90,10 @@ class Account < ApplicationRecord
     array
   end
 
-  def pie_chart_meta
+  def pie_chart_meta(start_date, end_date)
     meta_array = []
     meta = {}
-    transactions = self.transactions.where(ttype: [DEBIT, PAID_BY_PARTY])
+    transactions = self.transactions.where("date between ? and ?",start_date, end_date).where(ttype: [DEBIT, PAID_BY_PARTY])
     transactions.each do|transaction|
       if transaction.category.present?
         meta[transaction.category.name] = 0 unless meta.has_key? transaction.category.name
@@ -156,20 +156,9 @@ class Account < ApplicationRecord
     self.user.transactions.where(party: self.id)
   end
 
-  def stats(period)
+  def stats(start_date, end_date)
     transactions = self.transactions.where(pseudo: false)
-    case period
-    when 'today'
-      transactions = transactions.where(date: Date.today)
-    when 'week'
-      start_of_week = Date.today.beginning_of_week
-      end_of_week = Date.today.end_of_week
-      transactions = transactions.where("date BETWEEN ? AND ?", start_of_week, end_of_week)
-    when 'month'
-      start_of_month = Date.today.beginning_of_month
-      end_of_month = Date.today.end_of_month
-      transactions = transactions.where("date BETWEEN ? AND ?", start_of_month, end_of_month)
-    end
+    transactions = transactions.where("date BETWEEN ? AND ?", start_date, end_date)
     total = { CREDIT => 0, DEBIT => 0}
     transactions.each do |transaction|
       if transaction.get_difference(self) > 0

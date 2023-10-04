@@ -11,7 +11,7 @@ function PiechartSummary(props) {
         <PieChartWrapper data={data}/>
         {
             data.length !== 0 &&
-            <div className={`${theme}-bg3 sm:w-96 w-80 p-1 rounded ${theme}-c1 m-2`}>
+            <div className={`${theme}-bg3 w-96 p-1 rounded ${theme}-c1 m-2`}>
                 <div className={`flex flex-row h-12 ${theme}-bg2 m-2 rounded items-center font-bold ${theme}-c2`} style={{ fontSize: '0.9rem'}}>
                     <div className='w-1/3'>{props.header}</div>
                     <div className='w-1/3'>Spent</div>

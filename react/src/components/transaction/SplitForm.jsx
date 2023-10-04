@@ -32,7 +32,7 @@ function SplitForm(props) {
   const [category, setCategory] = useState('');
   const [personName, setPersonName] = React.useState([]);
   const [transactions, setTransactions] = useState('');
-  const [userSplit, setUserSplit] = useState('');
+  const [userSplit, setUserSplit] = useState(''); 
 
   let { theme } = useContext(ThemeContext);
   const payments = ['MOP', 'Account', 'Card']
@@ -165,7 +165,7 @@ function SplitForm(props) {
                 {error}
             </div>
             }
-            <div className={`flex flex-row pl-3 font-semibold mt-2 h-10 border rounded `}>
+            <div className={`flex flex-row pl-3 font-semibold mt-2 h-10 border rounded`} style={{borderColor: 'red'}}>
                 <CurrencyRupeeIcon style={{
                     height: '100%',
                 }}/>
@@ -175,7 +175,7 @@ function SplitForm(props) {
                 placeholder='Total Amount' required/>
             </div>
             
-            <div className='flex flex-row items-center mt-2 border rounded'>
+            <div className='flex flex-row items-center mt-2 border rounded' style={{borderColor: 'red'}}>
                 <PaidIcon style={{
                     height: '100%',
                     marginLeft: '0.75rem',
@@ -190,7 +190,7 @@ function SplitForm(props) {
             </div>
             {
                 paymentType === 'MOP' &&
-                <div className='flex flex-row items-center mt-2 border rounded'>
+                <div className='flex flex-row items-center mt-2 border rounded' style={{borderColor: 'red'}}>
                     <PaymentsIcon style={{
                         height: '100%',
                         marginLeft: '0.75rem',
@@ -206,7 +206,7 @@ function SplitForm(props) {
             }
             {
                 paymentType === 'Account' &&
-                <div className='flex flex-row items-center mt-2 border rounded'>
+                <div className='flex flex-row items-center mt-2 border rounded' style={{borderColor: 'red'}}>
                     <AccountBalanceWalletIcon style={{
                         height: '100%',
                         marginLeft: '0.75rem',
@@ -222,7 +222,7 @@ function SplitForm(props) {
             }
             {
                 paymentType === 'Card' &&
-                <div className='flex flex-row items-center mt-2 border rounded'>
+                <div className='flex flex-row items-center mt-2 border rounded' style={{borderColor: 'red'}}>
                     <CreditCardIcon style={{
                         height: '100%',
                         marginLeft: '0.75rem',
@@ -237,7 +237,7 @@ function SplitForm(props) {
                 </div>
             }
 
-            <div className='h-fit pl-3 mb-3 flex items-center w-64 border mt-2'>
+            <div className='h-fit pl-3 mb-3 flex items-center w-64 border mt-2' style={{borderColor: 'red'}}>
                 <div className='h-12'>
                 <PersonIcon style={{
                     height: '100%',
@@ -280,20 +280,20 @@ function SplitForm(props) {
             </div>
 
             <div className='flex flex-col'>
-                <div className='border h-12 flex items-center m-1 flex-row rounded'>
-                    <div className='w-2/3'>
-                        YOU
+                <div className='border h-12 flex items-center m-1 flex-row rounded' style={{borderColor: 'red'}}>
+                    <div className='w-2/3 font-bold' style={{color: 'orange'}}>
+                        You
                     </div>
                     <input type="number" className='bg-transparent bl-1 h-10 pl-3 w-24' placeholder='Enter Split' onChange={(e)=>setUserSplit(e.target.value)}/>
                 </div>
                 {
                     personName.map((person)=>{
                     return(
-                        <div className='border h-12 flex items-center m-1 flex-row rounded'>
-                            <div className='w-2/3'>
+                        <div className='border h-12 flex items-center m-1 flex-row rounded' style={{borderColor: 'red'}}>
+                            <div className='w-2/3 font-bold' style={{color: 'orange'}}>
                                 {person}
                             </div>
-                            <input type="number" className='bg-transparent bl-1 h-10 pl-3 w-24' placeholder='Enter Split' onChange={(e)=>changeOtherSplit(e.target.value, person)} required/>
+                            <input type="number" className='bg-transparent bl-1 h-10 pl-3 w-24' placeholder='Enter Split' value={false ? 2 : ''} onChange={(e)=>changeOtherSplit(e.target.value, person)} required/>
                         </div>
                     )
                 })}

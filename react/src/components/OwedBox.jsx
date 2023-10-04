@@ -8,7 +8,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import Transactions from './Transactions';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { redirect } from 'react-router-dom';
+import { Link, redirect } from 'react-router-dom';
 
 function OwedBox(props) {
     const account = props.account;
@@ -40,16 +40,12 @@ function OwedBox(props) {
         setEdit(false);
     }
 
-    const redirectOwed = () => {
-        window.location.replace(`${FRONTEND_API_URL}/owed/${account.id}`)
-    }
-
     let { theme } = useContext(ThemeContext);
   return (
     <div className={`flex flex-col`}>
         <div className={`flex flex-row ${theme}-c1 ${theme}-bg1 mt-3 font-semibold h-24 rounded`}>
         <div className='flex flex-col p-1 w-3/4'>
-        <div className='flex flex-row h-1/2 pb-1 pl-3 cursor-pointer' onClick={redirectOwed}>
+        <Link className='flex flex-row h-1/2 pb-1 pl-3 cursor-pointer' to={`${FRONTEND_API_URL}/owed/${account.id}`}>
             <PersonIcon style={{
                 height: '100%',
             }}/>
@@ -63,7 +59,7 @@ function OwedBox(props) {
                 ) : (
                 <div className='flex pl-3 text-md font-bold items-center'>{account.name}</div>
             )}
-            </div>
+        </Link>
             <div className='flex items-center h-1/2'>
             <div className={`${theme}-c3 pl-12 text-sm font-semibold`}>Balance:</div>
             <div className={`${theme}-c1 font-bold pl-3`}>₹ {account.balance}</div>

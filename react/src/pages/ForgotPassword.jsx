@@ -1,10 +1,9 @@
 import { React, useState } from 'react'
-import user_icon from '../assets/person.png'
 import email_icon from '../assets/email.png'
 import password_icon from '../assets/password.png'
 import { BACKEND_API_URL, FRONTEND_API_URL } from '../config'
 import axios from 'axios'
-import { redirect } from 'react-router-dom'
+import {  Link } from 'react-router-dom'
 
 function ForgotPassword() {
   const [formData, setFormData] = useState({
@@ -24,10 +23,6 @@ function ForgotPassword() {
         ...formData,
         [name]: value,
     });
-  }
-  
-  const redirectToLogin = () => {
-    window.location.replace(`${FRONTEND_API_URL}/`)
   }
 
   async function SendOtp(event) {
@@ -104,7 +99,7 @@ async function ResetPassword() {
             set_sign_in_error(createResponse.data.message);
         } else if (createResponse.status === 200) {
             set_sign_in_error('');
-            redirectToLogin()
+            window.location.replace(`${FRONTEND_API_URL}/`)
         } else {
             set_sign_in_error("An error occurred. Please try again later.");
         }
@@ -179,7 +174,7 @@ async function ResetPassword() {
               
             </div>
             <div className='text-gray-500 text-sm'>
-            Move to Login page? <span className='text-blue-600 cursor-pointer' onClick={redirectToLogin}>Log in</span>
+            Move to Login page? <Link className='text-blue-600 cursor-pointer' to={`${FRONTEND_API_URL}/`}>Log in</Link>
         </div>
         </div>
         

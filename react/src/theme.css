@@ -112,7 +112,11 @@
 
 .light-c1 {
     color: var(--light-c1);
-}.light-c2 {
+}
+.light-c1-imp {
+    color: var(--light-c1) !important;
+}
+.light-c2 {
     color: var(--light-c2);
 }
 .light-c3 {

@@ -1,9 +1,9 @@
 version: '3'
 services:
   rails:
-    image: sathwik139/audit:rails-v5
+    image: audit-rails:v3
     command: >
-      /bin/sh -c "rails db:drop && rails db:create && rails db:migrate && puma -C config/puma.rb"
+      /bin/sh -c "rails db:create && rails db:migrate && puma -C config/puma.rb"
     environment:
       RAILS_ENV: production
       DISABLE_DATABASE_ENVIRONMENT_CHECK: 1
@@ -16,7 +16,7 @@ services:
     ports:
       - "3001:3001"
   sidekiq:
-    image: sathwik139/audit:rails-v5
+    image: audit-rails:v3
     command: bundle exec sidekiq -c 2 -q low
     environment:
       RAILS_ENV: production
@@ -30,13 +30,18 @@ services:
   redis:
     image: redis:latest
   react:
-    image: sathwik139/audit:react-v4
+    image: audit-react:v5
     environment:
       VITE_HOST: localhost
-      VITE_PORT: 5173
+      VITE_PORT: 4173
     ports:
-      - "5173:5173"
+      - "4173:4173"
   postgres:
     image: postgres:latest
+    container_name: my-postgres-container
     ports:
-    - "5432:5432"
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: audit
+      POSTGRES_USER: sathwik
+      POSTGRES_PASSWORD: sath139
