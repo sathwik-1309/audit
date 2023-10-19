@@ -6,6 +6,7 @@ require_relative '../lib/util'
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
+Dotenv::Railtie.load
 
 module Audit
   class Application < Rails::Application

@@ -2,9 +2,9 @@ default: &default
   adapter: postgresql
   encoding: utf8
   pool: 5
-  host: my-postgres-container
-  username: myapp_user           # Replace with your PostgreSQL username
-  password: myapp_password       # Replace with your PostgreSQL password
+  host: localhost
+  username: sathwik           # Replace with your PostgreSQL username
+  password: sath139       # Replace with your PostgreSQL password
 
 development:
   <<: *default
