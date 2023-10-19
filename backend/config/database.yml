@@ -46,4 +46,3 @@ production:
 #   password: sath1399
 #   host: rds-database.cul8kbporqwf.ap-south-1.rds.amazonaws.com
 #   port: 5432 # Default PostgreSQL port
-

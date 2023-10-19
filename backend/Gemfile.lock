@@ -243,6 +243,9 @@ GEM
       actionpack (>= 5.2)
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
+    sqlite3 (1.6.7)
+      mini_portile2 (~> 2.8.0)
+    sqlite3 (1.6.7-arm64-darwin)
     stimulus-rails (1.2.2)
       railties (>= 6.0.0)
     thor (1.2.2)
@@ -282,7 +285,6 @@ DEPENDENCIES
   byebug
   cable_ready
   capybara
-  date
   debug
   devise (~> 4.9)
   factory_bot_rails
@@ -300,6 +302,7 @@ DEPENDENCIES
   sidekiq
   simple_token_authentication
   sprockets-rails
+  sqlite3 (~> 1.4)
   stimulus-rails
   turbo-rails
   tzinfo-data

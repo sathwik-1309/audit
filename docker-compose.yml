@@ -1,7 +1,7 @@
 version: '3'
 services:
   rails:
-    image: audit-rails:v3
+    image: audit-rails:v1.1
     command: >
       /bin/sh -c "rails db:create && rails db:migrate && puma -C config/puma.rb"
     environment:
@@ -16,7 +16,7 @@ services:
     ports:
       - "3001:3001"
   sidekiq:
-    image: audit-rails:v3
+    image: audit-rails:v1.1
     command: bundle exec sidekiq -c 2 -q low
     environment:
       RAILS_ENV: production
@@ -30,7 +30,7 @@ services:
   redis:
     image: redis:latest
   react:
-    image: audit-react:v5
+    image: audit-react:v6
     environment:
       VITE_HOST: localhost
       VITE_PORT: 4173
