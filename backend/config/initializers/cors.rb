@@ -6,12 +6,17 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
   # end
 
   allow do
-    origins "http://#{ENV.fetch("HOST_IP")}:4173" # Replace with the origin(s) you want to allow, e.g., 'http://example.com'
-    resource '*', headers: :any, methods: [:get, :post, :put, :patch, :delete, :options, :head], credentials: true
+    origins "*" # Replace with the origin(s) you want to allow, e.g., 'http://example.com'
+    resource '*', headers: :any, methods: [:get, :post, :put, :patch, :delete, :options, :head], credentials: false
   end
 
   allow do
     origins "http://#{ENV.fetch("HOST_IP")}:5173" # Replace with the origin(s) you want to allow, e.g., 'http://example.com'
+    resource '*', headers: :any, methods: [:get, :post, :put, :patch, :delete, :options, :head], credentials: true
+  end
+
+  allow do
+    origins "http://#{ENV.fetch("HOST_IP")}:4173" # Replace with the origin(s) you want to allow, e.g., 'http://example.com'
     resource '*', headers: :any, methods: [:get, :post, :put, :patch, :delete, :options, :head], credentials: true
   end
 
