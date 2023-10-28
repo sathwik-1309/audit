@@ -21,7 +21,7 @@ before_action :set_current_user
       render_202("Email id not found")
     else
       if user.valid_password?(password)
-        render_200("Credentials are valid")
+        render_200("Credentials are valid", {"auth_token" => user.authentication_token})
       else
         render_202("Email id and Password dont match")
       end
@@ -42,7 +42,8 @@ before_action :set_current_user
       LazyWorker.perform_async("send_admin_new_user_mail", {"name" => @user.name })
       render_200("User created", {
         "name": @user.name,
-        "email": @user.email
+        "email": @user.email,
+        "auth_token": @user.authentication_token
       })
     rescue StandardError => ex
       render_202(ex.message)
