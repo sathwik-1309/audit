@@ -11,4 +11,13 @@ module Util
   def self.has_upper_case(str)
     !str.match(/[A-Z]/).nil?
   end
+
+  def self.init_pie_category(category)
+    init_hash = {
+      "category" => category,
+      "transactions" => [],
+      "percentage" => 0,
+      "expenditure" => 0,
+    }
+  end
 end

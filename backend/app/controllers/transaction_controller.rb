@@ -303,6 +303,31 @@ class TransactionController < ApplicationController
     render(:json => json)
   end
 
+  def pie
+    transactions = @current_user.transactions.where(ttype: [DEBIT, PAID_BY_PARTY])
+    json = []
+    dict = {}
+    total_spent = 0
+    transactions.each do|transaction|
+      category = transaction.category
+      name = category.nil? ? "other" : category.name
+      unless dict.has_key? name
+        dict[name] = Util.init_pie_category(name)
+      end
+      dict[name]['transactions'] << transaction
+      dict[name]['expenditure'] += transaction.amount
+      total_spent += transaction.amount
+    end
+    PIE_CHART_COLORS
+    i = 0
+    dict.keys.each do|key|
+      dict[key]['color'] = PIE_CHART_COLORS[i]
+      dict[key]['percentage'] = (dict[key]['expenditure']*100/total_spent).round(0)
+      i += 1
+    end
+    render(:json => dict.values)
+  end
+
   private
 
   def filter_params

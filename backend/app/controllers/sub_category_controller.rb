@@ -8,14 +8,25 @@ class SubCategoryController < ApplicationController
 
   def create
     name = Util.processed_name(filter_params[:name])
-    category = @current_user.categories.find_by_id(filter_params[:category_id])
+    if filter_params[:category_id].present?
+      category = @current_user.categories.find_by_id(filter_params[:category_id])
+    elsif filter_params[:force]
+      category = Category.new(name: filter_params[:name], user_id: @current_user.id)
+      begin
+        category.save!
+      rescue StandardError => ex
+        render_202(ex.message) and return
+      end
+    end
+    
     if category.nil?
       render_202("Invalid Category") and return
     end
     if category.sub_categories.pluck(:name).include? name
       render_202("Sub-category #{name} already exists in this category") and return
     end
-    attributes = filter_params.slice(:category_id)
+    attributes = {}
+    attributes[:category_id] = category.id
     attributes[:user_id] = @current_user.id
     attributes[:name] = name
     @sub_category = SubCategory.new(attributes)
@@ -45,6 +56,6 @@ class SubCategoryController < ApplicationController
   private
 
   def filter_params
-    params.permit(:name, :category_id)
+    params.permit(:name, :category_id, :force)
   end
 end

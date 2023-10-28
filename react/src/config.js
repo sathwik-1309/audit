@@ -1,8 +1,11 @@
-export const HOST_IP = `${import.meta.env.VITE_HOST}`;
-export const REACT_PORT = `${import.meta.env.VITE_PORT}`;
+// export const HOST_IP = `${import.meta.env.VITE_HOST}`;
+// export const REACT_PORT = `${import.meta.env.VITE_PORT}`;
 
-// export const HOST_IP = `3.111.50.177`;
+// export const HOST_IP = `3.7.59.226`;
 // export const REACT_PORT = `4173`;
+
+export const HOST_IP = `localhost`;
+export const REACT_PORT = `5173`;
 
 
 export const RAILS_PORT = 3001;

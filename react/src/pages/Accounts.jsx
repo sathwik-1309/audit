@@ -6,7 +6,7 @@ import { useContext } from 'react';
 import ThemeContext from '../context/ThemeContext';
 import { refreshWebSocket } from '../context/WebSocketContext';
 import AccountBox from '../components/AccountBox';
-import AccountForm from "../components/AccountForm.jsx";
+import AccountForm from '../components/Accountform';
 import ApiPost from '../axios/postapi';
 import Owed from './Owed';
 
