@@ -11,7 +11,7 @@ class SubCategoryController < ApplicationController
     if filter_params[:category_id].present?
       category = @current_user.categories.find_by_id(filter_params[:category_id])
     elsif filter_params[:force]
-      category = Category.new(name: filter_params[:name], user_id: @current_user.id)
+      category = Category.new(name: filter_params[:name], user_id: @current_user.id, color: filter_params[:color])
       begin
         category.save!
       rescue StandardError => ex
@@ -56,6 +56,6 @@ class SubCategoryController < ApplicationController
   private
 
   def filter_params
-    params.permit(:name, :category_id, :force)
+    params.permit(:name, :category_id, :force, :color)
   end
 end

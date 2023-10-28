@@ -311,17 +311,16 @@ class TransactionController < ApplicationController
     transactions.each do|transaction|
       category = transaction.category
       name = category.nil? ? "other" : category.name
+      color = category.nil? ? 'gray' : category.color
       unless dict.has_key? name
-        dict[name] = Util.init_pie_category(name)
+        dict[name] = Util.init_pie_category(name, color)
       end
       dict[name]['transactions'] << transaction
       dict[name]['expenditure'] += transaction.amount
       total_spent += transaction.amount
     end
-    PIE_CHART_COLORS
     i = 0
     dict.keys.each do|key|
-      dict[key]['color'] = PIE_CHART_COLORS[i]
       dict[key]['percentage'] = (dict[key]['expenditure']*100/total_spent).round(0)
       i += 1
     end

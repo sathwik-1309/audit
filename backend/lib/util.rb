@@ -12,12 +12,13 @@ module Util
     !str.match(/[A-Z]/).nil?
   end
 
-  def self.init_pie_category(category)
+  def self.init_pie_category(category, color)
     init_hash = {
       "category" => category,
       "transactions" => [],
       "percentage" => 0,
       "expenditure" => 0,
+      "color" => color
     }
   end
 end
