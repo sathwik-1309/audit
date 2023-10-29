@@ -25,42 +25,81 @@ USER_CHANNEL = "UserChannel"
 #react
 PIE_CHART_COLORS = ['orange', '#e74c3c', '#9b59b6', '#f1c40f', '#1d81de', 'brown', 'red', 'blue']
 # PIE_CHART_COLORS = ['#e67e22', '#3498db', '#9b59b6', '#f1c40f']
+# CATEGORY_COLORS = [
+#   {
+#     'color' => 'orange',
+#     'name' => 'orange'
+#   },
+#   {
+#     'color' => '#3498db',
+#     'name' => 'blue'
+#   },
+#   {
+#     'color' => '#e74c3c',
+#     'name' => 'red'
+#   },
+#   {
+#     'color' => '#f1c40f',
+#     'name' => 'yellow'
+#   },
+#   {
+#     'color' => '#9b59b6',
+#     'name' => 'purple'
+#   },
+#   {
+#     'color' => '#2ecc71',
+#     'name' => 'emerald'
+#   },
+#   {
+#     'color' => '#1abc9c',
+#     'name' => 'turquoise'
+#   },
+#   {
+#     'color' => '#34495e',
+#     'name' => 'graphite'
+#   },
+#   {
+#     'color' => '#e84393',
+#     'name' => 'pink'
+#   },
+# ]
+
 CATEGORY_COLORS = [
   {
-    'color' => 'orange',
+    'color' => '#2c3e50',
+    'name' => 'midnight'
+  },
+  {
+    'color' => '#c0392b',
+    'name' => 'ruby'
+  },
+  {
+    'color' => '#6D214F',
+    'name' => 'magenta'
+  },
+  {
+    'color' => '#2980b9',
+    'name' => 'sea'
+  },
+  {
+    'color' => '#d35400',
     'name' => 'orange'
   },
   {
-    'color' => '#3498db',
-    'name' => 'blue'
+    'color' => '#2c4d42',
+    'name' => 'forest'
   },
   {
-    'color' => '#e74c3c',
-    'name' => 'red'
-  },
-  {
-    'color' => '#f1c40f',
-    'name' => 'yellow'
-  },
-  {
-    'color' => '#9b59b6',
+    'color' => '#8e44ad',
     'name' => 'purple'
-  },
-  {
-    'color' => '#2ecc71',
-    'name' => 'emerald'
-  },
-  {
-    'color' => '#1abc9c',
-    'name' => 'turquoise'
-  },
-  {
-    'color' => '#34495e',
-    'name' => 'graphite'
   },
   {
     'color' => '#e84393',
     'name' => 'pink'
+  },
+  {
+    'color' => '#16a085',
+    'name' => 'aqua'
   },
 ]
 
