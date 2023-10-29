@@ -4,6 +4,7 @@ class CreateUsers < ActiveRecord::Migration[7.0]
       t.string :name, null: false
       t.string :password, default: ""
       t.string :theme, default: "dark"
+      t.string :app_theme, default: "midnight"
       t.timestamps
     end
   end

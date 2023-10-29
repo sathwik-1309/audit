@@ -59,7 +59,7 @@ before_action :set_current_user
       if params[:image].present?
         @user.upload(params[:image])
       end
-      @user.assign_attributes(filter_params.slice(:name, :email, :password))
+      @user.assign_attributes(filter_params.slice(:name, :email, :password, :app_theme))
       @user.save!
       msg = {
         "@user": {
@@ -127,6 +127,6 @@ before_action :set_current_user
   private
 
   def filter_params
-    params.permit(:name, :email, :password, :theme, :otp, :user_id)
+    params.permit(:name, :email, :password, :theme, :otp, :user_id, :app_theme)
   end
 end
