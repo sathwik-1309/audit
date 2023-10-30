@@ -63,7 +63,7 @@ function Categories() {
         {showForm && (
             <CategoryForm onSubmit={handleCreateCategory} onCancel={handleCloseForm} />
         )}
-        {data.map((category, index) => (
+        {data.categories.map((category, index) => (
           <CategoryBox category={category} index={index} />
         ))}
       </div>

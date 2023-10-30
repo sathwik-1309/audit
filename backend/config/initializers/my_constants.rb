@@ -64,43 +64,83 @@ PIE_CHART_COLORS = ['orange', '#e74c3c', '#9b59b6', '#f1c40f', '#1d81de', 'brown
 #   },
 # ]
 
+# CATEGORY_COLORS = [
+#   {
+#     'color' => '#2c3e50',
+#     'name' => 'midnight'
+#   },
+#   {
+#     'color' => '#c0392b',
+#     'name' => 'ruby'
+#   },
+#   {
+#     'color' => '#6D214F',
+#     'name' => 'magenta'
+#   },
+#   {
+#     'color' => '#2980b9',
+#     'name' => 'sea'
+#   },
+#   {
+#     'color' => '#d35400',
+#     'name' => 'orange'
+#   },
+#   {
+#     'color' => '#2c4d42',
+#     'name' => 'forest'
+#   },
+#   {
+#     'color' => '#8e44ad',
+#     'name' => 'purple'
+#   },
+#   {
+#     'color' => '#e84393',
+#     'name' => 'pink'
+#   },
+#   {
+#     'color' => '#16a085',
+#     'name' => 'aqua'
+#   },
+# ]
+
 CATEGORY_COLORS = [
   {
-    'color' => '#2c3e50',
-    'name' => 'midnight'
+    'color' => 'orange',
+    'name' => 'gold'
   },
   {
-    'color' => '#c0392b',
-    'name' => 'ruby'
-  },
-  {
-    'color' => '#6D214F',
-    'name' => 'magenta'
-  },
-  {
-    'color' => '#2980b9',
-    'name' => 'sea'
-  },
-  {
-    'color' => '#d35400',
+    'color' => '#e67e22',
     'name' => 'orange'
   },
   {
-    'color' => '#2c4d42',
-    'name' => 'forest'
+    'color' => '#B33771',
+    'name' => 'magenta'
   },
   {
-    'color' => '#8e44ad',
-    'name' => 'purple'
+    'color' => '#16a085',
+    'name' => 'aqua'
+  },
+  {
+    'color' => '#3498db',
+    'name' => 'sea'
+  },
+  {
+    'color' => '#34495e',
+    'name' => 'midnight'
   },
   {
     'color' => '#e84393',
     'name' => 'pink'
   },
   {
-    'color' => '#16a085',
-    'name' => 'aqua'
+    'color' => '#e74c3c',
+    'name' => 'ruby'
   },
+  {
+    'color' => '#03674c',
+    'name' => 'forest'
+  },
+  
 ]
 
 #env
