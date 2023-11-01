@@ -304,7 +304,28 @@ class TransactionController < ApplicationController
   end
 
   def pie
-    transactions = @current_user.transactions.where(ttype: [DEBIT, PAID_BY_PARTY])
+    start_date, end_date = nil, nil
+    if filter_params[:start_date].present?
+      start_date = DateTime.parse(filter_params[:start_date]).strftime("%Y-%m-%d")
+      end_date = DateTime.parse(filter_params[:end_date]).strftime("%Y-%m-%d")
+    elsif filter_params[:month].present?
+      start_date, end_date = Util.month_year_to_start_end_date(filter_params[:month], filter_params[:year])
+    end
+
+    if filter_params[:account_id].present?
+      account = @current_user.accounts.find_by_id(filter_params[:account_id])
+      if account.nil?
+        render_202("Account not found with this ID") and return
+      end
+      transactions = account.transactions.where(ttype: [DEBIT, PAID_BY_PARTY])
+    else
+      transactions = @current_user.transactions.where(ttype: [DEBIT, PAID_BY_PARTY])
+    end
+
+    if start_date.present?
+      transactions = transactions.where("date BETWEEN ? AND ?", start_date, end_date)
+    end
+    
     json = []
     dict = {}
     total_spent = 0
@@ -330,7 +351,7 @@ class TransactionController < ApplicationController
   private
 
   def filter_params
-    params.permit(:account_id, :mop_id, :amount, :ttype, :date, :party, :meta, :comments, :card_id, :sub_category_id, transactions: [:amount, :user, :party])
+    params.permit(:account_id, :start_date, :end_date, :year, :month, :mop_id, :amount, :ttype, :date, :party, :meta, :comments, :card_id, :sub_category_id, transactions: [:amount, :user, :party])
   end
 
 end

@@ -27,7 +27,6 @@ class CategoryController < ApplicationController
     attributes = filter_params.slice(:name, :color)
     attributes[:user_id] = @current_user.id
     @category = Category.new(attributes)
-    byebug
     begin
       @category.save!
       msg = @category.attributes

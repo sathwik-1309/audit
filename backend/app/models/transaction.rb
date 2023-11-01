@@ -152,6 +152,11 @@ class Transaction < ApplicationRecord
 
   def transaction_box
     hash = self.attributes
+    if CREDIT_TRANSACTIONS.include? self.ttype
+      hash['signed_amount'] = "+  ₹ #{self.amount}"
+    else
+      hash['signed_amount'] = "-  ₹ #{self.amount}"
+    end
     hash['sub_category'] =  self.sub_category.name unless self.sub_category.nil?
     hash['comments_mob'] = hash['comments']
     hash['category'] = self.sub_category.sub_category_box unless self.sub_category.nil?

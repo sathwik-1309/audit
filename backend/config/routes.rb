@@ -79,6 +79,16 @@ Rails.application.routes.draw do
   scope :images do
     get '/profile_pic', to: 'image#profile_pic', as: :uploaded_image
   end
+
+  scope :v1 do
+    scope :accounts do
+      get '/:id/details' => 'v1/account#details'
+    end
+
+    scope :transactions do
+      get '' => 'v1/transaction#list'
+    end
+  end
   
 
 end
