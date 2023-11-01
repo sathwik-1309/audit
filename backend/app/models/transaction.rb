@@ -171,6 +171,27 @@ class Transaction < ApplicationRecord
     return
   end
 
+  def self.analytics(list)
+    json = {}
+    json['labels'] = []
+    data = []
+    list.each do|hash|
+      json['labels'] << hash['label']
+      spent = 0
+      hash['transactions'].each do |transaction|
+        spent += transaction.amount
+      end
+      data << spent
+    end
+    json['labels'] = json['labels'].reverse
+    json['datasets'] = [
+      {
+        'data' => data.reverse
+      }
+    ]
+    json
+  end
+
   private
 
   def self.find_previous_element(arr, element)

@@ -13,6 +13,8 @@ SPLIT = "split"
 TTYPES = [DEBIT, CREDIT, PAID_BY_YOU, PAID_BY_PARTY, SETTLED_BY_PARTY, SETTLED_BY_YOU, SPLIT]
 CREDIT_TRANSACTIONS = [CREDIT, SETTLED_BY_PARTY]
 PERIODS = ["today", "month", "week"]
+WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] 
+MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'] 
 
 #channels
 ACCOUNTS_CHANNEL = "AccountsChannel"

@@ -87,6 +87,7 @@ Rails.application.routes.draw do
 
     scope :transactions do
       get '' => 'v1/transaction#list'
+      get '/analytics' => 'v1/transaction#analytics'
     end
   end
   
