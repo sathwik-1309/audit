@@ -29,14 +29,13 @@ class Account < ApplicationRecord
 
   def add_opening_transaction
     balance = self.balance
-    mop = Mop.create("auto_generated", self, {"auto_generated" => true})
-    self.add_opening_balance(balance, mop, self.opening_date)
+    self.add_opening_balance(balance, self.opening_date)
   end
 
 
 
-  def add_opening_balance(amount, mop, date)
-    transaction = Transaction.account_opening(amount, mop, date, self)
+  def add_opening_balance(amount, date)
+    transaction = Transaction.account_opening(amount, date, self)
     # self.update_balance(transaction)
     self.update_daily_log(transaction)
   end

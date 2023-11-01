@@ -50,20 +50,20 @@ class TransactionController < ApplicationController
   # optional params - date, category, comments, account_id, mop_id
   def debit
     attributes = filter_params.slice(:amount, :comments, :sub_category_id)
+
     if filter_params[:card_id].present?
       @card = @current_user.cards.find_by_id(filter_params[:card_id])
+      account = @card.account
       mop = @card.mop
-    elsif filter_params[:mop_id].present?
-      mop = @current_user.mops.find_by_id(filter_params[:mop_id])
-    elsif filter_params[:account_id].present?
-      mop = @current_user.mops.where(account_id: filter_params[:account_id]).find{|m| m.is_auto_generated? }
     else
-      render_202("Either mop_id or account_id must be sent in request") and return
+      account = @current_user.accounts.find_by_id(filter_params[:account_id])
     end
 
-    if mop.nil?
-      render_202("mop_id or account_id is invalid") and return
+    if account.nil?
+      render_202("Account not found")
     end
+
+    mop = @current_user.mops.find_by_id(filter_params[:mop_id]) if filter_params[:mop_id].present?
 
     unless attributes[:sub_category_id].nil?
       attributes[:category_id] = @current_user.sub_categories.find_by_id(filter_params[:sub_category_id]).category_id
@@ -71,8 +71,8 @@ class TransactionController < ApplicationController
 
     attributes[:user_id] = @current_user.id
     attributes[:ttype] = DEBIT
-    attributes[:mop_id] = mop.id
-    attributes[:account_id] = mop.account_id
+    attributes[:mop_id] = mop.id if mop.present?
+    attributes[:account_id] = account.id
     attributes[:date] = filter_params[:date].present? ? filter_params[:date] : Date.today
     begin
       @transaction = Transaction.create(attributes)
@@ -96,9 +96,13 @@ class TransactionController < ApplicationController
       render_202("account not found") and return
     end
 
+    if filter_params[:mop_id].present?
+      mop = @current_user.mops.find_by_id(filter_params[:mop_id])
+    end
+
     attributes[:user_id] = @current_user.id
     attributes[:ttype] = CREDIT
-    attributes[:mop_id] = @account.auto_generated_mop.id
+    attributes[:mop_id] = mop.id if mop.present?
     attributes[:account_id] = @account.id
     attributes[:date] = filter_params[:date].present? ? filter_params[:date] : Date.today
 
@@ -123,7 +127,6 @@ class TransactionController < ApplicationController
 
     attributes[:user_id] = @current_user.id
     attributes[:ttype] = PAID_BY_PARTY
-    attributes[:mop_id] = @account.auto_generated_mop.id
     attributes[:account_id] = @account.id
     attributes[:date] = filter_params[:date].present? ? filter_params[:date] : Date.today
     attributes[:party] = @account.id
@@ -151,23 +154,23 @@ class TransactionController < ApplicationController
     end
 
     if filter_params[:card_id].present?
-      mop = @current_user.cards.find_by_id(filter_params[:card_id]).mop
-    elsif filter_params[:mop_id].present?
-      mop = @current_user.mops.find_by_id(filter_params[:mop_id])
-    elsif filter_params[:account_id].present?
-      mop = @current_user.mops.where(account_id: filter_params[:account_id]).find{|m| m.is_auto_generated? }
+      @card = @current_user.cards.find_by_id(filter_params[:card_id])
+      @account = @card.account
+      mop = @card.mop
     else
-      render_202("Either mop_id or account_id must be sent in request") and return
+      @account = @current_user.accounts.find_by_id(filter_params[:account_id])
     end
 
-    if mop.nil?
-      render_202("mop_id or account_id is invalid") and return
+    if @account.nil?
+      render_202("Account not found")
     end
+
+    mop = @current_user.mops.find_by_id(filter_params[:mop_id]) if filter_params[:mop_id].present?
 
     attributes[:user_id] = @current_user.id
     attributes[:ttype] = PAID_BY_YOU
-    attributes[:mop_id] = mop.id
-    attributes[:account_id] = mop.account_id
+    attributes[:mop_id] = mop.id if mop.present?
+    attributes[:account_id] = @account.id
     attributes[:date] = filter_params[:date].present? ? filter_params[:date] : Date.today
     attributes[:party] = @party.id
 
@@ -194,9 +197,11 @@ class TransactionController < ApplicationController
       render_202("party not found") and return
     end
 
+    mop = @current_user.mops.find_by_id(filter_params[:mop_id]) if filter_params[:mop_id].present?
+
     attributes[:user_id] = @current_user.id
     attributes[:ttype] = SETTLED_BY_PARTY
-    attributes[:mop_id] = @account.auto_generated_mop.id
+    attributes[:mop_id] = mop.id if mop.present?
     attributes[:account_id] = @account.id
     attributes[:date] = filter_params[:date].present? ? filter_params[:date] : Date.today
     attributes[:party] = @party.id
@@ -216,25 +221,26 @@ class TransactionController < ApplicationController
     if @party.nil?
       render_202("party not found") and return
     end
-    attributes = filter_params.slice(:amount, :comments)
+
     if filter_params[:card_id].present?
-      mop = @current_user.cards.find_by_id(filter_params[:card_id]).mop
-    elsif filter_params[:mop_id].present?
-      mop = @current_user.mops.find_by_id(filter_params[:mop_id])
-    elsif filter_params[:account_id].present?
-      mop = @current_user.mops.where(account_id: filter_params[:account_id]).find{|m| m.is_auto_generated? }
+      @card = @current_user.cards.find_by_id(filter_params[:card_id])
+      @account = @card.account
+      mop = @card.mop
     else
-      render_202("Either mop_id or account_id must be sent in request") and return
+      @account = @current_user.accounts.find_by_id(filter_params[:account_id])
     end
 
-    if mop.nil?
-      render_202("mop_id or account_id is invalid") and return
+    if @account.nil?
+      render_202("Account not found")
     end
 
+    mop = @current_user.mops.find_by_id(filter_params[:mop_id]) if filter_params[:mop_id].present?
+
+    attributes = filter_params.slice(:amount, :comments)
     attributes[:user_id] = @current_user.id
     attributes[:ttype] = SETTLED_BY_YOU
-    attributes[:mop_id] = mop.id
-    attributes[:account_id] = mop.account_id
+    attributes[:mop_id] = mop.id if mop.present?
+    attributes[:account_id] = @account.id
     attributes[:date] = filter_params[:date].present? ? filter_params[:date] : Date.today
     attributes[:party] = @party.id
 
@@ -251,24 +257,24 @@ class TransactionController < ApplicationController
   # amount, transactions, card_id/account_id/mop_id
   # date, category, comments,
   def split
-    attributes = filter_params.slice(:amount, :comments)
     if filter_params[:card_id].present?
-      mop = @current_user.cards.find_by_id(filter_params[:card_id]).mop
-    elsif filter_params[:mop_id].present?
-      mop = @current_user.mops.find_by_id(filter_params[:mop_id])
-    elsif filter_params[:account_id].present?
-      mop = @current_user.mops.where(account_id: filter_params[:account_id]).find{|m| m.is_auto_generated? }
+      @card = @current_user.cards.find_by_id(filter_params[:card_id])
+      @account = @card.account
+      mop = @card.mop
     else
-      render_202("Either mop_id or account_id must be sent in request") and return
+      @account = @current_user.accounts.find_by_id(filter_params[:account_id])
     end
 
-    if mop.nil?
-      render_202("mop_id or account_id is invalid") and return
+    if @account.nil?
+      render_202("Account not found")
     end
 
+    mop = @current_user.mops.find_by_id(filter_params[:mop_id]) if filter_params[:mop_id].present?
+
+    attributes = filter_params.slice(:amount, :comments)
     attributes[:user_id] = @current_user.id
-    attributes[:mop_id] = mop.id
-    attributes[:account_id] = mop.account_id
+    attributes[:mop_id] = mop.id if mop.present?
+    attributes[:account_id] = @account.id
     attributes[:ttype] = SPLIT
     attributes[:date] = filter_params[:date].present? ? filter_params[:date] : Date.today
     tr_array = filter_params[:transactions].map(&:to_h)

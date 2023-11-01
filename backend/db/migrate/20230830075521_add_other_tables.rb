@@ -30,7 +30,7 @@ class AddOtherTables < ActiveRecord::Migration[7.0]
       t.json :meta, default: {}
       t.string :comments
       t.integer :sub_category_id
-      t.belongs_to :mop
+      t.integer :mop_id
       t.belongs_to :account
       t.belongs_to :user
       t.timestamps

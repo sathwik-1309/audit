@@ -1,7 +1,6 @@
 class Transaction < ApplicationRecord
   belongs_to :user
   belongs_to :account
-  belongs_to :mop
 
   before_save :validate_transaction
   after_create :track_modifications
@@ -29,10 +28,10 @@ class Transaction < ApplicationRecord
     end
   end
 
-  def self.account_opening(amount, mop, date, account)
+  def self.account_opening(amount, date, account)
     tr = Transaction.new(amount: amount, ttype: CREDIT, date: date, user: account.user, account: account,
                          meta: { "opening_transaction" => true }, comments: "account opening transaction",
-                         mop: mop, balance_before: 0, balance_after: amount)
+                        balance_before: 0, balance_after: amount)
     tr.save!
     return tr
   end
@@ -190,6 +189,13 @@ class Transaction < ApplicationRecord
       }
     ]
     json
+  end
+
+  def mop
+    if self.mop_id.present?
+      return Mop.find_by_id(self.mop_id)
+    end
+    return nil
   end
 
   private
