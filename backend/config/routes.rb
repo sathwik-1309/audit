@@ -89,6 +89,10 @@ Rails.application.routes.draw do
       get '' => 'v1/transaction#list'
       get '/analytics' => 'v1/transaction#analytics'
     end
+
+    scope :users do
+      get '/home' => 'v1/user#home'
+    end
   end
   
 

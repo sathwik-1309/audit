@@ -77,13 +77,14 @@ class Account < ApplicationRecord
     array = []
     accounts = user.accounts.where(creditcard: false, owed: owed)
     accounts.each do |account|
-      temp = account.attributes
+      temp = account.attributes.slice('id', 'name', 'balance', 'owed')
       if owed
         transactions = account.owed_transactions
       else
         transactions = account.transactions
       end
       temp['transactions'] = transactions.order(date: :desc, updated_at: :desc).limit(5).map{|t| t.transaction_box }
+      temp['mops'] = account.mops.filter{|mop| !mop.meta['card_id'].present? }.map{|mop| mop.attributes.slice('id', 'name')}
       array << temp
     end
     array

@@ -150,7 +150,7 @@ class Transaction < ApplicationRecord
   end
 
   def transaction_box
-    hash = self.attributes
+    hash = self.attributes.slice('id', 'amount', 'ttype', 'date', 'party', 'category_id', 'pseudo', 'balance_after', 'balance_before', 'comments')
     if CREDIT_TRANSACTIONS.include? self.ttype
       hash['signed_amount'] = "+  ₹ #{self.amount}"
     else
