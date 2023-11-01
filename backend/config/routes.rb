@@ -57,6 +57,7 @@ Rails.application.routes.draw do
     post '/settled_by_you' => 'transaction#settled_by_you'
     get 'dashboard' => 'transaction#dashboard'
     post '/split' => 'transaction#split'
+    get '/pie' => 'transaction#pie'
   end
 
   scope :sessions do
@@ -77,6 +78,17 @@ Rails.application.routes.draw do
 
   scope :images do
     get '/profile_pic', to: 'image#profile_pic', as: :uploaded_image
+  end
+
+  scope :v1 do
+    scope :accounts do
+      get '/:id/details' => 'v1/account#details'
+    end
+
+    scope :transactions do
+      get '' => 'v1/transaction#list'
+      get '/analytics' => 'v1/transaction#analytics'
+    end
   end
   
 

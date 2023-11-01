@@ -94,9 +94,10 @@ class AccountController < ApplicationController
   def home
     json = {
       "theme" => @current_user.theme,
-      "username" => @current_user.name
+      "username" => @current_user.name,
+      "app_theme" => @current_user.app_theme
     }
-    render(:json => json)
+    render_200("Successfull", json)
   end
 
   def home_page

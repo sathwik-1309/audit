@@ -152,8 +152,14 @@ class Transaction < ApplicationRecord
 
   def transaction_box
     hash = self.attributes
+    if CREDIT_TRANSACTIONS.include? self.ttype
+      hash['signed_amount'] = "+  ₹ #{self.amount}"
+    else
+      hash['signed_amount'] = "-  ₹ #{self.amount}"
+    end
     hash['sub_category'] =  self.sub_category.name unless self.sub_category.nil?
     hash['comments_mob'] = hash['comments']
+    hash['category'] = self.sub_category.sub_category_box unless self.sub_category.nil?
     hash['mop_name'] = self.mop&.processed_name
     if hash['comments'] and hash['comments'].length > 33
       hash['comments_mob'] = hash['comments'][..30] + '...'
@@ -163,6 +169,27 @@ class Transaction < ApplicationRecord
 
   def self.validate_split(amount, tr_json)
     return
+  end
+
+  def self.analytics(list)
+    json = {}
+    json['labels'] = []
+    data = []
+    list.each do|hash|
+      json['labels'] << hash['label']
+      spent = 0
+      hash['transactions'].each do |transaction|
+        spent += transaction.amount
+      end
+      data << spent
+    end
+    json['labels'] = json['labels'].reverse
+    json['datasets'] = [
+      {
+        'data' => data.reverse
+      }
+    ]
+    json
   end
 
   private

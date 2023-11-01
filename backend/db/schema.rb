@@ -41,6 +41,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_30_075521) do
 
   create_table "categories", force: :cascade do |t|
     t.string "name", null: false
+    t.string "color", null: false
     t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -108,6 +109,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_30_075521) do
     t.string "name", null: false
     t.string "password", default: ""
     t.string "theme", default: "dark"
+    t.string "app_theme", default: "midnight"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "email", default: "", null: false

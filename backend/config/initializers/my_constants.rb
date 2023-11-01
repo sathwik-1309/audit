@@ -13,6 +13,8 @@ SPLIT = "split"
 TTYPES = [DEBIT, CREDIT, PAID_BY_YOU, PAID_BY_PARTY, SETTLED_BY_PARTY, SETTLED_BY_YOU, SPLIT]
 CREDIT_TRANSACTIONS = [CREDIT, SETTLED_BY_PARTY]
 PERIODS = ["today", "month", "week"]
+WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] 
+MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'] 
 
 #channels
 ACCOUNTS_CHANNEL = "AccountsChannel"
@@ -23,7 +25,125 @@ SUBCATEGORY_CHANNEL = "SubcategoryChannel"
 USER_CHANNEL = "UserChannel"
 
 #react
-PIE_CHART_COLORS = ['orange', '#32a852', '#1d81de', 'violet', 'brown', 'red', 'blue']
+PIE_CHART_COLORS = ['orange', '#e74c3c', '#9b59b6', '#f1c40f', '#1d81de', 'brown', 'red', 'blue']
+# PIE_CHART_COLORS = ['#e67e22', '#3498db', '#9b59b6', '#f1c40f']
+# CATEGORY_COLORS = [
+#   {
+#     'color' => 'orange',
+#     'name' => 'orange'
+#   },
+#   {
+#     'color' => '#3498db',
+#     'name' => 'blue'
+#   },
+#   {
+#     'color' => '#e74c3c',
+#     'name' => 'red'
+#   },
+#   {
+#     'color' => '#f1c40f',
+#     'name' => 'yellow'
+#   },
+#   {
+#     'color' => '#9b59b6',
+#     'name' => 'purple'
+#   },
+#   {
+#     'color' => '#2ecc71',
+#     'name' => 'emerald'
+#   },
+#   {
+#     'color' => '#1abc9c',
+#     'name' => 'turquoise'
+#   },
+#   {
+#     'color' => '#34495e',
+#     'name' => 'graphite'
+#   },
+#   {
+#     'color' => '#e84393',
+#     'name' => 'pink'
+#   },
+# ]
+
+# CATEGORY_COLORS = [
+#   {
+#     'color' => '#2c3e50',
+#     'name' => 'midnight'
+#   },
+#   {
+#     'color' => '#c0392b',
+#     'name' => 'ruby'
+#   },
+#   {
+#     'color' => '#6D214F',
+#     'name' => 'magenta'
+#   },
+#   {
+#     'color' => '#2980b9',
+#     'name' => 'sea'
+#   },
+#   {
+#     'color' => '#d35400',
+#     'name' => 'orange'
+#   },
+#   {
+#     'color' => '#2c4d42',
+#     'name' => 'forest'
+#   },
+#   {
+#     'color' => '#8e44ad',
+#     'name' => 'purple'
+#   },
+#   {
+#     'color' => '#e84393',
+#     'name' => 'pink'
+#   },
+#   {
+#     'color' => '#16a085',
+#     'name' => 'aqua'
+#   },
+# ]
+
+CATEGORY_COLORS = [
+  {
+    'color' => 'orange',
+    'name' => 'gold'
+  },
+  {
+    'color' => '#e67e22',
+    'name' => 'orange'
+  },
+  {
+    'color' => '#B33771',
+    'name' => 'magenta'
+  },
+  {
+    'color' => '#16a085',
+    'name' => 'aqua'
+  },
+  {
+    'color' => '#3498db',
+    'name' => 'sea'
+  },
+  {
+    'color' => '#34495e',
+    'name' => 'midnight'
+  },
+  {
+    'color' => '#e84393',
+    'name' => 'pink'
+  },
+  {
+    'color' => '#e74c3c',
+    'name' => 'ruby'
+  },
+  {
+    'color' => '#03674c',
+    'name' => 'forest'
+  },
+  
+]
 
 #env
 ADMIN_MAIL_ID = 'sathwik1309@gmail.com'

@@ -2,7 +2,8 @@ class CategoryController < ApplicationController
   before_action :check_current_user
 
   def index
-    json = []
+    json = {}
+    arr = []
     categories = @current_user.categories
     categories.each do |category|
       temp = category.attributes
@@ -11,9 +12,11 @@ class CategoryController < ApplicationController
         sub_categories << sub_category.attributes
       end
       temp['sub_categories'] = sub_categories
-      json << temp
+      arr << temp
     end
-    render(:json => json)
+    json['categories'] = arr
+    json['colors'] = CATEGORY_COLORS
+    render(:json => Oj.dump(json))
   end
 
   def create
@@ -21,7 +24,7 @@ class CategoryController < ApplicationController
     if @current_user.categories.pluck(:name).include? name
       render_202("Category already exists") and return
     end
-    attributes = filter_params.slice(:name)
+    attributes = filter_params.slice(:name, :color)
     attributes[:user_id] = @current_user.id
     @category = Category.new(attributes)
     begin

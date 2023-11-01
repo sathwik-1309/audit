@@ -158,7 +158,9 @@ class Account < ApplicationRecord
 
   def stats(start_date, end_date)
     transactions = self.transactions.where(pseudo: false)
-    transactions = transactions.where("date BETWEEN ? AND ?", start_date, end_date)
+    if start_date.present? and end_date.present?
+      transactions = transactions.where("date BETWEEN ? AND ?", start_date, end_date)
+    end
     total = { CREDIT => 0, DEBIT => 0}
     transactions.each do |transaction|
       if transaction.get_difference(self) > 0
@@ -167,6 +169,7 @@ class Account < ApplicationRecord
         total[DEBIT] += transaction.amount
       end
     end
+    total["net"] = total[CREDIT] - total[DEBIT]
     total
   end
 end

@@ -12,4 +12,14 @@ class SubCategory < ApplicationRecord
   def after_delete_action
     Websocket.publish(CATEGORY_CHANNEL, 'refresh')
   end
+
+  def sub_category_box
+    hash = {
+      'id' => self.id,
+      'category' => self.category.name,
+      'sub_category' => self.name,
+      'category_id' => self.category.id,
+      'color' => self.category.color,
+    }
+  end
 end
