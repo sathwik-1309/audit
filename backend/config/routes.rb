@@ -57,7 +57,6 @@ Rails.application.routes.draw do
     post '/settled_by_you' => 'transaction#settled_by_you'
     get 'dashboard' => 'transaction#dashboard'
     post '/split' => 'transaction#split'
-    get '/pie' => 'transaction#pie'
   end
 
   scope :sessions do
@@ -85,9 +84,15 @@ Rails.application.routes.draw do
       get '/:id/details' => 'v1/account#details'
     end
 
+    scope :cards do
+      get '/:id/details' => 'v1/card#details'
+      put '/:id/pay_bill' => 'v1/card#pay_bill'
+    end
+
     scope :transactions do
       get '' => 'v1/transaction#list'
       get '/analytics' => 'v1/transaction#analytics'
+      get '/pie' => 'v1/transaction#pie'
     end
 
     scope :users do

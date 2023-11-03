@@ -27,4 +27,22 @@ class Card < ApplicationRecord
     self.save!
   end
 
+  def debitcard_details
+    json = {}
+    json['details'] = {
+      'name' => self.name,
+      'account' => self.account.name
+    }
+    json
+  end
+
+  def creditcard_details
+    json = {}
+    json['details'] = {
+      'name' => self.name,
+      'outstanding_bill' => self.outstanding_bill
+    }
+    json
+  end
+
 end
