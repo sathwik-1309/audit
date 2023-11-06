@@ -31,6 +31,7 @@ class AddOtherTables < ActiveRecord::Migration[7.0]
       t.string :comments
       t.integer :sub_category_id
       t.integer :mop_id
+      t.integer :card_id
       t.belongs_to :account
       t.belongs_to :user
       t.timestamps

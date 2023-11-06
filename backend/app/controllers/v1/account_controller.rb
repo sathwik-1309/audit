@@ -13,7 +13,8 @@ class V1::AccountController < ApplicationController
     end_date = filter_params[:end_date].present? ? DateTime.parse(filter_params[:end_date]).strftime("%Y-%m-%d") : nil
     
     json['stats'] = account.stats(start_date, end_date)
-    json['mops'] = account.mops.filter{|mop| !mop.meta['card_id'].present? }.map{|mop| mop.attributes.slice('id', 'name')}
+    # json['mops'] = account.mops.filter{|mop| !mop.meta['card_id'].present? }.map{|mop| mop.attributes.slice('id', 'name')}
+    json['mops'] = account.mops.map{|mop| mop.attributes.slice('id', 'name')}
     render(:json => Oj.dump(json))
   end
 

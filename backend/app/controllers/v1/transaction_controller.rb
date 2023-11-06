@@ -9,7 +9,7 @@ class V1::TransactionController < ApplicationController
       end
       transactions = account.transactions
     elsif filter_params[:card_id].present?
-      transactions = @current_user.transactions.where("meta->>'card_id' = ?", filter_params[:card_id])
+      transactions = @current_user.transactions.where(card_id: filter_params[:card_id])
     else
       transactions = @current_user.transactions
     end
@@ -42,7 +42,7 @@ class V1::TransactionController < ApplicationController
       end
       transactions = account.transactions
     elsif filter_params[:card_id].present?
-      transactions = @current_user.transactions.where("meta->>'card_id' = ?", filter_params[:card_id])
+      transactions = @current_user.transactions.where(card_id: filter_params[:card_id])
     else
       transactions = @current_user.transactions
     end
@@ -116,7 +116,7 @@ class V1::TransactionController < ApplicationController
       end
       transactions = account.transactions
     elsif filter_params[:card_id].present?
-      transactions = @current_user.transactions.where("meta->>'card_id' = ?", filter_params[:card_id])
+      transactions = @current_user.transactions.where(card_id: filter_params[:card_id])
     else
       transactions = @current_user.transactions
     end

@@ -22,9 +22,10 @@ class V1::CardController < ApplicationController
     if card.ctype == DEBITCARD
       render_202("Provide a creditcard") and return
     end
-    meta = {'card_id' => card.id}
+    # meta = {'card_id' => card.id}
     transaction = Transaction.new(amount: filter_params[:amount], ttype: CREDIT, date: Date.today,
-      comments: filter_params[:comments], account_id: card.account_id, user_id: @current_user.id, meta: meta)
+      comments: filter_params[:comments], account_id: card.account_id, user_id: @current_user.id, meta: meta,
+      card_id: card.id)
     begin
       transaction.save!
       card.outstanding_bill -= filter_params[:amount].to_f

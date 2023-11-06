@@ -96,6 +96,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_30_075521) do
     t.string "comments"
     t.integer "sub_category_id"
     t.integer "mop_id"
+    t.integer "card_id"
     t.bigint "account_id"
     t.bigint "user_id"
     t.datetime "created_at", null: false

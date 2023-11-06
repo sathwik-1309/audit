@@ -54,8 +54,6 @@ class TransactionController < ApplicationController
     if filter_params[:card_id].present?
       @card = @current_user.cards.find_by_id(filter_params[:card_id])
       account = @card.account
-      mop = @card.mop
-      meta = {'card_id' => filter_params[:card_id]}
     else
       account = @current_user.accounts.find_by_id(filter_params[:account_id])
     end
@@ -74,7 +72,8 @@ class TransactionController < ApplicationController
     attributes[:ttype] = DEBIT
     attributes[:mop_id] = mop.id if mop.present?
     attributes[:account_id] = account.id
-    attributes[:meta] = meta if meta.present?
+    # attributes[:meta] = meta if meta.present?
+    attributes[:card_id] = @card.id if @card.present?
     attributes[:date] = filter_params[:date].present? ? filter_params[:date] : Date.today
     begin
       @transaction = Transaction.create(attributes)
@@ -158,8 +157,6 @@ class TransactionController < ApplicationController
     if filter_params[:card_id].present?
       @card = @current_user.cards.find_by_id(filter_params[:card_id])
       @account = @card.account
-      mop = @card.mop
-      meta = {'card_id' => filter_params[:card_id]}
     else
       @account = @current_user.accounts.find_by_id(filter_params[:account_id])
     end
@@ -174,7 +171,8 @@ class TransactionController < ApplicationController
     attributes[:ttype] = PAID_BY_YOU
     attributes[:mop_id] = mop.id if mop.present?
     attributes[:account_id] = @account.id
-    attributes[:meta] = meta if meta.present?
+    # attributes[:meta] = meta if meta.present?
+    attributes[:card_id] = @card.id if @card.present?
     attributes[:date] = filter_params[:date].present? ? filter_params[:date] : Date.today
     attributes[:party] = @party.id
 
@@ -230,8 +228,6 @@ class TransactionController < ApplicationController
     if filter_params[:card_id].present?
       @card = @current_user.cards.find_by_id(filter_params[:card_id])
       @account = @card.account
-      mop = @card.mop
-      meta = {'card_id' => filter_params[:card_id]}
     else
       @account = @current_user.accounts.find_by_id(filter_params[:account_id])
     end
@@ -247,7 +243,8 @@ class TransactionController < ApplicationController
     attributes[:ttype] = SETTLED_BY_YOU
     attributes[:mop_id] = mop.id if mop.present?
     attributes[:account_id] = @account.id
-    attributes[:meta] = meta if meta.present?
+    # attributes[:meta] = meta if meta.present?
+    attributes[:card_id] = @card.id if @card.present?
     attributes[:date] = filter_params[:date].present? ? filter_params[:date] : Date.today
     attributes[:party] = @party.id
 
@@ -267,8 +264,6 @@ class TransactionController < ApplicationController
     if filter_params[:card_id].present?
       @card = @current_user.cards.find_by_id(filter_params[:card_id])
       @account = @card.account
-      mop = @card.mop
-      meta = {'card_id' => filter_params[:card_id]}
     else
       @account = @current_user.accounts.find_by_id(filter_params[:account_id])
     end
@@ -283,8 +278,9 @@ class TransactionController < ApplicationController
     attributes[:user_id] = @current_user.id
     attributes[:mop_id] = mop.id if mop.present?
     attributes[:account_id] = @account.id
-    attributes[:meta] = meta if meta.present?
+    # attributes[:meta] = meta if meta.present?
     attributes[:ttype] = SPLIT
+    attributes[:card_id] = @card.id if @card.present?
     attributes[:date] = filter_params[:date].present? ? filter_params[:date] : Date.today
     unless attributes[:sub_category_id].nil?
       attributes[:category_id] = @current_user.sub_categories.find_by_id(filter_params[:sub_category_id]).category_id

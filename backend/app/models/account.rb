@@ -84,7 +84,7 @@ class Account < ApplicationRecord
         transactions = account.transactions.where(pseudo: false)
       end
       temp['transactions'] = transactions.order(date: :desc, updated_at: :desc).limit(5).map{|t| t.transaction_box }
-      temp['mops'] = account.mops.filter{|mop| !mop.meta['card_id'].present? }.map{|mop| mop.attributes.slice('id', 'name')}
+      temp['mops'] = account.mops.map{|mop| mop.attributes.slice('id', 'name')}
       array << temp
     end
     array
