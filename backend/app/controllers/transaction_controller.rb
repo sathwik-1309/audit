@@ -181,6 +181,7 @@ class TransactionController < ApplicationController
     begin
       @transaction = Transaction.create(attributes)
       @transaction.save!
+      @card.update_outstanding_bill(attributes[:amount]) if !@card.nil? and @card.ctype == CREDITCARD
       msg = @transaction.attributes
       render_200("Paid by you Transaction added", msg) and return
     rescue StandardError => ex
@@ -278,13 +279,17 @@ class TransactionController < ApplicationController
 
     mop = @current_user.mops.find_by_id(filter_params[:mop_id]) if filter_params[:mop_id].present?
 
-    attributes = filter_params.slice(:amount, :comments)
+    attributes = filter_params.slice(:amount, :comments, :sub_category_id)
     attributes[:user_id] = @current_user.id
     attributes[:mop_id] = mop.id if mop.present?
     attributes[:account_id] = @account.id
     attributes[:meta] = meta if meta.present?
     attributes[:ttype] = SPLIT
     attributes[:date] = filter_params[:date].present? ? filter_params[:date] : Date.today
+    unless attributes[:sub_category_id].nil?
+      attributes[:category_id] = @current_user.sub_categories.find_by_id(filter_params[:sub_category_id]).category_id
+    end
+    
     tr_array = filter_params[:transactions].map(&:to_h)
     amounts_arr = tr_array.map{|t| t['amount'].to_f}
     if amounts_arr.sum != filter_params[:amount].to_f
@@ -294,6 +299,7 @@ class TransactionController < ApplicationController
     begin
       @transaction = Transaction.create(attributes)
       @transaction.save!
+      @card.update_outstanding_bill(attributes[:amount]) if !@card.nil? and @card.ctype == CREDITCARD
       LazyWorker.perform_async('create_split_transactions', { "transaction_id" => @transaction.id, "tr_array" => tr_array } )
       msg = @transaction.attributes
       render_200("Split transactions will be added", msg) and return

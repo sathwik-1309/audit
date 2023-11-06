@@ -114,6 +114,9 @@ class Transaction < ApplicationRecord
 
   def add_split_debit(args)
     meta = { "parent_tr_id" => self.id }
+    if self.meta['card_id'].present?
+      meta['card_id'] = self.meta['card_id']
+    end
     transaction = Transaction.new(amount: args['amount'], ttype: DEBIT, date: self.date, category_id: self.category_id,
                                    pseudo: true, balance_before: self.balance_before, balance_after: self.balance_after,
                                    meta: meta, comments: self.comments, sub_category_id: self.sub_category_id,

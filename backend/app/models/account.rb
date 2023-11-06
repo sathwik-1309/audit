@@ -81,7 +81,7 @@ class Account < ApplicationRecord
       if owed
         transactions = account.owed_transactions
       else
-        transactions = account.transactions
+        transactions = account.transactions.where(pseudo: false)
       end
       temp['transactions'] = transactions.order(date: :desc, updated_at: :desc).limit(5).map{|t| t.transaction_box }
       temp['mops'] = account.mops.filter{|mop| !mop.meta['card_id'].present? }.map{|mop| mop.attributes.slice('id', 'name')}

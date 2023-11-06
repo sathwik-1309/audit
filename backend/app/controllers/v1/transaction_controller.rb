@@ -7,12 +7,13 @@ class V1::TransactionController < ApplicationController
       if account.nil?
         render_202("Account not found") and return
       end
-      transactions = account.transactions.where(pseudo: false)
+      transactions = account.transactions
     elsif filter_params[:card_id].present?
       transactions = @current_user.transactions.where("meta->>'card_id' = ?", filter_params[:card_id])
     else
       transactions = @current_user.transactions
     end
+    transactions = transactions.where(pseudo: false)
 
     start_date, end_date = nil, nil
     if filter_params[:start_date].present?
