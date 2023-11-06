@@ -145,5 +145,10 @@ CATEGORY_COLORS = [
   
 ]
 
+BUGDET_INIT = {
+  "monthly" => {},
+  "yearly" => {}
+}
+
 #env
 ADMIN_MAIL_ID = 'sathwik1309@gmail.com'

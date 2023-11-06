@@ -24,7 +24,7 @@ class V1::CardController < ApplicationController
     end
     # meta = {'card_id' => card.id}
     transaction = Transaction.new(amount: filter_params[:amount], ttype: CREDIT, date: Date.today,
-      comments: filter_params[:comments], account_id: card.account_id, user_id: @current_user.id, meta: meta,
+      comments: filter_params[:comments], account_id: card.account_id, user_id: @current_user.id,
       card_id: card.id)
     begin
       transaction.save!

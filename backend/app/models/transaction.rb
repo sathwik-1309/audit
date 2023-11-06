@@ -19,6 +19,9 @@ class Transaction < ApplicationRecord
     self.balance_before = prev_tr.balance_after
     self.balance_after = prev_tr.balance_after + self.get_difference(self.account)
     self.save!
+    if [DEBIT, PAID_BY_PARTY].include? self.ttype
+      self.update_budgets
+    end
     LazyWorker.perform_async("update_subsequent", {"transaction_id" => self.id})
     if [PAID_BY_YOU, SETTLED_BY_PARTY, SETTLED_BY_YOU].include? self.ttype
       owed_acc = Account.find_by_id(self.party)
@@ -164,6 +167,40 @@ class Transaction < ApplicationRecord
       hash['comments_mob'] = hash['comments'][..30] + '...'
     end
     hash
+  end
+
+  def update_budgets
+    category = self.category
+    if category.present?
+      month_code = category.budget['monthly'][Util.get_date_code_month(date)]
+      unless month_code.present?
+        category.budget['monthly'][Util.get_date_code_month(date)] = 0
+      end
+      category.budget['monthly'][Util.get_date_code_month(date)] += self.amount
+
+      yealy_code = category.budget['yearly'][Util.get_date_code_year(date)]
+      unless yealy_code.present?
+        category.budget['yearly'][Util.get_date_code_year(date)] = 0
+      end
+      category.budget['yearly'][Util.get_date_code_year(date)] += self.amount
+      category.save!
+    end
+
+    sub_category = self.sub_category
+    if sub_category.present?
+      month_code = sub_category.budget['monthly'][Util.get_date_code_month(date)]
+      unless month_code.present?
+        sub_category.budget['monthly'][Util.get_date_code_month(date)] = 0
+      end
+      sub_category.budget['monthly'][Util.get_date_code_month(date)] += self.amount
+
+      yealy_code = sub_category.budget['yearly'][Util.get_date_code_year(date)]
+      unless yealy_code.present?
+        sub_category.budget['yearly'][Util.get_date_code_year(date)] = 0
+      end
+      sub_category.budget['yearly'][Util.get_date_code_year(date)] += self.amount
+      sub_category.save!
+    end
   end
 
   def self.validate_split(amount, tr_json)
