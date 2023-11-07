@@ -54,6 +54,8 @@ class TransactionController < ApplicationController
     if filter_params[:card_id].present?
       @card = @current_user.cards.find_by_id(filter_params[:card_id])
       account = @card.account
+    elsif filter_params[:cash].present?
+      account = @current_user.cash_account
     else
       account = @current_user.accounts.find_by_id(filter_params[:account_id])
     end
@@ -191,7 +193,12 @@ class TransactionController < ApplicationController
   # date, comments
   def settled_by_party
     attributes = filter_params.slice(:amount, :comments, :account_id)
-    @account = Account.find_by_id(filter_params[:account_id])
+    if filter_params[:cash].present?
+      @account = @current_user.cash_account
+    else
+      @account = @current_user.accounts.find_by_id(filter_params[:account_id])
+    end
+    
     if @account.nil?
       render_202("account not found") and return
     end
@@ -228,6 +235,8 @@ class TransactionController < ApplicationController
     if filter_params[:card_id].present?
       @card = @current_user.cards.find_by_id(filter_params[:card_id])
       @account = @card.account
+    elsif filter_params[:cash].present?
+      account = @current_user.cash_account
     else
       @account = @current_user.accounts.find_by_id(filter_params[:account_id])
     end
@@ -264,6 +273,8 @@ class TransactionController < ApplicationController
     if filter_params[:card_id].present?
       @card = @current_user.cards.find_by_id(filter_params[:card_id])
       @account = @card.account
+    elsif filter_params[:cash].present?
+      account = @current_user.cash_account
     else
       @account = @current_user.accounts.find_by_id(filter_params[:account_id])
     end
@@ -322,7 +333,7 @@ class TransactionController < ApplicationController
   private
 
   def filter_params
-    params.permit(:account_id, :start_date, :end_date, :year, :month, :mop_id, :amount, :ttype, :date, :party, :meta, :comments, :card_id, :sub_category_id, transactions: [:amount, :user, :party])
+    params.permit(:account_id, :start_date, :end_date, :year, :month, :mop_id, :amount, :ttype, :date, :party, :meta, :comments, :card_id, :sub_category_id, :cash, transactions: [:amount, :user, :party])
   end
 
 end

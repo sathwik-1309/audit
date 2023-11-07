@@ -17,7 +17,13 @@ class V1::TransactionController < ApplicationController
     else
       transactions = @current_user.transactions
     end
-    transactions = transactions.where(pseudo: false)
+
+    if filter_params[:party].present?
+      transactions = transactions.where(party: filter_params[:party])
+    else
+      transactions = transactions.where(pseudo: false)
+    end
+    
 
     start_date, end_date = nil, nil
     if filter_params[:start_date].present?
@@ -182,7 +188,7 @@ class V1::TransactionController < ApplicationController
   private
 
   def filter_params
-    params.permit(:account_id, :card_id, :start_date, :end_date, :month, :year, :category_id, :sub_category_id)
+    params.permit(:account_id, :card_id, :party, :start_date, :end_date, :month, :year, :category_id, :sub_category_id)
   end
 
 end

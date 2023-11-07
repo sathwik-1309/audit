@@ -1,6 +1,7 @@
 CREDITCARD = "creditcard"
 DEBITCARD = "debitcard"
 CTYPES = [CREDITCARD, DEBITCARD]
+CASH_ACCOUNT = "Cash"
 
 DEBIT = "debit"
 CREDIT = "credit"

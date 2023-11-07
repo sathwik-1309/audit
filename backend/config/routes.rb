@@ -83,6 +83,7 @@ Rails.application.routes.draw do
   scope :v1 do
     scope :accounts do
       get '/:id/details' => 'v1/account#details'
+      get '/:id/owed_details' => 'v1/account#owed_details'
     end
 
     scope :categories do

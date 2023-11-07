@@ -18,6 +18,17 @@ class V1::AccountController < ApplicationController
     render(:json => Oj.dump(json))
   end
 
+  def owed_details
+    json = {}
+    account = @current_user.accounts.find_by_id(params[:id])
+    if account.nil?
+      render_202("Account not found") and return
+    end
+    json['details'] = account.attributes.slice('id', 'name', 'balance')
+    
+    render(:json => Oj.dump(json))
+  end
+
   private
 
   def filter_params

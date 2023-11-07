@@ -203,6 +203,8 @@ class Transaction < ApplicationRecord
     end
   end
 
+
+
   def self.validate_split(amount, tr_json)
     return
   end
