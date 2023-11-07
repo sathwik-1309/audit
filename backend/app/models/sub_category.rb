@@ -23,32 +23,21 @@ class SubCategory < ApplicationRecord
     }
   end
 
-  def monthly_budget
+  def get_budget(type)
     temp = {}
-    monthly_spent = self.budget['monthly'][Util.get_date_code_month(Date.today)]
-    temp['monthly'] = {
-      "spent" => monthly_spent.present? ? monthly_spent : 0,
-      "budget" => self.monthly_limit
-    }
-    if temp['monthly']['budget'].present?
-      temp['monthly']['percentage'] = (temp['monthly']['spent']*100/temp['monthly']['budget']).to_i
+    if type == 'monthly'
+      spent = self.budget[type][Util.get_date_code_month(Date.today)]
     else
-      temp['monthly']['percentage'] = 0
+      spent = self.budget[type][Util.get_date_code_year(Date.today)]
     end
-    temp
-  end
-
-  def yearly_budget
-    temp = {}
-    yearly_spent = self.budget['yearly'][Util.get_date_code_year(Date.today)]
-    temp['yearly'] = {
-      "spent" => yearly_spent.present? ? yearly_spent : 0,
-      "budget" => self.yearly_limit
+    temp = {
+      "spent" => spent.present? ? spent : 0,
+      "budget" => type == 'monthly' ? self.monthly_limit : self.yearly_limit
     }
-    if temp['yearly']['budget'].present?
-      temp['yearly']['percentage'] = (temp['yearly']['spent']*100/temp['yearly']['budget']).to_i
+    if temp['budget'].present?
+      temp['percentage'] = (temp['spent']*100/temp['budget']).to_i
     else
-      temp['yearly']['percentage'] = 0
+      temp['percentage'] = 0
     end
     temp
   end

@@ -66,6 +66,7 @@ Rails.application.routes.draw do
   scope :categories do
     get '/index' => 'category#index'
     post '/create' => 'category#create'
+    put '/:id/update' => 'category#update'
     delete '/:id/delete' => 'category#delete'
   end
 
@@ -82,6 +83,11 @@ Rails.application.routes.draw do
   scope :v1 do
     scope :accounts do
       get '/:id/details' => 'v1/account#details'
+    end
+
+    scope :categories do
+      get '/:id/details' => 'v1/category#details'
+      get '/:id/sub_categories' => 'v1/category#sub_categories'
     end
 
     scope :cards do

@@ -111,6 +111,14 @@ CATEGORY_COLORS = [
     'name' => 'gold'
   },
   {
+    'color' => '#3498db',
+    'name' => 'sea'
+  },
+  {
+    'color' => '#03674c',
+    'name' => 'forest'
+  },
+  {
     'color' => '#e67e22',
     'name' => 'orange'
   },
@@ -119,16 +127,12 @@ CATEGORY_COLORS = [
     'name' => 'magenta'
   },
   {
-    'color' => '#16a085',
-    'name' => 'aqua'
-  },
-  {
-    'color' => '#3498db',
-    'name' => 'sea'
-  },
-  {
     'color' => '#34495e',
     'name' => 'midnight'
+  },
+  {
+    'color' => '#16a085',
+    'name' => 'aqua'
   },
   {
     'color' => '#e84393',
@@ -137,10 +141,6 @@ CATEGORY_COLORS = [
   {
     'color' => '#e74c3c',
     'name' => 'ruby'
-  },
-  {
-    'color' => '#03674c',
-    'name' => 'forest'
   },
   
 ]

@@ -45,6 +45,21 @@ class CategoryController < ApplicationController
     end
   end
 
+  def update
+    @category = @current_user.categories.find_by_id(params[:id])
+    if @category.nil?
+      render_404("Category not found") and return
+    end
+    @category.assign_attributes(filter_params)
+    begin
+      @category.save!
+      msg = @category.attributes
+      render_200("Category updated", msg)
+    rescue StandardError => ex
+      render_400(ex.message)
+    end
+  end
+
   def delete
     @category = @current_user.categories.find_by_id(params[:id])
     if @category.nil?
@@ -62,6 +77,6 @@ class CategoryController < ApplicationController
   private
 
   def filter_params
-    params.permit(:name, :monthly_limit, :color)
+    params.permit(:name, :monthly_limit, :color, :yearly_limit)
   end
 end

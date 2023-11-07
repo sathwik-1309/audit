@@ -10,6 +10,10 @@ class V1::TransactionController < ApplicationController
       transactions = account.transactions
     elsif filter_params[:card_id].present?
       transactions = @current_user.transactions.where(card_id: filter_params[:card_id])
+    elsif filter_params[:category_id].present?
+      transactions = @current_user.transactions.where(category_id: filter_params[:category_id])
+    elsif filter_params[:sub_category_id].present?
+      transactions = @current_user.transactions.where(sub_category_id: filter_params[:sub_category_id])
     else
       transactions = @current_user.transactions
     end
@@ -43,6 +47,10 @@ class V1::TransactionController < ApplicationController
       transactions = account.transactions
     elsif filter_params[:card_id].present?
       transactions = @current_user.transactions.where(card_id: filter_params[:card_id])
+    elsif filter_params[:category_id].present?
+      transactions = @current_user.transactions.where(category_id: filter_params[:category_id])
+    elsif filter_params[:sub_category_id].present?
+      transactions = @current_user.transactions.where(sub_category_id: filter_params[:sub_category_id])
     else
       transactions = @current_user.transactions
     end
@@ -101,6 +109,7 @@ class V1::TransactionController < ApplicationController
   end
 
   def pie
+    sub_cat = false
     start_date, end_date = nil, nil
     if filter_params[:start_date].present?
       start_date = DateTime.parse(filter_params[:start_date]).strftime("%Y-%m-%d")
@@ -117,6 +126,9 @@ class V1::TransactionController < ApplicationController
       transactions = account.transactions
     elsif filter_params[:card_id].present?
       transactions = @current_user.transactions.where(card_id: filter_params[:card_id])
+    elsif filter_params[:category_id].present?
+      sub_cat = true
+      transactions = @current_user.transactions.where(category_id: filter_params[:category_id])
     else
       transactions = @current_user.transactions
     end
@@ -130,20 +142,38 @@ class V1::TransactionController < ApplicationController
     json = []
     dict = {}
     total_spent = 0
-    transactions.each do|transaction|
-      category = transaction.category
-      name = category.nil? ? "other" : category.name
-      color = category.nil? ? 'gray' : category.color
-      unless dict.has_key? name
-        dict[name] = Util.init_pie_category(name, color)
+    if sub_cat
+      transactions.each do|transaction|
+        sub_category = transaction.sub_category
+        name = sub_category.nil? ? "other" : sub_category.name
+        color = sub_category.category.nil? ? 'gray' : sub_category.category.color
+        unless dict.has_key? name
+          dict[name] = Util.init_pie_category(name, color)
+        end
+        dict[name]['transactions'] << transaction
+        dict[name]['expenditure'] += transaction.amount
+        total_spent += transaction.amount
       end
-      dict[name]['transactions'] << transaction
-      dict[name]['expenditure'] += transaction.amount
-      total_spent += transaction.amount
+    else
+      transactions.each do|transaction|
+        category = transaction.category
+        name = category.nil? ? "other" : category.name
+        color = category.nil? ? 'gray' : category.color
+        unless dict.has_key? name
+          dict[name] = Util.init_pie_category(name, color)
+        end
+        dict[name]['transactions'] << transaction
+        dict[name]['expenditure'] += transaction.amount
+        total_spent += transaction.amount
+      end
     end
+    
     i = 0
     dict.keys.each do|key|
       dict[key]['percentage'] = (dict[key]['expenditure']*100/total_spent).round(0)
+      if sub_cat
+        dict[key]['color'] = CATEGORY_COLORS[i]['color']
+      end
       i += 1
     end
     render(:json => dict.values)
@@ -152,7 +182,7 @@ class V1::TransactionController < ApplicationController
   private
 
   def filter_params
-    params.permit(:account_id, :card_id, :start_date, :end_date, :month, :year)
+    params.permit(:account_id, :card_id, :start_date, :end_date, :month, :year, :category_id, :sub_category_id)
   end
 
 end
