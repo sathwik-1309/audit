@@ -10,6 +10,10 @@ class Transaction < ApplicationRecord
     raise StandardError.new("Cannot add a transaction in past date of account opening") if self.account.opening_date > self.date
   end
 
+  def card
+    Card.find_by_id(self.card_id)
+  end
+
   def track_modifications
     return if self.pseudo
     return if self.account_opening?
@@ -159,6 +163,7 @@ class Transaction < ApplicationRecord
     else
       hash['signed_amount'] = "-  ₹ #{self.amount}"
     end
+    hash['payment_symbol'] = self.payment_symbol
     hash['sub_category'] =  self.sub_category.name unless self.sub_category.nil?
     hash['comments_mob'] = hash['comments']
     hash['category'] = self.sub_category.sub_category_box unless self.sub_category.nil?
@@ -167,6 +172,23 @@ class Transaction < ApplicationRecord
       hash['comments_mob'] = hash['comments'][..30] + '...'
     end
     hash
+  end
+
+  def payment_symbol
+    if self.card_id.present?
+      symbol = 'card'
+      name = self.card.name
+    elsif self.account.is_cash?
+      symbol = 'cash'
+      name = CASH_ACCOUNT
+    else
+      symbol = 'account'
+      name = self.account.name
+    end
+    {
+      "symbol" => symbol,
+      "name" => name
+    }
   end
 
   def update_budgets

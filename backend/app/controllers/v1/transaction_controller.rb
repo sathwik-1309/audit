@@ -23,6 +23,8 @@ class V1::TransactionController < ApplicationController
     else
       transactions = transactions.where(pseudo: false)
     end
+
+    transactions = transactions.where.not(comments: 'account opening transaction')
     
 
     start_date, end_date = nil, nil

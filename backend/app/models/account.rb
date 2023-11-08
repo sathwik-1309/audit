@@ -89,6 +89,11 @@ class Account < ApplicationRecord
     array
   end
 
+  def is_cash?
+    return true if self.name == CASH_ACCOUNT
+    false
+  end
+
   def pie_chart_meta(start_date, end_date)
     meta_array = []
     meta = {}
