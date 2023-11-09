@@ -1,7 +1,6 @@
 class Transaction < ApplicationRecord
   belongs_to :user
   belongs_to :account
-  belongs_to :mop
 
   before_save :validate_transaction
   after_create :track_modifications
@@ -9,6 +8,10 @@ class Transaction < ApplicationRecord
 
   def validate_transaction
     raise StandardError.new("Cannot add a transaction in past date of account opening") if self.account.opening_date > self.date
+  end
+
+  def card
+    Card.find_by_id(self.card_id)
   end
 
   def track_modifications
@@ -21,6 +24,9 @@ class Transaction < ApplicationRecord
     self.balance_before = prev_tr.balance_after
     self.balance_after = prev_tr.balance_after + self.get_difference(self.account)
     self.save!
+    if [DEBIT, PAID_BY_PARTY].include? self.ttype
+      self.update_budgets
+    end
     LazyWorker.perform_async("update_subsequent", {"transaction_id" => self.id})
     if [PAID_BY_YOU, SETTLED_BY_PARTY, SETTLED_BY_YOU].include? self.ttype
       owed_acc = Account.find_by_id(self.party)
@@ -30,10 +36,10 @@ class Transaction < ApplicationRecord
     end
   end
 
-  def self.account_opening(amount, mop, date, account)
+  def self.account_opening(amount, date, account)
     tr = Transaction.new(amount: amount, ttype: CREDIT, date: date, user: account.user, account: account,
                          meta: { "opening_transaction" => true }, comments: "account opening transaction",
-                         mop: mop, balance_before: 0, balance_after: amount)
+                        balance_before: 0, balance_after: amount)
     tr.save!
     return tr
   end
@@ -121,7 +127,7 @@ class Transaction < ApplicationRecord
     transaction = Transaction.new(amount: args['amount'], ttype: DEBIT, date: self.date, category_id: self.category_id,
                                    pseudo: true, balance_before: self.balance_before, balance_after: self.balance_after,
                                    meta: meta, comments: self.comments, sub_category_id: self.sub_category_id,
-                                   mop_id: self.mop_id, account_id: self.account_id, user_id: self.user_id)
+                                   mop_id: self.mop_id, account_id: self.account_id, user_id: self.user_id, card_id: self.card_id)
     begin
       transaction.save!
       return transaction
@@ -154,12 +160,13 @@ class Transaction < ApplicationRecord
   end
 
   def transaction_box
-    hash = self.attributes
+    hash = self.attributes.slice('id', 'amount', 'ttype', 'date', 'party', 'category_id', 'pseudo', 'balance_after', 'balance_before', 'comments')
     if CREDIT_TRANSACTIONS.include? self.ttype
       hash['signed_amount'] = "+  ₹ #{self.amount}"
     else
       hash['signed_amount'] = "-  ₹ #{self.amount}"
     end
+    hash['payment_symbol'] = self.payment_symbol
     hash['sub_category'] =  self.sub_category.name unless self.sub_category.nil?
     hash['comments_mob'] = hash['comments']
     hash['category'] = self.sub_category.sub_category_box unless self.sub_category.nil?
@@ -169,6 +176,59 @@ class Transaction < ApplicationRecord
     end
     hash
   end
+
+  def payment_symbol
+    if self.card_id.present?
+      symbol = 'card'
+      name = self.card.name
+    elsif self.account.is_cash?
+      symbol = 'cash'
+      name = CASH_ACCOUNT
+    else
+      symbol = 'account'
+      name = self.account.name
+    end
+    {
+      "symbol" => symbol,
+      "name" => name
+    }
+  end
+
+  def update_budgets
+    category = self.category
+    if category.present?
+      month_code = category.budget['monthly'][Util.get_date_code_month(date)]
+      unless month_code.present?
+        category.budget['monthly'][Util.get_date_code_month(date)] = 0
+      end
+      category.budget['monthly'][Util.get_date_code_month(date)] += self.amount
+
+      yealy_code = category.budget['yearly'][Util.get_date_code_year(date)]
+      unless yealy_code.present?
+        category.budget['yearly'][Util.get_date_code_year(date)] = 0
+      end
+      category.budget['yearly'][Util.get_date_code_year(date)] += self.amount
+      category.save!
+    end
+
+    sub_category = self.sub_category
+    if sub_category.present?
+      month_code = sub_category.budget['monthly'][Util.get_date_code_month(date)]
+      unless month_code.present?
+        sub_category.budget['monthly'][Util.get_date_code_month(date)] = 0
+      end
+      sub_category.budget['monthly'][Util.get_date_code_month(date)] += self.amount
+
+      yealy_code = sub_category.budget['yearly'][Util.get_date_code_year(date)]
+      unless yealy_code.present?
+        sub_category.budget['yearly'][Util.get_date_code_year(date)] = 0
+      end
+      sub_category.budget['yearly'][Util.get_date_code_year(date)] += self.amount
+      sub_category.save!
+    end
+  end
+
+
 
   def self.validate_split(amount, tr_json)
     return
@@ -193,6 +253,13 @@ class Transaction < ApplicationRecord
       }
     ]
     json
+  end
+
+  def mop
+    if self.mop_id.present?
+      return Mop.find_by_id(self.mop_id)
+    end
+    return nil
   end
 
   private

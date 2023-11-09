@@ -38,7 +38,7 @@ class CardController < ApplicationController
   end
 
   def update
-    @card = Card.find_by_id(params[:id])
+    @card = @current_user.cards.find_by_id(params[:id])
     if @card.nil?
       render_404("Card not found") and return
     end

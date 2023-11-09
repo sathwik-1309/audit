@@ -13,7 +13,42 @@ class User < ApplicationRecord
   has_many :categories
   has_many :sub_categories
 
+  after_create :after_create_action
   after_commit :after_save_action, on: [:create, :update]
+
+  def after_create_action
+    date = Date.today
+    account = Account.new(name: CASH_ACCOUNT, balance: 0, user_id: self.id, opening_date: date)
+    account.save!
+    account2 = Account.new(name: 'Account 1', balance: 1000, user_id: self.id, opening_date: date)
+    account2.save!
+    party = Account.new(name: 'Friend 1', balance: 0, user_id: self.id, owed: true, opening_date: date)
+    party.save!
+    creditcard_account = Account.create_credit_card_account('Creditcard 1', self)
+    creditcard = Card.new(name: 'Creditcard 1', ctype: CREDITCARD, user_id: self.id, account_id: creditcard_account.id)
+    creditcard.save!
+    debitcard = Card.new(name: 'Debitcard 1', ctype: DEBITCARD, user_id: self.id, account_id: account2.id)
+    debitcard.save!
+    category = Category.new(name: 'Travel', user_id: self.id, color: 'orange', budget: BUGDET_INIT, monthly_limit: 2000, yearly_limit: 24000)
+    category.save!
+    sub_cat1 = SubCategory.new(name: 'Fuel', budget: BUGDET_INIT, monthly_limit: 1000, yearly_limit: 12000, category_id: category.id, user_id: self.id)
+    sub_cat1.save!
+    sub_cat2 = SubCategory.new(name: 'Cabs', budget: BUGDET_INIT, monthly_limit: 1000, yearly_limit: 12000, category_id: category.id, user_id: self.id)
+    sub_cat2.save!
+    category2 = Category.new(name: 'Food', user_id: self.id, color: '#3498db', budget: BUGDET_INIT, monthly_limit: 5000, yearly_limit: 60000)
+    category2.save!
+    sub_cat3 = SubCategory.new(name: 'Food', budget: BUGDET_INIT, monthly_limit: 5000, yearly_limit: 60000, category_id: category2.id, user_id: self.id)
+    sub_cat3.save!
+    tr = Transaction.new(amount: 200, sub_category_id: sub_cat1.id, user_id: self.id, date: Date.today, ttype: DEBIT,
+                        account_id: account2.id, category_id: category.id, comments: 'Sample Account Transaction')
+    tr.save!
+    tr = Transaction.new(amount: 100, sub_category_id: sub_cat2.id, user_id: self.id, date: Date.today, ttype: DEBIT,
+      account_id: account.id, category_id: category.id, comments: 'Sample Cash Transaction')
+    tr.save!
+    tr = Transaction.new(amount: 150, sub_category_id: sub_cat3.id, user_id: self.id, date: Date.today, ttype: DEBIT,
+      account_id: creditcard_account.id, category_id: category2.id, comments: 'Sample CreditCard Transaction', card_id: creditcard.id)
+    tr.save!
+  end
 
   def after_save_action
     Websocket.publish(USER_CHANNEL, 'refresh')
@@ -25,6 +60,10 @@ class User < ApplicationRecord
 
   def creditcards
     self.cards.where(ctype: CREDITCARD)
+  end
+
+  def cash_account
+    self.accounts.find_by(name: CASH_ACCOUNT)
   end
 
   def send_reset_password_otp

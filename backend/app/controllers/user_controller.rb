@@ -1,5 +1,5 @@
 class UserController < ApplicationController
-before_action :set_current_user
+  before_action :set_current_user
 
   def index
     arr = []
