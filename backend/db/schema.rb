@@ -42,6 +42,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_30_075521) do
   create_table "categories", force: :cascade do |t|
     t.string "name", null: false
     t.string "color", null: false
+    t.float "monthly_limit"
+    t.float "yearly_limit"
+    t.json "budget", default: {}
     t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -63,6 +66,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_30_075521) do
     t.string "name", null: false
     t.bigint "category_id"
     t.bigint "user_id"
+    t.float "monthly_limit"
+    t.float "yearly_limit"
+    t.json "budget", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_sub_categories_on_category_id"
@@ -79,16 +85,16 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_30_075521) do
     t.float "balance_before"
     t.float "balance_after"
     t.json "meta", default: {}
-    t.string "comments"
+    t.string "comments", default: ""
     t.integer "sub_category_id"
+    t.integer "mop_id"
+    t.integer "card_id"
     t.integer "t_order", default: 1
-    t.bigint "mop_id"
     t.bigint "account_id"
     t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_transactions_on_account_id"
-    t.index ["mop_id"], name: "index_transactions_on_mop_id"
     t.index ["user_id"], name: "index_transactions_on_user_id"
   end
 

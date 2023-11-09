@@ -28,10 +28,11 @@ class AddOtherTables < ActiveRecord::Migration[7.0]
       t.float :balance_before
       t.float :balance_after
       t.json :meta, default: {}
-      t.string :comments
+      t.string :comments, default: ""
       t.integer :sub_category_id
+      t.integer :mop_id
+      t.integer :card_id
       t.integer :t_order, default: 1
-      t.belongs_to :mop
       t.belongs_to :account
       t.belongs_to :user
       t.timestamps
@@ -40,6 +41,9 @@ class AddOtherTables < ActiveRecord::Migration[7.0]
     create_table :categories do |t|
       t.string :name, null: false
       t.string :color, null: false
+      t.float :monthly_limit
+      t.float :yearly_limit
+      t.json :budget, default: {}
       t.belongs_to :user
       t.timestamps
     end
@@ -59,6 +63,9 @@ class AddOtherTables < ActiveRecord::Migration[7.0]
       t.string :name, null: false
       t.belongs_to :category
       t.belongs_to :user
+      t.float :monthly_limit
+      t.float :yearly_limit
+      t.json :budget, default: {}
       t.timestamps
     end
     
