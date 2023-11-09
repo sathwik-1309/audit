@@ -15,10 +15,11 @@ class Transaction < ApplicationRecord
   end
 
   def track_modifications
-    return if self.pseudo
     return if self.account_opening?
+    self.update_t_order
+    return if self.pseudo
     self.reload.account.update_balance(self)
-    self.account.update_daily_log(self)
+    # self.account.update_daily_log(self)
     prev_tr = self.get_previous
     self.balance_before = prev_tr.balance_after
     self.balance_after = prev_tr.balance_after + self.get_difference(self.account)
@@ -30,7 +31,7 @@ class Transaction < ApplicationRecord
     if [PAID_BY_YOU, SETTLED_BY_PARTY, SETTLED_BY_YOU].include? self.ttype
       owed_acc = Account.find_by_id(self.party)
       owed_acc.update_balance(self)
-      owed_acc.update_daily_log(self)
+      # owed_acc.update_daily_log(self)
       LazyWorker.perform_async("update_subsequent", {"transaction_id" => self.id, "account_id"=> owed_acc.id})
     end
   end
@@ -41,6 +42,12 @@ class Transaction < ApplicationRecord
                         balance_before: 0, balance_after: amount)
     tr.save!
     return tr
+  end
+
+  def update_t_order
+    prev_tr = self.get_previous
+    self.t_order = prev_tr.t_order + 1
+    self.save!
   end
 
   def get_difference(account)
@@ -60,19 +67,17 @@ class Transaction < ApplicationRecord
 
   end
 
+  def get_subsequent_transactions(account=self.acccount)
+    account.transactions.where('date > ? OR (date = ? AND t_order > ?)', self.date, self.date, self.t_order)
+  end
+
   def update_subsequent(account=self.account)
     amount = self.get_difference(account)
-    daily_logs = account.daily_logs.where("date > ?",self.date)
-    daily_logs.each do |daily_log|
-      daily_log.opening_balance += amount
-      daily_log.closing_balance += amount
-      daily_log.save!
-      transactions = self.user.transactions.where(id: daily_log.meta['tr_ids'])
-      transactions.each do |transaction|
-        transaction.balance_before += amount
-        transaction.balance_after += amount
-        transaction.save!
-      end
+    transactions = self.get_subsequent_transactions(account)
+    transactions.each do |transaction|
+      transaction.balance_before += amount
+      transaction.balance_after += amount
+      transaction.save!
     end
   end
 
@@ -83,14 +88,12 @@ class Transaction < ApplicationRecord
   # end
 
   def get_previous(account=self.account)
-    daily_log = account.daily_logs.find_by(date: self.date)
-    prev_tr = Transaction.find_by_id(Transaction.find_previous_element(daily_log.meta['tr_ids'], self.id))
-    if prev_tr.nil?
-      prev_daily_log = account.daily_logs.where("date < ?", self.date).order(date: :desc).first
-      raise StandardError.new("Cant find previous transaction for tr_id #{self.id}") if prev_daily_log.nil?
-      prev_tr = Transaction.find_by_id(prev_daily_log.meta['tr_ids'][-1])
+    arr = account.transactions.where('date < ? OR (date = ? AND t_order < ?)', self.date, self.date, self.t_order).order(date: :desc, t_order: :desc)
+    if arr.present?
+      prev_tr = arr.first
+    else 
+      raise StandardError.new("Previous Transaction not found")
     end
-    prev_tr
   end
 
   def account_opening?
@@ -143,7 +146,7 @@ class Transaction < ApplicationRecord
       transaction.save!
       owed_acc = self.user.accounts.find_by_id(args['party'])
       owed_acc.update_balance(transaction)
-      owed_acc.update_daily_log(transaction)
+      # owed_acc.update_daily_log(transaction)
       prev_tr = transaction.get_previous(owed_acc)
       transaction.balance_before = prev_tr.balance_after
       transaction.balance_after = prev_tr.balance_after + transaction.get_difference(owed_acc)
