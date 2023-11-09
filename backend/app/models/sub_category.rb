@@ -22,4 +22,23 @@ class SubCategory < ApplicationRecord
       'color' => self.category.color,
     }
   end
+
+  def get_budget(type)
+    temp = {}
+    if type == 'monthly'
+      spent = self.budget[type][Util.get_date_code_month(Date.today)]
+    else
+      spent = self.budget[type][Util.get_date_code_year(Date.today)]
+    end
+    temp = {
+      "spent" => spent.present? ? spent : 0,
+      "budget" => type == 'monthly' ? self.monthly_limit : self.yearly_limit
+    }
+    if temp['budget'].present?
+      temp['percentage'] = (temp['spent']*100/temp['budget']).to_i
+    else
+      temp['percentage'] = 0
+    end
+    temp
+  end
 end

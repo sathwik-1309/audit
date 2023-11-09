@@ -29,15 +29,13 @@ class Account < ApplicationRecord
 
   def add_opening_transaction
     balance = self.balance
-    mop = Mop.create("auto_generated", self, {"auto_generated" => true})
-    self.add_opening_balance(balance, mop, self.opening_date)
+    self.add_opening_balance(balance, self.opening_date)
   end
 
 
 
-  def add_opening_balance(amount, mop, date)
-    transaction = Transaction.account_opening(amount, mop, date, self)
-    # self.update_balance(transaction)
+  def add_opening_balance(amount, date)
+    transaction = Transaction.account_opening(amount, date, self)
     self.update_daily_log(transaction)
   end
 
@@ -76,18 +74,24 @@ class Account < ApplicationRecord
 
   def self.list(user, owed=false)
     array = []
-    accounts = user.accounts.where(creditcard: false, owed: owed)
+    accounts = user.accounts.where(creditcard: false, owed: owed).where.not(name: CASH_ACCOUNT)
     accounts.each do |account|
-      temp = account.attributes
+      temp = account.attributes.slice('id', 'name', 'balance', 'owed')
       if owed
         transactions = account.owed_transactions
       else
-        transactions = account.transactions
+        transactions = account.transactions.where(pseudo: false)
       end
       temp['transactions'] = transactions.order(date: :desc, updated_at: :desc).limit(5).map{|t| t.transaction_box }
+      temp['mops'] = account.mops.map{|mop| mop.attributes.slice('id', 'name')}
       array << temp
     end
     array
+  end
+
+  def is_cash?
+    return true if self.name == CASH_ACCOUNT
+    false
   end
 
   def pie_chart_meta(start_date, end_date)

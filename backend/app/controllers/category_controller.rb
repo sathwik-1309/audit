@@ -6,12 +6,16 @@ class CategoryController < ApplicationController
     arr = []
     categories = @current_user.categories
     categories.each do |category|
-      temp = category.attributes
+      temp = category.attributes.slice('id', 'name', 'color')
       sub_categories = []
       category.sub_categories.each do |sub_category|
-        sub_categories << sub_category.attributes
+        sub_categories << sub_category.attributes.slice('id', 'name', 'color')
       end
       temp['sub_categories'] = sub_categories
+      temp['sub_category_count'] = sub_categories.length
+      temp['monthly'] = category.get_budget('monthly')
+      temp['yearly'] = category.get_budget('yearly')
+      
       arr << temp
     end
     json['categories'] = arr
@@ -26,11 +30,31 @@ class CategoryController < ApplicationController
     end
     attributes = filter_params.slice(:name, :color)
     attributes[:user_id] = @current_user.id
+    if filter_params[:monthly_limit].present?
+      attributes[:monthly_limit] = filter_params[:monthly_limit]
+      attributes[:yearly_limit] = ((filter_params[:monthly_limit].to_f)*12).to_i
+    end
+    attributes[:budget] = BUGDET_INIT
     @category = Category.new(attributes)
     begin
       @category.save!
       msg = @category.attributes
       render_200("Category created", msg)
+    rescue StandardError => ex
+      render_400(ex.message)
+    end
+  end
+
+  def update
+    @category = @current_user.categories.find_by_id(params[:id])
+    if @category.nil?
+      render_404("Category not found") and return
+    end
+    @category.assign_attributes(filter_params)
+    begin
+      @category.save!
+      msg = @category.attributes
+      render_200("Category updated", msg)
     rescue StandardError => ex
       render_400(ex.message)
     end
@@ -53,6 +77,6 @@ class CategoryController < ApplicationController
   private
 
   def filter_params
-    params.permit(:name)
+    params.permit(:name, :monthly_limit, :color, :yearly_limit)
   end
 end

@@ -11,7 +11,11 @@ class SubCategoryController < ApplicationController
     if filter_params[:category_id].present?
       category = @current_user.categories.find_by_id(filter_params[:category_id])
     elsif filter_params[:force]
-      category = Category.new(name: filter_params[:name], user_id: @current_user.id, color: filter_params[:color])
+      category = Category.new(name: filter_params[:name], user_id: @current_user.id, color: filter_params[:color], budget: BUGDET_INIT)
+      if filter_params[:monthly_limit].present?
+        category.monthly_limit = filter_params[:monthly_limit]
+        category.yearly_limit = ((filter_params[:monthly_limit].to_f)*12).to_i
+      end
       begin
         category.save!
       rescue StandardError => ex
@@ -28,6 +32,11 @@ class SubCategoryController < ApplicationController
     attributes = {}
     attributes[:category_id] = category.id
     attributes[:user_id] = @current_user.id
+    if filter_params[:monthly_limit].present?
+      attributes[:monthly_limit] = filter_params[:monthly_limit]
+      attributes[:yearly_limit] = ((filter_params[:monthly_limit].to_f)*12).to_i
+    end
+    attributes[:budget] = BUGDET_INIT
     attributes[:name] = name
     @sub_category = SubCategory.new(attributes)
     begin
@@ -56,6 +65,6 @@ class SubCategoryController < ApplicationController
   private
 
   def filter_params
-    params.permit(:name, :category_id, :force, :color)
+    params.permit(:name, :category_id, :force, :color, :monthly_limit)
   end
 end

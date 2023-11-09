@@ -34,4 +34,12 @@ module Util
   
     return start_date, end_date
   end
+
+  def self.get_date_code_month(date)
+    "#{date.year}_#{date.month}"
+  end
+
+  def self.get_date_code_year(date)
+    "#{date.year}"
+  end
 end

@@ -14,3 +14,6 @@
 ### Postgres
     docker run -e POSTGRES_USER=sathwik -e POSTGRES_PASSWORD=sath139 -p 5432:5432 -d postgres:latest
 
+### Sidekiq
+    bundle exec sidekiq -c 2 -q low
+

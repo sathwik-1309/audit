@@ -57,7 +57,6 @@ Rails.application.routes.draw do
     post '/settled_by_you' => 'transaction#settled_by_you'
     get 'dashboard' => 'transaction#dashboard'
     post '/split' => 'transaction#split'
-    get '/pie' => 'transaction#pie'
   end
 
   scope :sessions do
@@ -67,6 +66,7 @@ Rails.application.routes.draw do
   scope :categories do
     get '/index' => 'category#index'
     post '/create' => 'category#create'
+    put '/:id/update' => 'category#update'
     delete '/:id/delete' => 'category#delete'
   end
 
@@ -83,11 +83,27 @@ Rails.application.routes.draw do
   scope :v1 do
     scope :accounts do
       get '/:id/details' => 'v1/account#details'
+      get '/:id/owed_details' => 'v1/account#owed_details'
+    end
+
+    scope :categories do
+      get '/:id/details' => 'v1/category#details'
+      get '/:id/sub_categories' => 'v1/category#sub_categories'
+    end
+
+    scope :cards do
+      get '/:id/details' => 'v1/card#details'
+      put '/:id/pay_bill' => 'v1/card#pay_bill'
     end
 
     scope :transactions do
       get '' => 'v1/transaction#list'
       get '/analytics' => 'v1/transaction#analytics'
+      get '/pie' => 'v1/transaction#pie'
+    end
+
+    scope :users do
+      get '/home' => 'v1/user#home'
     end
   end
   

@@ -50,20 +50,21 @@ class TransactionController < ApplicationController
   # optional params - date, category, comments, account_id, mop_id
   def debit
     attributes = filter_params.slice(:amount, :comments, :sub_category_id)
+
     if filter_params[:card_id].present?
       @card = @current_user.cards.find_by_id(filter_params[:card_id])
-      mop = @card.mop
-    elsif filter_params[:mop_id].present?
-      mop = @current_user.mops.find_by_id(filter_params[:mop_id])
-    elsif filter_params[:account_id].present?
-      mop = @current_user.mops.where(account_id: filter_params[:account_id]).find{|m| m.is_auto_generated? }
+      account = @card.account
+    elsif filter_params[:cash].present?
+      account = @current_user.cash_account
     else
-      render_202("Either mop_id or account_id must be sent in request") and return
+      account = @current_user.accounts.find_by_id(filter_params[:account_id])
     end
 
-    if mop.nil?
-      render_202("mop_id or account_id is invalid") and return
+    if account.nil?
+      render_202("Account not found")
     end
+
+    mop = @current_user.mops.find_by_id(filter_params[:mop_id]) if filter_params[:mop_id].present?
 
     unless attributes[:sub_category_id].nil?
       attributes[:category_id] = @current_user.sub_categories.find_by_id(filter_params[:sub_category_id]).category_id
@@ -71,8 +72,10 @@ class TransactionController < ApplicationController
 
     attributes[:user_id] = @current_user.id
     attributes[:ttype] = DEBIT
-    attributes[:mop_id] = mop.id
-    attributes[:account_id] = mop.account_id
+    attributes[:mop_id] = mop.id if mop.present?
+    attributes[:account_id] = account.id
+    # attributes[:meta] = meta if meta.present?
+    attributes[:card_id] = @card.id if @card.present?
     attributes[:date] = filter_params[:date].present? ? filter_params[:date] : Date.today
     begin
       @transaction = Transaction.create(attributes)
@@ -96,9 +99,13 @@ class TransactionController < ApplicationController
       render_202("account not found") and return
     end
 
+    if filter_params[:mop_id].present?
+      mop = @current_user.mops.find_by_id(filter_params[:mop_id])
+    end
+
     attributes[:user_id] = @current_user.id
     attributes[:ttype] = CREDIT
-    attributes[:mop_id] = @account.auto_generated_mop.id
+    attributes[:mop_id] = mop.id if mop.present?
     attributes[:account_id] = @account.id
     attributes[:date] = filter_params[:date].present? ? filter_params[:date] : Date.today
 
@@ -123,7 +130,6 @@ class TransactionController < ApplicationController
 
     attributes[:user_id] = @current_user.id
     attributes[:ttype] = PAID_BY_PARTY
-    attributes[:mop_id] = @account.auto_generated_mop.id
     attributes[:account_id] = @account.id
     attributes[:date] = filter_params[:date].present? ? filter_params[:date] : Date.today
     attributes[:party] = @account.id
@@ -151,29 +157,31 @@ class TransactionController < ApplicationController
     end
 
     if filter_params[:card_id].present?
-      mop = @current_user.cards.find_by_id(filter_params[:card_id]).mop
-    elsif filter_params[:mop_id].present?
-      mop = @current_user.mops.find_by_id(filter_params[:mop_id])
-    elsif filter_params[:account_id].present?
-      mop = @current_user.mops.where(account_id: filter_params[:account_id]).find{|m| m.is_auto_generated? }
+      @card = @current_user.cards.find_by_id(filter_params[:card_id])
+      @account = @card.account
     else
-      render_202("Either mop_id or account_id must be sent in request") and return
+      @account = @current_user.accounts.find_by_id(filter_params[:account_id])
     end
 
-    if mop.nil?
-      render_202("mop_id or account_id is invalid") and return
+    if @account.nil?
+      render_202("Account not found")
     end
+
+    mop = @current_user.mops.find_by_id(filter_params[:mop_id]) if filter_params[:mop_id].present?
 
     attributes[:user_id] = @current_user.id
     attributes[:ttype] = PAID_BY_YOU
-    attributes[:mop_id] = mop.id
-    attributes[:account_id] = mop.account_id
+    attributes[:mop_id] = mop.id if mop.present?
+    attributes[:account_id] = @account.id
+    # attributes[:meta] = meta if meta.present?
+    attributes[:card_id] = @card.id if @card.present?
     attributes[:date] = filter_params[:date].present? ? filter_params[:date] : Date.today
     attributes[:party] = @party.id
 
     begin
       @transaction = Transaction.create(attributes)
       @transaction.save!
+      @card.update_outstanding_bill(attributes[:amount]) if !@card.nil? and @card.ctype == CREDITCARD
       msg = @transaction.attributes
       render_200("Paid by you Transaction added", msg) and return
     rescue StandardError => ex
@@ -185,7 +193,12 @@ class TransactionController < ApplicationController
   # date, comments
   def settled_by_party
     attributes = filter_params.slice(:amount, :comments, :account_id)
-    @account = Account.find_by_id(filter_params[:account_id])
+    if filter_params[:cash].present?
+      @account = @current_user.cash_account
+    else
+      @account = @current_user.accounts.find_by_id(filter_params[:account_id])
+    end
+    
     if @account.nil?
       render_202("account not found") and return
     end
@@ -194,9 +207,11 @@ class TransactionController < ApplicationController
       render_202("party not found") and return
     end
 
+    mop = @current_user.mops.find_by_id(filter_params[:mop_id]) if filter_params[:mop_id].present?
+
     attributes[:user_id] = @current_user.id
     attributes[:ttype] = SETTLED_BY_PARTY
-    attributes[:mop_id] = @account.auto_generated_mop.id
+    attributes[:mop_id] = mop.id if mop.present?
     attributes[:account_id] = @account.id
     attributes[:date] = filter_params[:date].present? ? filter_params[:date] : Date.today
     attributes[:party] = @party.id
@@ -216,25 +231,29 @@ class TransactionController < ApplicationController
     if @party.nil?
       render_202("party not found") and return
     end
-    attributes = filter_params.slice(:amount, :comments)
+
     if filter_params[:card_id].present?
-      mop = @current_user.cards.find_by_id(filter_params[:card_id]).mop
-    elsif filter_params[:mop_id].present?
-      mop = @current_user.mops.find_by_id(filter_params[:mop_id])
-    elsif filter_params[:account_id].present?
-      mop = @current_user.mops.where(account_id: filter_params[:account_id]).find{|m| m.is_auto_generated? }
+      @card = @current_user.cards.find_by_id(filter_params[:card_id])
+      @account = @card.account
+    elsif filter_params[:cash].present?
+      account = @current_user.cash_account
     else
-      render_202("Either mop_id or account_id must be sent in request") and return
+      @account = @current_user.accounts.find_by_id(filter_params[:account_id])
     end
 
-    if mop.nil?
-      render_202("mop_id or account_id is invalid") and return
+    if @account.nil?
+      render_202("Account not found")
     end
 
+    mop = @current_user.mops.find_by_id(filter_params[:mop_id]) if filter_params[:mop_id].present?
+
+    attributes = filter_params.slice(:amount, :comments)
     attributes[:user_id] = @current_user.id
     attributes[:ttype] = SETTLED_BY_YOU
-    attributes[:mop_id] = mop.id
-    attributes[:account_id] = mop.account_id
+    attributes[:mop_id] = mop.id if mop.present?
+    attributes[:account_id] = @account.id
+    # attributes[:meta] = meta if meta.present?
+    attributes[:card_id] = @card.id if @card.present?
     attributes[:date] = filter_params[:date].present? ? filter_params[:date] : Date.today
     attributes[:party] = @party.id
 
@@ -251,26 +270,33 @@ class TransactionController < ApplicationController
   # amount, transactions, card_id/account_id/mop_id
   # date, category, comments,
   def split
-    attributes = filter_params.slice(:amount, :comments)
     if filter_params[:card_id].present?
-      mop = @current_user.cards.find_by_id(filter_params[:card_id]).mop
-    elsif filter_params[:mop_id].present?
-      mop = @current_user.mops.find_by_id(filter_params[:mop_id])
-    elsif filter_params[:account_id].present?
-      mop = @current_user.mops.where(account_id: filter_params[:account_id]).find{|m| m.is_auto_generated? }
+      @card = @current_user.cards.find_by_id(filter_params[:card_id])
+      @account = @card.account
+    elsif filter_params[:cash].present?
+      account = @current_user.cash_account
     else
-      render_202("Either mop_id or account_id must be sent in request") and return
+      @account = @current_user.accounts.find_by_id(filter_params[:account_id])
     end
 
-    if mop.nil?
-      render_202("mop_id or account_id is invalid") and return
+    if @account.nil?
+      render_202("Account not found")
     end
 
+    mop = @current_user.mops.find_by_id(filter_params[:mop_id]) if filter_params[:mop_id].present?
+
+    attributes = filter_params.slice(:amount, :comments, :sub_category_id)
     attributes[:user_id] = @current_user.id
-    attributes[:mop_id] = mop.id
-    attributes[:account_id] = mop.account_id
+    attributes[:mop_id] = mop.id if mop.present?
+    attributes[:account_id] = @account.id
+    # attributes[:meta] = meta if meta.present?
     attributes[:ttype] = SPLIT
+    attributes[:card_id] = @card.id if @card.present?
     attributes[:date] = filter_params[:date].present? ? filter_params[:date] : Date.today
+    unless attributes[:sub_category_id].nil?
+      attributes[:category_id] = @current_user.sub_categories.find_by_id(filter_params[:sub_category_id]).category_id
+    end
+    
     tr_array = filter_params[:transactions].map(&:to_h)
     amounts_arr = tr_array.map{|t| t['amount'].to_f}
     if amounts_arr.sum != filter_params[:amount].to_f
@@ -280,6 +306,7 @@ class TransactionController < ApplicationController
     begin
       @transaction = Transaction.create(attributes)
       @transaction.save!
+      @card.update_outstanding_bill(attributes[:amount]) if !@card.nil? and @card.ctype == CREDITCARD
       LazyWorker.perform_async('create_split_transactions', { "transaction_id" => @transaction.id, "tr_array" => tr_array } )
       msg = @transaction.attributes
       render_200("Split transactions will be added", msg) and return
@@ -303,55 +330,10 @@ class TransactionController < ApplicationController
     render(:json => json)
   end
 
-  def pie
-    start_date, end_date = nil, nil
-    if filter_params[:start_date].present?
-      start_date = DateTime.parse(filter_params[:start_date]).strftime("%Y-%m-%d")
-      end_date = DateTime.parse(filter_params[:end_date]).strftime("%Y-%m-%d")
-    elsif filter_params[:month].present?
-      start_date, end_date = Util.month_year_to_start_end_date(filter_params[:month], filter_params[:year])
-    end
-
-    if filter_params[:account_id].present?
-      account = @current_user.accounts.find_by_id(filter_params[:account_id])
-      if account.nil?
-        render_202("Account not found with this ID") and return
-      end
-      transactions = account.transactions.where(ttype: [DEBIT, PAID_BY_PARTY])
-    else
-      transactions = @current_user.transactions.where(ttype: [DEBIT, PAID_BY_PARTY])
-    end
-
-    if start_date.present?
-      transactions = transactions.where("date BETWEEN ? AND ?", start_date, end_date)
-    end
-    
-    json = []
-    dict = {}
-    total_spent = 0
-    transactions.each do|transaction|
-      category = transaction.category
-      name = category.nil? ? "other" : category.name
-      color = category.nil? ? 'gray' : category.color
-      unless dict.has_key? name
-        dict[name] = Util.init_pie_category(name, color)
-      end
-      dict[name]['transactions'] << transaction
-      dict[name]['expenditure'] += transaction.amount
-      total_spent += transaction.amount
-    end
-    i = 0
-    dict.keys.each do|key|
-      dict[key]['percentage'] = (dict[key]['expenditure']*100/total_spent).round(0)
-      i += 1
-    end
-    render(:json => dict.values)
-  end
-
   private
 
   def filter_params
-    params.permit(:account_id, :start_date, :end_date, :year, :month, :mop_id, :amount, :ttype, :date, :party, :meta, :comments, :card_id, :sub_category_id, transactions: [:amount, :user, :party])
+    params.permit(:account_id, :start_date, :end_date, :year, :month, :mop_id, :amount, :ttype, :date, :party, :meta, :comments, :card_id, :sub_category_id, :cash, transactions: [:amount, :user, :party])
   end
 
 end
