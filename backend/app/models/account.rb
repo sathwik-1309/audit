@@ -1,7 +1,6 @@
 class Account < ApplicationRecord
   belongs_to :user
   has_many :transactions
-  has_many :daily_logs
   has_many :cards
   has_many :mops
 
@@ -37,8 +36,6 @@ class Account < ApplicationRecord
 
   def add_opening_balance(amount, mop, date)
     transaction = Transaction.account_opening(amount, mop, date, self)
-    # self.update_balance(transaction)
-    self.update_daily_log(transaction)
   end
 
   def update_balance(transaction)
@@ -46,21 +43,21 @@ class Account < ApplicationRecord
     self.save!
   end
 
-  def update_daily_log(transaction)
-    log = self.daily_logs.find_by(date: transaction.date)
-    if log.nil?
-      meta = {"tr_ids" => []}
-      if self.daily_logs.blank?
-        log = DailyLog.new(opening_balance: 0, closing_balance: 0, account_id: self.id, user_id: transaction.user_id, meta: meta, date: transaction.date, total_transactions: 0)
-        log.save!
-      else
-        opening_balance = self.daily_logs.where("date < ?", transaction.date).order(date: :desc).first&.closing_balance
-        log = DailyLog.new(opening_balance: opening_balance, closing_balance: opening_balance, account_id: self.id, user_id: transaction.user_id, meta: meta, date: transaction.date, total_transactions: 0)
-        log.save!
-      end
-    end
-    log.add_transaction(transaction, self)
-  end
+  # def update_daily_log(transaction)
+  #   log = self.daily_logs.find_by(date: transaction.date)
+  #   if log.nil?
+  #     meta = {"tr_ids" => []}
+  #     if self.daily_logs.blank?
+  #       log = DailyLog.new(opening_balance: 0, closing_balance: 0, account_id: self.id, user_id: transaction.user_id, meta: meta, date: transaction.date, total_transactions: 0)
+  #       log.save!
+  #     else
+  #       opening_balance = self.daily_logs.where("date < ?", transaction.date).order(date: :desc).first&.closing_balance
+  #       log = DailyLog.new(opening_balance: opening_balance, closing_balance: opening_balance, account_id: self.id, user_id: transaction.user_id, meta: meta, date: transaction.date, total_transactions: 0)
+  #       log.save!
+  #     end
+  #   end
+  #   log.add_transaction(transaction, self)
+  # end
 
   def self.create_credit_card_account(name, user)
     attributes = {}

@@ -48,20 +48,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_30_075521) do
     t.index ["user_id"], name: "index_categories_on_user_id"
   end
 
-  create_table "daily_logs", force: :cascade do |t|
-    t.float "opening_balance"
-    t.float "closing_balance"
-    t.date "date"
-    t.integer "total_transactions"
-    t.json "meta"
-    t.bigint "account_id"
-    t.bigint "user_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["account_id"], name: "index_daily_logs_on_account_id"
-    t.index ["user_id"], name: "index_daily_logs_on_user_id"
-  end
-
   create_table "mops", force: :cascade do |t|
     t.string "name", null: false
     t.json "meta", default: {}
@@ -95,6 +81,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_30_075521) do
     t.json "meta", default: {}
     t.string "comments"
     t.integer "sub_category_id"
+    t.integer "t_order", default: 1
     t.bigint "mop_id"
     t.bigint "account_id"
     t.bigint "user_id"

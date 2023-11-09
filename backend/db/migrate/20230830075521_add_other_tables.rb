@@ -30,6 +30,7 @@ class AddOtherTables < ActiveRecord::Migration[7.0]
       t.json :meta, default: {}
       t.string :comments
       t.integer :sub_category_id
+      t.integer :t_order, default: 1
       t.belongs_to :mop
       t.belongs_to :account
       t.belongs_to :user
@@ -43,16 +44,16 @@ class AddOtherTables < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    create_table :daily_logs do |t|
-      t.float :opening_balance
-      t.float :closing_balance
-      t.date :date
-      t.integer :total_transactions
-      t.json :meta
-      t.belongs_to :account
-      t.belongs_to :user
-      t.timestamps
-    end
+    # create_table :daily_logs do |t|
+    #   t.float :opening_balance
+    #   t.float :closing_balance
+    #   t.date :date
+    #   t.integer :total_transactions
+    #   t.json :meta
+    #   t.belongs_to :account
+    #   t.belongs_to :user
+    #   t.timestamps
+    # end
 
     create_table :sub_categories do |t|
       t.string :name, null: false
