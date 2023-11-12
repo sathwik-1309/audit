@@ -36,7 +36,7 @@ class UserController < ApplicationController
       render_202("Email already taken") and return
     end
     @user = User.new(attributes)
-    begin
+    # begin
       @user.save!
       LazyWorker.perform_async("send_welcome_email", {"name" => @user.name, "email"=> @user.email })
       LazyWorker.perform_async("send_admin_new_user_mail", {"name" => @user.name })
@@ -45,9 +45,9 @@ class UserController < ApplicationController
         "email": @user.email,
         "auth_token": @user.authentication_token
       })
-    rescue StandardError => ex
-      render_202(ex.message)
-    end
+    # rescue StandardError => ex
+    #   render_202(ex.message)
+    # end
   end
 
   def update

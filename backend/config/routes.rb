@@ -104,6 +104,8 @@ Rails.application.routes.draw do
 
     scope :users do
       get '/home' => 'v1/user#home'
+      get '/configs' => 'v1/user#configs'
+      put '/update_configs' => 'v1/user#update_configs'
     end
   end
   

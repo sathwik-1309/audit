@@ -3,5 +3,6 @@ FactoryBot.define do
     user
     category
     sequence(:name) { |n| "Sub Category#{n}" }
+    budget {BUGDET_INIT}
   end
 end

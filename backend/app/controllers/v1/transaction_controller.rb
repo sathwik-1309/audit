@@ -7,15 +7,15 @@ class V1::TransactionController < ApplicationController
       if account.nil?
         render_202("Account not found") and return
       end
-      transactions = account.transactions
+      transactions = account.transactions.order(date: :desc, t_order: :desc)
     elsif filter_params[:card_id].present?
-      transactions = @current_user.transactions.where(card_id: filter_params[:card_id])
+      transactions = @current_user.transactions.where(card_id: filter_params[:card_id]).order(date: :desc, updated_at: :desc)
     elsif filter_params[:category_id].present?
-      transactions = @current_user.transactions.where(category_id: filter_params[:category_id])
+      transactions = @current_user.transactions.where(category_id: filter_params[:category_id]).order(date: :desc, updated_at: :desc)
     elsif filter_params[:sub_category_id].present?
-      transactions = @current_user.transactions.where(sub_category_id: filter_params[:sub_category_id])
+      transactions = @current_user.transactions.where(sub_category_id: filter_params[:sub_category_id]).order(date: :desc, updated_at: :desc)
     else
-      transactions = @current_user.transactions
+      transactions = @current_user.transactions.order(date: :desc, updated_at: :desc)
     end
 
     if filter_params[:party].present?
@@ -25,8 +25,7 @@ class V1::TransactionController < ApplicationController
     end
 
     transactions = transactions.where.not(comments: 'account opening transaction')
-    
-
+  
     start_date, end_date = nil, nil
     if filter_params[:start_date].present?
       start_date = DateTime.parse(filter_params[:start_date]).strftime("%Y-%m-%d")
@@ -42,7 +41,7 @@ class V1::TransactionController < ApplicationController
     transactions.each do|transaction|
       arr << transaction.transaction_box
     end
-    render(:json => arr)
+    render(:json => arr.reverse)
   end
 
   def analytics
@@ -154,7 +153,7 @@ class V1::TransactionController < ApplicationController
       transactions.each do|transaction|
         sub_category = transaction.sub_category
         name = sub_category.nil? ? "other" : sub_category.name
-        color = sub_category.category.nil? ? 'gray' : sub_category.category.color
+        color = sub_category.nil? ? "gray" : sub_category.category.color
         unless dict.has_key? name
           dict[name] = Util.init_pie_category(name, color)
         end
@@ -166,7 +165,7 @@ class V1::TransactionController < ApplicationController
       transactions.each do|transaction|
         category = transaction.category
         name = category.nil? ? "other" : category.name
-        color = category.nil? ? 'gray' : category.color
+        color = category.nil? ? "gray" : category.color
         unless dict.has_key? name
           dict[name] = Util.init_pie_category(name, color)
         end
@@ -179,6 +178,7 @@ class V1::TransactionController < ApplicationController
     i = 0
     dict.keys.each do|key|
       dict[key]['percentage'] = (dict[key]['expenditure']*100/total_spent).round(0)
+      dict[key]['formatted_expenditure'] = Util.format_amount(dict[key]['expenditure'], @current_user)
       if sub_cat
         dict[key]['color'] = CATEGORY_COLORS[i]['color']
       end

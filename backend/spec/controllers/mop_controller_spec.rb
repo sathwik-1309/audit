@@ -12,7 +12,7 @@ describe MopController do
     create(:mop, user: @user)
     get :index, params: { unfiltered: true }
     resp = Oj.load(response.body)
-    expect(resp.length).to eq 3
+    expect(resp.length).to eq 2
   end
 
   context 'Mop#create:' do
@@ -50,7 +50,7 @@ describe MopController do
       delete :delete, params: { id: @mop.id }
       validate_response(response, 200, 'Mode of payment deleted')
       get :index, params: { unfiltered: true }
-      expect(Oj.load(response.body).length).to eq 1
+      expect(Oj.load(response.body).length).to eq 0
     end
 
   end

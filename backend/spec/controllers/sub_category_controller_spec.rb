@@ -2,17 +2,17 @@ require 'rails_helper'
 
 describe SubCategoryController do
   before :each do
-    @category = create(:category)
-    @sub_category = create(:sub_category, category: @category, user: @category.user)
+    @category = create(:category, name: 'Movies')
+    @sub_category = create(:sub_category, category: @category, user: @category.user, name: 'Movie1')
     @user = @sub_category.user
     sign_in(@user)
   end
 
   it 'index api should return all sub-categories' do
-    create(:sub_category, user: @user)
+    create(:sub_category, user: @user, category: @category, name: 'Movie2')
     get :index
     resp = Oj.load(response.body)
-    expect(resp.length).to eq 2
+    expect(resp.length).to eq 5
   end
 
   context 'Sub-Category#create:' do
@@ -42,7 +42,10 @@ describe SubCategoryController do
     end
 
     it 'should delete category' do
-      delete :delete, params: { id: @category.id }
+      id = @sub_category.id
+      expect(SubCategory.find_by_id(id).nil?).to eq false
+      delete :delete, params: { id: @sub_category.id }
+      expect(SubCategory.find_by_id(id).nil?).to eq true
       validate_response(response, 200, 'Sub-category deleted')
     end
   end

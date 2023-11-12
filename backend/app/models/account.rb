@@ -6,18 +6,21 @@ class Account < ApplicationRecord
 
   after_create :after_create_action
   after_commit :after_save_action, on: [:create, :update]
-  after_destroy :after_delete_action
+  before_destroy :before_delete_action
 
   def after_save_action
     Websocket.publish(ACCOUNTS_CHANNEL, 'refresh')
   end
 
-  def after_delete_action
+  def before_delete_action
     self.cards.each do |card|
       card.destroy
     end
     self.mops.each do |mop|
       mop.destroy
+    end
+    self.transactions.each do |tr|
+      tr.delete
     end
     Websocket.publish(ACCOUNTS_CHANNEL, 'refresh')
   end
@@ -32,12 +35,13 @@ class Account < ApplicationRecord
   end
 
 
-  def add_opening_balance(amount, mop, date)
-    transaction = Transaction.account_opening(amount, mop, date, self)
+  def add_opening_balance(amount, date)
+    transaction = Transaction.account_opening(amount, date, self)
   end
 
-  def update_balance(transaction)
-    self.balance += transaction.get_difference(self)
+  def update_balance(transaction, action='create')
+    amount = action == 'create' ? transaction.get_difference(self) : - transaction.get_difference(self)
+    self.balance += amount
     self.save!
   end
 
@@ -74,12 +78,13 @@ class Account < ApplicationRecord
     accounts = user.accounts.where(creditcard: false, owed: owed).where.not(name: CASH_ACCOUNT)
     accounts.each do |account|
       temp = account.attributes.slice('id', 'name', 'balance', 'owed')
+      temp['formatted_balance'] = Util.format_amount(account.balance, @current_user)
       if owed
         transactions = account.owed_transactions
       else
         transactions = account.transactions.where(pseudo: false)
       end
-      temp['transactions'] = transactions.order(date: :desc, updated_at: :desc).limit(5).map{|t| t.transaction_box }
+      temp['transactions'] = transactions.order(date: :desc, t_order: :desc).limit(5).map{|t| t.transaction_box }
       temp['mops'] = account.mops.map{|mop| mop.attributes.slice('id', 'name')}
       array << temp
     end
@@ -148,6 +153,14 @@ class Account < ApplicationRecord
     meta_array
   end
 
+  def move_opening_transaction(date, diff_amount)
+    opening_tr = self.transactions.find{|tr| tr.account_opening?}
+    raise StandardError.new("Transaction is not account opening") unless opening_tr.account_opening?
+    opening_bal = opening_tr.amount - diff_amount
+    raise StandardError.new("Unable to delete the account opening transation") unless opening_tr.delete
+    return self.reload.add_opening_balance(opening_bal, date)
+  end
+
   def auto_generated_mop
     self.mops.find{|m| m.is_auto_generated?}
   end
@@ -170,7 +183,11 @@ class Account < ApplicationRecord
         total[DEBIT] += transaction.amount
       end
     end
-    total["net"] = total[CREDIT] - total[DEBIT]
+
+    total["net"] = Util.format_amount(total[CREDIT] - total[DEBIT], self.user)
+    total[CREDIT] = Util.format_amount(total[CREDIT], self.user)
+    total[DEBIT] = Util.format_amount(total[DEBIT], self.user)
+    
     total
   end
 end

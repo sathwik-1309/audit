@@ -5,8 +5,9 @@ class CardController < ApplicationController
     cards = @current_user.cards
     json = { CREDITCARD => [], DEBITCARD => []}
     cards.each do|card|
-      card_json = card.attributes
+      card_json = card.attributes.slice('id', 'name', 'ctype', 'account_id')
       if card.ctype == CREDITCARD
+        card_json['outstanding_bill'] = Util.format_amount(card.outstanding_bill, card.user)
         json[CREDITCARD] << card_json
       else
         card_json['account'] = card.account.name

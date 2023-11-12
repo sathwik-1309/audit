@@ -27,6 +27,8 @@ class AddOtherTables < ActiveRecord::Migration[7.0]
       t.boolean :pseudo, default: false
       t.float :balance_before
       t.float :balance_after
+      t.float :o_balance_before
+      t.float :o_balance_after
       t.json :meta, default: {}
       t.string :comments, default: ""
       t.integer :sub_category_id

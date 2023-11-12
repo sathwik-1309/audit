@@ -7,7 +7,8 @@ class V1::AccountController < ApplicationController
     if account.nil?
       render_202("Account not found") and return
     end
-    json['details'] = account.attributes.slice('id', 'name', 'balance')
+    json['details'] = account.attributes.slice('id', 'name')
+    json['details']['balance'] = Util.format_amount(account.balance, @current_user)
 
     start_date = filter_params[:start_date].present? ? DateTime.parse(filter_params[:start_date]).strftime("%Y-%m-%d") : nil
     end_date = filter_params[:end_date].present? ? DateTime.parse(filter_params[:end_date]).strftime("%Y-%m-%d") : nil
@@ -24,7 +25,8 @@ class V1::AccountController < ApplicationController
     if account.nil?
       render_202("Account not found") and return
     end
-    json['details'] = account.attributes.slice('id', 'name', 'balance')
+    json['details'] = account.attributes.slice('id', 'name')
+    json['details']['balance'] = Util.format_amount(account.balance, @current_user)
     
     render(:json => Oj.dump(json))
   end

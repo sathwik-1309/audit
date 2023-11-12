@@ -1,8 +1,6 @@
 FactoryBot.define do
   factory :transaction do
-    mop
-    account { mop.account }
-    user { mop.user }
+    user { account.user }
     amount { 100 }
     date { Date.today }
     ttype { DEBIT }

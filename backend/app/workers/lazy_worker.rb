@@ -13,10 +13,12 @@ class LazyWorker
 
   def update_subsequent(args)
     transaction = Transaction.find_by_id(args['transaction_id'])
+    return if transaction.account_opening?
+    action = args['action'].present? ? args['action'] : 'create'
     if args['account_id'].present?
-      transaction.update_subsequent(Account.find_by_id(args['account_id']))
+      transaction.update_subsequent(action, Account.find_by_id(args['account_id']))
     else
-      transaction.update_subsequent
+      transaction.update_subsequent(action)
     end
 
   end

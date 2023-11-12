@@ -87,7 +87,7 @@ class TransactionController < ApplicationController
       if ex.message == "Cannot add a transaction in past date of account opening"
         render_202("Cannot add a transaction in past date of account opening")
       else
-        render_400(ex.message, {"error_message" => ex.message}) and return
+        render_202(ex.message, {"error_message" => ex.message}) and return
       end
     end
   end

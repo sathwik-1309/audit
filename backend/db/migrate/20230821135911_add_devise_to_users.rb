@@ -15,6 +15,7 @@ class AddDeviseToUsers < ActiveRecord::Migration[7.0]
       t.datetime :remember_created_at
       t.json :meta, default: {}
       t.string :image_url, default: "empty_user.jpg"
+      t.json :configs, default: {}
 
       ## Trackable
       # t.integer  :sign_in_count, default: 0, null: false

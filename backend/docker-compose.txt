@@ -1,0 +1,47 @@
+version: '3'
+services:
+  rails:
+    image: sathwik139/audit-rails:v2.3
+    command: >
+      /bin/sh -c "rails db:drop && rails db:create && rails db:migrate && puma -C config/puma.rb"
+    environment:
+      RAILS_ENV: production
+      DISABLE_DATABASE_ENVIRONMENT_CHECK: 1
+      REDIS_URL: redis://redis:6379/1
+      HOST_IP: 3.7.59.226
+      GMAIL_EMAIL: 'audit.app.mail@gmail.com'
+      GMAIL_PASSWORD: 'zuka ydyi punm bzyb'
+    depends_on:
+      - redis
+    ports:
+      - "3001:3001"
+  sidekiq:
+    image: sathwik139/audit-rails:v2.3
+    command: bundle exec sidekiq -c 2 -q low
+    environment:
+      RAILS_ENV: production
+      DISABLE_DATABASE_ENVIRONMENT_CHECK: 1
+      REDIS_URL: redis://redis:6379/1
+      HOST_IP: 3.7.59.226
+      GMAIL_EMAIL: 'audit.app.mail@gmail.com'
+      GMAIL_PASSWORD: 'zuka ydyi punm bzyb'
+    depends_on:
+      - redis
+  redis:
+    image: redis:latest
+  react:
+    image: sathwik139/audit-react:v6
+    environment:
+      VITE_HOST: 3.7.59.226
+      VITE_PORT: 4173
+    ports:
+      - "4173:4173"
+  postgres:
+    image: postgres:latest
+    container_name: my-postgres-container
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: audit # Replace with your desired database name
+      POSTGRES_USER: sathwik       # Replace with your desired username
+      POSTGRES_PASSWORD: sath139

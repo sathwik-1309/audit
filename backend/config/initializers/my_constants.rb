@@ -150,6 +150,13 @@ BUGDET_INIT = {
   "monthly" => {},
   "yearly" => {}
 }
+USER_CONFIG_INIT = {
+  "pin" => 0,
+  "lock" => true,
+  "date_format" => 1,
+  "amount_decimal" => true,
+  "amount_commas" => true
+}
 
 #env
 ADMIN_MAIL_ID = 'sathwik1309@gmail.com'

@@ -2,12 +2,24 @@ class Transaction < ApplicationRecord
   belongs_to :user
   belongs_to :account
 
-  before_save :validate_transaction
   after_create :track_modifications
+  before_destroy :before_delete_action
 
 
-  def validate_transaction
-    raise StandardError.new("Cannot add a transaction in past date of account opening") if self.account.opening_date > self.date
+  # def validate_transaction
+  #   raise StandardError.new("Cannot add a transaction in past date of account opening") if self.account.opening_date > self.date
+  # end
+
+  def before_delete_action
+    return if self.account.nil?
+    self.account.update_balance(self, 'delete')
+    LazyWorker.perform_async("update_subsequent", {"transaction_id" => self.id, "action" => "delete"}) unless self.pseudo
+    if [PAID_BY_YOU, SETTLED_BY_PARTY, SETTLED_BY_YOU].include? self.ttype
+      owed_acc = Account.find_by_id(self.party)
+      owed_acc.update_balance(self, 'delete')
+      # LazyWorker.perform_async("update_subsequent", {"transaction_id" => self.id, "account_id"=> owed_acc.id})
+    end
+    self.delete_split_transactions if self.ttype == SPLIT
   end
 
   def card
@@ -20,19 +32,26 @@ class Transaction < ApplicationRecord
     return if self.pseudo
     self.reload.account.update_balance(self)
     # self.account.update_daily_log(self)
-    prev_tr = self.get_previous
-    self.balance_before = prev_tr.balance_after
-    self.balance_after = prev_tr.balance_after + self.get_difference(self.account)
+    if [DEBIT, CREDIT, SPLIT].include? self.ttype
+      balance_before, new_tr = self.get_balance_before
+      self.balance_before = balance_before
+      self.balance_after = balance_before + self.get_difference(self.account)
+    else
+      balance_before, new_tr = self.get_balance_before(Account.find_by_id(self.party))
+      self.o_balance_before = balance_before
+      self.o_balance_after = balance_before + self.get_difference(self.account)
+    end
+    
     self.save!
     if [DEBIT, PAID_BY_PARTY].include? self.ttype
       self.update_budgets
     end
-    LazyWorker.perform_async("update_subsequent", {"transaction_id" => self.id})
+    LazyWorker.perform_async("update_subsequent", {"transaction_id" => self.id}) if new_tr
     if [PAID_BY_YOU, SETTLED_BY_PARTY, SETTLED_BY_YOU].include? self.ttype
       owed_acc = Account.find_by_id(self.party)
       owed_acc.update_balance(self)
       # owed_acc.update_daily_log(self)
-      LazyWorker.perform_async("update_subsequent", {"transaction_id" => self.id, "account_id"=> owed_acc.id})
+      LazyWorker.perform_async("update_subsequent", {"transaction_id" => self.id, "account_id"=> owed_acc.id}) if new_tr
     end
   end
 
@@ -45,8 +64,13 @@ class Transaction < ApplicationRecord
   end
 
   def update_t_order
-    prev_tr = self.get_previous
-    self.t_order = prev_tr.t_order + 1
+    today = self.account.transactions.where(date: self.date)
+    if today.present?
+      t_order = today.order(t_order: :desc).first.t_order + 1
+    else
+      t_order = 1
+    end
+    self.t_order = t_order
     self.save!
   end
 
@@ -67,16 +91,21 @@ class Transaction < ApplicationRecord
 
   end
 
-  def get_subsequent_transactions(account=self.acccount)
+  def get_subsequent_transactions(account=self.account)
     account.transactions.where('date > ? OR (date = ? AND t_order > ?)', self.date, self.date, self.t_order)
   end
 
-  def update_subsequent(account=self.account)
-    amount = self.get_difference(account)
+  def update_subsequent(action, account=self.account)
+    amount = action == 'delete' ? - self.get_difference(account) : self.get_difference(account)
     transactions = self.get_subsequent_transactions(account)
     transactions.each do |transaction|
-      transaction.balance_before += amount
-      transaction.balance_after += amount
+      if [DEBIT, CREDIT, SPLIT].include? transaction.ttype
+        transaction.balance_before += amount
+        transaction.balance_after += amount
+      else
+        transaction.o_balance_before += amount
+        transaction.o_balance_after += amount
+      end
       transaction.save!
     end
   end
@@ -87,12 +116,16 @@ class Transaction < ApplicationRecord
   #   return @transaction
   # end
 
-  def get_previous(account=self.account)
-    arr = account.transactions.where('date < ? OR (date = ? AND t_order < ?)', self.date, self.date, self.t_order).order(date: :desc, t_order: :desc)
+  def get_balance_before(account=self.account)
+    arr = account.transactions.where('date < ? OR (date = ? AND t_order < ?)', self.date, self.date, self.t_order).order([date: :desc, t_order: :desc]).limit(1)
     if arr.present?
       prev_tr = arr.first
-    else 
-      raise StandardError.new("Previous Transaction not found")
+      return prev_tr.balance_after, true
+    else
+      opening_tr = account.move_opening_transaction(self.date, self.get_difference(account))
+      self.t_order = 2
+      self.save!
+      return opening_tr.balance_after, false
     end
   end
 
@@ -122,6 +155,15 @@ class Transaction < ApplicationRecord
     self.save!
   end
 
+  def delete_split_transactions
+    return if self.ttype != SPLIT
+    child_tr_ids = self.meta["child_tr_ids"]
+    child_tr_ids.each do |tr_id|
+      tr = Transaction.find_by_id(tr_id)
+      tr.destroy
+    end
+  end
+
   def add_split_debit(args)
     meta = { "parent_tr_id" => self.id }
     transaction = Transaction.new(amount: args['amount'], ttype: DEBIT, date: self.date, category_id: self.category_id,
@@ -147,11 +189,12 @@ class Transaction < ApplicationRecord
       owed_acc = self.user.accounts.find_by_id(args['party'])
       owed_acc.update_balance(transaction)
       # owed_acc.update_daily_log(transaction)
-      prev_tr = transaction.get_previous(owed_acc)
-      transaction.balance_before = prev_tr.balance_after
-      transaction.balance_after = prev_tr.balance_after + transaction.get_difference(owed_acc)
+      balance_before, new_tr = transaction.get_balance_before(owed_acc)
+      transaction.o_balance_before = balance_before
+      transaction.o_balance_after = balance_before + transaction.get_difference(owed_acc)
       transaction.save!
-      LazyWorker.perform_async("update_subsequent", {"transaction_id" => transaction.id})
+
+      LazyWorker.perform_async("update_subsequent", {"transaction_id" => transaction.id}) if new_tr
       return transaction
     rescue StandardError => ex
       AdminMailer.error_mailer('add_split_paid_by_you', ex.message)
@@ -160,11 +203,25 @@ class Transaction < ApplicationRecord
   end
 
   def transaction_box
-    hash = self.attributes.slice('id', 'amount', 'ttype', 'date', 'party', 'category_id', 'pseudo', 'balance_after', 'balance_before', 'comments')
-    if CREDIT_TRANSACTIONS.include? self.ttype
-      hash['signed_amount'] = "+  ₹ #{self.amount}"
+    hash = self.attributes.slice('id', 'amount', 'ttype', 'party', 'category_id', 'pseudo', 'comments')
+    hash['balance_before'] = Util.format_amount(self.balance_before, self.user)
+    hash['balance_after'] = Util.format_amount(self.balance_after, self.user)
+    hash['o_balance_before'] = Util.format_amount(self.o_balance_before, self.user)
+    hash['o_balance_after'] = Util.format_amount(self.o_balance_after, self.user)
+    formatted_amount = Util.format_amount(self.amount, self.user)
+    # hash['formatted_amount'] = formatted_amount
+    hash['date'] = self.date.strftime("%d-%m-%Y")
+
+    if (self.user.configs['date_format'] == 1)
+      hash['date_text'] = self.date.strftime("%d-%m-%Y")
     else
-      hash['signed_amount'] = "-  ₹ #{self.amount}"
+      hash['date_text'] = self.date.strftime('%d %b %Y')
+    end
+
+    if CREDIT_TRANSACTIONS.include? self.ttype
+      hash['signed_amount'] = "+  ₹ #{formatted_amount}"
+    else
+      hash['signed_amount'] = "-  ₹ #{formatted_amount}"
     end
     hash['payment_symbol'] = self.payment_symbol
     hash['sub_category'] =  self.sub_category.name unless self.sub_category.nil?
@@ -185,7 +242,11 @@ class Transaction < ApplicationRecord
       symbol = 'cash'
       name = CASH_ACCOUNT
     else
-      symbol = 'account'
+      if self.account.owed
+        symbol = 'party'
+      else
+        symbol = 'account'
+      end
       name = self.account.name
     end
     {

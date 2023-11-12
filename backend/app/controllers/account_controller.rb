@@ -2,8 +2,10 @@ class AccountController < ApplicationController
   before_action :check_current_user
 
   def index
-    accounts = Account.list(@current_user)
-    render(:json => accounts)
+    json = {}
+    json['accounts'] = Account.list(@current_user)
+    json['lock'] = @current_user.configs['lock']
+    render(:json => Oj.dump(json))
   end
 
   def index_owed
@@ -82,13 +84,13 @@ class AccountController < ApplicationController
     if @account.nil?
       render_404("Account not found") and return
     end
-    begin
+    # begin
       @account.destroy
       msg = @account.attributes
       render_200("Account deleted", msg)
-    rescue StandardError => ex
-      render_400(ex.message)
-    end
+    # rescue StandardError => ex
+    #   render_202(ex.message)
+    # end
   end
 
   def home

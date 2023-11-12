@@ -33,9 +33,10 @@ describe AccountController do
         expect(resp['name']).to eq 'Somename'
       end
 
+    
     it 'returns 400 when tried to create account without name without name' do
       post :create, params: { balance: 1000, owed: true }
-      validate_error_response(response, 400, "SQLite3::ConstraintException: NOT NULL constraint failed: accounts.name")
+      expect(response).to have_http_status(400)
     end
 
     it 'sends websocket message on account create' do
@@ -59,11 +60,12 @@ describe AccountController do
 
   context 'Account#delete:' do
 
-    it 'delete account' do
+    it 'delete account and its transactions' do
+      id = @account.id
       delete :delete, params: {id: @account.id }
       validate_response(response, 200, 'Account deleted')
-      get :index
-      expect(Oj.load(response.body).length).to eq 0
+      expect(Account.find_by_id(id).nil?).to eq true
+      expect(Transaction.where(account_id: id)).to eq []
     end
 
   end

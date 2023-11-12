@@ -8,6 +8,9 @@ class V1::CategoryController < ApplicationController
       render_202("Category not found") and return
     end
     details = category.attributes.slice('id', 'name', 'color', 'monthly_limit', 'yearly_limit')
+    details['formatted_monthly_limit'] = Util.format_amount(category.monthly_limit, @current_user)
+    details['formatted_yearly_limit'] = Util.format_amount(category.yearly_limit, @current_user)
+    
     details['color'] = CATEGORY_COLORS.select{|color| color['color'] == category.color}.first
     json['details'] = details
     

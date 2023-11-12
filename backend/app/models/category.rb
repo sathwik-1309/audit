@@ -22,7 +22,9 @@ class Category < ApplicationRecord
     end
     temp = {
       "spent" => spent.present? ? spent : 0,
-      "budget" => type == 'monthly' ? self.monthly_limit : self.yearly_limit
+      "formatted_spent" => spent.present? ? Util.format_amount(spent, self.user) : 0,
+      "budget" => type == 'monthly' ? self.monthly_limit : self.yearly_limit,
+      "formatted_budget" => type == 'monthly' ? Util.format_amount(self.monthly_limit, self.user) : Util.format_amount(self.yearly_limit, self.user)
     }
     if temp['budget'].present?
       temp['percentage'] = (temp['spent']*100/temp['budget']).to_i

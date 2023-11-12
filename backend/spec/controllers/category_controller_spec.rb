@@ -16,7 +16,7 @@ describe CategoryController do
 
   context 'Category#create:' do
     it 'should create a new category' do
-      post :create, params: { name: 'category1'}
+      post :create, params: { name: 'category2', color: 'orange'}
       validate_response(response, 200, 'Category created')
       get :index
       resp = Oj.load(response.body)

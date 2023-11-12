@@ -25,13 +25,13 @@ class Mop < ApplicationRecord
     self.name
   end
 
-  # def is_auto_generated?
-  #   return true if self.meta["auto_generated"] and  self.meta["auto_generated"] == true
-  #   return false
-  # end
+  def is_auto_generated?
+    return true if self.meta["auto_generated"] and  self.meta["auto_generated"] == true
+    return false
+  end
 
-  # def is_card?
-  #   return true if self.meta["ctype"] and self.meta["card_id"]
-  #   return false 
-  # end
+  def is_card?
+    return true if self.meta["ctype"] and self.meta["card_id"]
+    return false 
+  end
 end

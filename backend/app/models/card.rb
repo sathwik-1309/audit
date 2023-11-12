@@ -12,6 +12,9 @@ class Card < ApplicationRecord
 
   def after_delete_action
     Websocket.publish(CARDS_CHANNEL, 'refresh')
+    if self.ctype == CREDITCARD
+      self.account.destroy
+    end
   end
 
   def after_save_action
@@ -40,7 +43,7 @@ class Card < ApplicationRecord
     json = {}
     json['details'] = {
       'name' => self.name,
-      'outstanding_bill' => self.outstanding_bill
+      'outstanding_bill' => Util.format_amount(self.outstanding_bill, self.user)
     }
     json
   end

@@ -17,6 +17,8 @@ class User < ApplicationRecord
   after_commit :after_save_action, on: [:create, :update]
 
   def after_create_action
+    self.configs = USER_CONFIG_INIT
+    self.save!
     date = Date.today
     account = Account.new(name: CASH_ACCOUNT, balance: 0, user_id: self.id, opening_date: date)
     account.save!
